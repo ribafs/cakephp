@@ -1,0 +1,144 @@
+=== Projeto de Criação de Plugin para CakePHP 3
+
+Criar conta no GitHub
+Criar repositório na conta do github - cake-control
+
+Criar conta no Packagist
+Criar pacote no Packagist - cake-control
+Ativar atualização automática
+
+Criar código do plugin localmente
+Enviar para o gitHub pelo git
+
+Recursos do Plugin Cake Control
+
+- Controle de acesso (componente Control)
+- Embutir alguns recursos no template do bake:
+	- Bcrypt
+	- Redirecionamento automático para usuários
+	- Busca
+	- Foco automático no primeiro campo do login
+- Editor TinyMCE automaticamente em campos tipo textarea
+- Internacionalização
+- Dois layouts: admin e default
+
+Template Default
+
+Para gerar o código com template default do CakePHP 3:
+
+Editar o AppControl.php e mudar a variável $layout para 'default'
+E executar o bake assim:
+bin/cake bake all groups --force
+
+Template Bootstrap
+
+Para gerar o código com template usando bootstrap:
+
+Editar o AppControl.php e mudar a variável $layout para 'bootstrap'
+E executar o bake assim:
+bin/cake bake all groups --theme CakeControl --force
+
+
+Quando a variável $layout for 'bootstrap', teremos duas opções de layouts, detectados pelo Cake, de acordo com 
+o grupo do usuário logado:
+
+- Users e Managers - default
+- Supers e Admins - admin
+
+Copiar o Layout/default.ctp para admin.ctp e configurar admin.ctp para usar:
+webroot/less/variables_admin.less
+webroot/less/bootstrap_admin.less
+webroot/less/scaffolding_admin.less
+
+== Criar um Aplicativo Demo no ribafs.org
+
+- http://ribafs.org/cakephp3/cake-control-demo
+
+		Português	-	English
+
+- Sem delete (esconder de todos no Tempalte/*Controller/index.ctp)
+- add e edit sem permissão para todos pelo ControlCoponent
+
+
+- docs:
+	- /tips
+	- /dicas
+	- /js
+	- AppControl.php
+	- ControlComponent.php
+	- bootstrap-pt_BR.php
+	- bootstrap_cli.php
+	- cake-control-my.sql
+	- cake-control-pg.sql
+	- business-my.sql
+	- business-pg.sql
+
+business tem as tabelas customers, products, product_items
+
+Usar o generatedata_ribafs (https://github.com/ribafs/generatedata) para gerar massa de dados de teste
+
+topmenu.ctp e topmenu-no.ctp em inglês traduzível com __('Strings')
+
+Refazer ambos os tutoriais: pt e en e recriar em duas etapas:
+	- Na primeira implemtnar apenas a parte administrativa, apenas usando o script cake-control-my ou pg
+	- Na segudna etapa adicionar o script business-my ou pg e implementar
+
+
+=== Implementar Testes
+
+Numa segunda etapa
+
+=== Criando um novo layout, o admin.ctp
+
+Copiar os 3 arquivos existentes para:
+
+De 
+webroot/less/variables.less
+webroot/less/bootstrap.less
+webroot/less/scaffolding.less
+
+para
+
+webroot/less/variables_admin.less
+webroot/less/bootstrap_admin.less
+webroot/less/scaffolding_admin.less
+
+Editar o bootstrap_admin.less e mudar as duas linhas abaixo:
+
+@import "variables_admin.less";
+@import "scaffolding_admin.less";
+
+Editar o variables_admin.less e mudar apenas:
+
+@body-bg:               #efd;
+
+Copiar o src/Template/Layout/default.ctp para admin.ctp
+
+Editar o admin.ctp e alterar apenas a linha:
+            'CakeControl.less/bootstrap_admin.less'
+
+No AppControl.php, adicionar ao final do initialize():
+
+		$layout = 'bootstrap';//Opções: default, e bootstrap
+		$this->set('layout', $layout);
+
+		if($layout == 'bootstrap'){
+			if($loguser == 'user' || $loguser == 'manager'){
+		    	$this->viewBuilder()->layout('CakeControl.default');
+		    }else{
+	    		$this->viewBuilder()->layout('CakeControl.admin');
+		    }
+		}else{
+		    $this->viewBuilder()->layout('default');
+		}
+
+Nas views src/Template/Bake/Template/index.ctp e view.ctp:
+
+if($layout == 'bootstrap'){
+// Código para o template com o bootstrap (do twbs-cake-plugin)
+
+}else{
+// Código para o tempalte Default do CakePHP 3
+
+}
+

@@ -1,0 +1,247 @@
+Segurança
+https://book.cakephp.org/3.0/pt/security.html
+https://book.cakephp.org/3.0/pt/core-libraries/security.html
+https://book.cakephp.org/3.0/pt/controllers/components/csrf.html
+https://book.cakephp.org/3.0/pt/controllers/components/security.html
+
+Segurança
+
+class Cake\Utility\Security
+
+A biblioteca de segurança trabalha com medidas básicas de segurança fornecendo métodos para hash e criptografia de dados.
+Criptografando e Descriptografando Dados
+
+static Cake\Utility\Security::encrypt($text, $key, $hmacSalt = null)
+
+static Cake\Utility\Security::decrypt($cipher, $key, $hmacSalt = null)
+
+Criptografando $text usando AES-256. A $key deve ser um valor com dados variados como uma senha forte. O resultado retornado será o valor criptografado com um HMAC checksum.
+
+Este método irá usar openssl ou mcrypt dependendo de qual deles estiver disponível em seu sistema. Dados criptografados em uma implementação são portáveis para a outra.
+
+A extensão mcrypt foi considerada obsoleta no PHP7.1
+
+Este método nunca deve ser usado para armazenar senhas. Em vez disso, você deve usar o método de hash de mão única fornecidos por Utility\Security::hash(). Um exemplo de uso pode ser:
+
+// Assumindo que $key está gravada em algum lugar, ela pode ser reusada para
+// descriptografar depois.
+$key = 'wt1U5MACWJFTXGenFoZoiLwQGrLgdbHA';
+$result = Security::encrypt($value, $key);
+
+Se você não fornecer um HMAC salt, o valor em Security.salt será usado. Os valores criptografados podem ser descriptografados usando Cake\Utility\Security::decrypt().
+
+Descriptografando um valor criptografado anteriormente. Os parametros $key e $hmacSalt devem corresponder aos valores utilizados para a criptografia senão o processo falhará.
+
+Exemplo:
+
+// Assumindo que $key está gravada em algum lugar, ela pode ser reusada para
+// descriptografar depois.
+$key = 'wt1U5MACWJFTXGenFoZoiLwQGrLgdbHA';
+
+$cipher = $user->secrets;
+$result = Security::decrypt($cipher, $key);
+
+Se o valor não puder ser descriptografado por mudanças em $key ou HMAC salt o método retornará false.
+
+
+
+Cross Site Request Forgery
+
+Ao habilitar o componente CSRF você obtém proteção contra ataques. CSRF ou Cross Site Request Forgery (Falsificação de solicitação entre sites) é uma vulnerabilidade comum nas aplicações web. Esta brecha permite que o atacante capture e responda uma requisição, e as vezes envie dados através de uma requisição usando tags de imagem ou recursos em outros domínios.
+
+O CsrfComponent trabalha setando um cookie no navegador do usuário. Quando os formulários são criados com o Cake\View\Helper\FormHelper, um input hidden é adicionado contendo o token CSRF. Durante o evento Controller.startup, se a requisição for POST, PUT, DELETE ou PATCH o componente irá comparar os dados da requisição e o valor do cookie. Se um deles estiver faltando ou os dois valores forem imcompatíveis o componente lançará um Cake\Network\Exception\InvalidCsrfTokenException.
+
+Você sempre deve verificar o método HTTP que está sendo usado antes de tomar uma ação. Você deve verificar o método HTTP ou usar Cake\Http\ServerRequest::allowMethod() para garantir que o método HTTP correto está sendo usado.
+
+Novo na versão 3.1: O tipo da exceção foi mudado de Cake\Network\Exception\ForbiddenException para Cake\Network\Exception\InvalidCsrfTokenException.
+
+Obsoleto desde a versão 3.5.0: Você deve usar Cross Site Request Forgery (CSRF) Middleware ao invés do CsrfComponent.
+
+
+
+Usando o CsrfComponent
+
+Simplismente adicionando o CsrfComponent ao array de componentes, você pode se beneficiar da proteção contra CSRF fornecida:
+
+public function initialize()
+{
+    parent::initialize();
+    $this->loadComponent('Csrf');
+}
+
+As configurações podem ser passadas ao componente através das configurações de componentes. As configurações disponiveis são:
+
+    cookieName O nome do cookie a ser enviado. O padrão é csrfToken.
+    expiry Quanto tempo o token CSRF deve durar. Padrão para a sessão no navegador. Aceita valores strtotime a partir da versão 3.1
+    secure Se o cookie será ou não setado com a flag de Segurança. Isto é, o cookie só será setado em conexão HTTPS e qualquer tentativa sobre uma conexão HTTP normal irá falhar. O padrão é false.
+    field O nome do campo no formulário a ser checado. O padrão é _csrfToken. Mudar esta opção exigirá também configurações no FormHelper.
+
+Quando habilitado, você pode acessar o CSRF token atual fazendo uma chamada ao objeto:
+
+$token = $this->request->getParam('_csrfToken');
+
+
+
+Integração com o FormHelper
+
+O CsrfComponent integra perfeitamente com o FormHelper. Toda vez que você cria um formulário com o FormHelper, ele irá gerar um input hidden contendo o CSRF token.
+
+Quando usar o CsrfComponent você sempre deverá iniciar seus formulários com o FormHelper. Senão, você precisará criar o input hidden manualmente para cada formulário que fizer.
+
+
+
+Desabilitando o Componente CSRF para Ações Específicas
+
+Embora não recomendado, você pode querer desabilitar o CsrfComponent em certas requisições. Você pode fazer isto usando o event dispatcher do controller, no método beforeFilter():
+
+public function beforeFilter(Event $event)
+{
+    $this->eventManager()->off($this->Csrf);
+}
+
+
+
+Security
+
+class SecurityComponent(ComponentCollection $collection, array $config = [])
+
+The Security Component creates an easy way to integrate tighter security in your application. It provides methods for various tasks like:
+
+    Restricting which HTTP methods your application accepts.
+    Form tampering protection
+    Requiring that SSL be used.
+    Limiting cross controller communication.
+
+Like all components it is configured through several configurable parameters. All of these properties can be set directly or through setter methods of the same name in your controller’s beforeFilter().
+
+By using the Security Component you automatically get form tampering protection. Hidden token fields will automatically be inserted into forms and checked by the Security component.
+
+If you are using Security component’s form protection features and other components that process form data in their startup() callbacks, be sure to place Security Component before those components in your initialize() method.
+
+When using the Security Component you must use the FormHelper to create your forms. In addition, you must not override any of the fields’ “name” attributes. The Security Component looks for certain indicators that are created and managed by the FormHelper (especially those created in View\Helper\FormHelper::create() and View\Helper\FormHelper::end()). Dynamically altering the fields that are submitted in a POST request (e.g. disabling, deleting or creating new fields via JavaScript) is likely to cause the request to be send to the blackhole callback.
+
+You should always verify the HTTP method being used before executing to avoid side-effects. You should check the HTTP method or use Cake\Http\ServerRequest::allowMethod() to ensure the correct HTTP method is used.
+
+
+
+Handling Blackhole Callbacks
+
+SecurityComponent::blackHole(object $controller, string $error = '', SecurityException $exception = null)
+
+If an action is restricted by the Security Component it is ‘black-holed’ as an invalid request which will result in a 400 error by default. You can configure this behavior by setting the blackHoleCallback configuration option to a callback function in the controller.
+
+By configuring a callback method you can customize how the blackhole process works:
+
+public function beforeFilter(Event $event)
+{
+    $this->Security->setConfig('blackHoleCallback', 'blackhole');
+}
+
+public function blackhole($type)
+{
+    // Handle errors.
+}
+
+use $this->Security->config() for CakePHP versions prior to 3.4
+
+The $type parameter can have the following values:
+
+    ‘auth’ Indicates a form validation error, or a controller/action mismatch error.
+    ‘secure’ Indicates an SSL method restriction failure.
+
+New in version cakephp/cakephp: 3.2.6
+
+As of v3.2.6 an additional parameter is included in the blackHole callback, an instance of the Cake\Controller\Exception\SecurityException is included as a second parameter.
+
+
+
+Usage
+
+Using the security component is generally done in the controller’s beforeFilter(). You would specify the security restrictions you want and the Security Component will enforce them on its startup:
+
+namespace App\Controller;
+
+use App\Controller\AppController;
+use Cake\Event\Event;
+
+class WidgetsController extends AppController
+{
+    public function initialize()
+    {
+        parent::initialize();
+        $this->loadComponent('Security');
+    }
+
+    public function beforeFilter(Event $event)
+    {
+        if ($this->request->getParam('admin')) {
+            $this->Security->requireSecure();
+        }
+    }
+}
+
+The above example would force all actions that had admin routing to require secure SSL requests:
+
+namespace App\Controller;
+
+use App\Controller\AppController;
+use Cake\Event\Event;
+
+class WidgetsController extends AppController
+{
+    public function initialize()
+    {
+        parent::initialize();
+        $this->loadComponent('Security', ['blackHoleCallback' => 'forceSSL']);
+    }
+
+    public function beforeFilter(Event $event)
+    {
+        if ($this->request->getParam('admin')) {
+            $this->Security->requireSecure();
+        }
+    }
+
+    public function forceSSL($error = '', SecurityException $exception = null)
+    {
+        if ($exception instanceof SecurityException && $exception->getType() === 'secure') {
+            return $this->redirect('https://' . env('SERVER_NAME') . Router::url($this->request->getRequestTarget()));
+        }
+
+        throw $exception;
+    }
+}
+
+Use $this->request->here() for CakePHP versions prior to 3.4.0
+
+This example would force all actions that had admin routing to require secure SSL requests. When the request is black holed, it will call the nominated forceSSL() callback which will redirect non-secure requests to secure requests automatically.
+
+
+
+Disabling Security Component for Specific Actions
+
+There may be cases where you want to disable all security checks for an action (ex. AJAX requests). You may “unlock” these actions by listing them in $this->Security->unlockedActions in your beforeFilter(). The unlockedActions property will not affect other features of SecurityComponent:
+
+namespace App\Controller;
+
+use App\Controller\AppController;
+use Cake\Event\Event;
+
+class WidgetController extends AppController
+{
+    public function initialize()
+    {
+        parent::initialize();
+        $this->loadComponent('Security');
+    }
+
+    public function beforeFilter(Event $event)
+    {
+         $this->Security->setConfig('unlockedActions', ['edit']);
+    }
+}
+
+Use $this->Security->config() for CakePHP versions prior to 3.4.0
+
+This example would disable all security checks for the edit action.
+

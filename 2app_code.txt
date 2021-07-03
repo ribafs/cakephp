@@ -1,0 +1,184 @@
+Criar um aplicativo para exemplo de interação do codigo do CakePHP entre controllers, models e templates.
+
+Neste aplicativo não usaremos o bake. Todo o código será bem simples mas será criado todo manualmente.
+Criaremos métodos no Modem que interagirão com actions do Controller e este interagirá com as views.
+
+cd /var/www/html
+composer create-project --prefer-dist cakephp/app app_code
+
+Criar um banco no mysql com duas tabelas relacionadas
+
+groups e users
+
+CREATE TABLE groups (
+    id int primary key auto_increment,
+    name character varying(100) NOT NULL,
+    created datetime DEFAULT NULL,
+    modified datetime DEFAULT NULL
+);
+
+INSERT INTO groups VALUES (1, 'Supers', '2016-08-30 21:15:01', '2016-08-30 21:15:01');
+INSERT INTO groups VALUES (2, 'Admins', '2016-08-30 21:15:01', '2016-08-30 21:15:01');
+INSERT INTO groups VALUES (3, 'Managers', '2016-08-30 21:15:01', '2016-08-30 21:15:01');
+INSERT INTO groups VALUES (4, 'Users', '2016-08-30 21:15:01', '2016-08-30 21:15:01');
+
+CREATE TABLE users (
+    id int primary key auto_increment,
+    username character varying(55) UNIQUE NOT NULL,
+    password character varying(255) NOT NULL,
+    group_id integer NOT NULL,
+    created datetime DEFAULT NULL,
+    modified datetime DEFAULT NULL,
+    constraint group_fk foreign key (group_id) references groups(id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+INSERT INTO users VALUES (1, 'super', '$2y$10$xYFpaipCoUJw6LmYr6SuFe/XH3w/GsiTd7DefUf1Ky3CHmkTAMDIe', 1, '2016-09-28 20:41:02', '2016-09-28 20:41:02');
+INSERT INTO users VALUES (2, 'admin', '$2y$10$GYRI2Ze7sRn/65bZDdUYTexEP1bifK2guHqPmCcdAa41MTD6u1gka', 2, '2016-09-28 20:41:12', '2016-09-28 20:41:12');
+INSERT INTO users VALUES (3, 'manager', '$2y$10$Fpv1fmHwJxC10/qIEPCkt.PvwcsJqYL2d4ceBHzyc9C.huSiHygM.', 3, '2016-09-28 20:41:23', '2016-09-28 20:41:23');
+INSERT INTO users VALUES (4, 'user', '$2y$10$.7Nr1.zDhq69axFaPviZauKNl7Gg9pHV3E110H.bx9euPwiJDl3Au', 4, '2016-09-28 20:41:33', '2016-09-28 20:41:33');
+
+
+Configurar o banco no app.php e a rota para apontar para Users e index
+
+Testar
+
+http://localhost/app_code
+
+
+== Criar um novo método com apenas uma mensagem/string
+
+Criar a classe com apenas um método novo no UsersTable.php
+
+<?php
+namespace App\Model\Table;
+
+use Cake\ORM\Query;
+use Cake\ORM\RulesChecker;
+use Cake\ORM\Table;
+use Cake\Validation\Validator;
+
+class UsersTable extends Table
+{
+
+    public function olaModel(){
+        return "Olá model do CakePHP3";
+    }
+
+}
+
+Na classe UsersController.php use
+
+<?php
+namespace App\Controller;
+
+use App\Controller\AppController;
+use Cake\ORM\TableRegistry;
+
+class UsersController extends AppController
+{
+
+	public function ola()
+	{
+		$msg = TableRegistry::get('Users');
+		$ola = $msg->olaModel();
+		$this->set('ola',$ola); 
+	}
+
+}
+
+No Template Users cria o arquivo ola.ctp
+
+src/Template/Users/ola.ctp
+
+Contendo
+
+<h3>Mensagem criada na classe Modem, no método olaModel do Model UsersTable.php e requisitada pelo action ola() do Controller Users e deste enviada para a view ola.ctp em Tempalte/Users</h3>
+<?= $ola ?>
+
+Chamar pelo navegador assim:
+
+http://localhost/app_code/users/ola
+
+
+== Criar um método que pega um registro da tabela users
+
+No UsersTable.php:
+
+Adicione ao início
+    use Cake\ORM\TableRegistry;
+
+	public function umUser()
+	{
+        $users = TableRegistry::get('Users');
+        $query = $users->find();
+        $user=$query->where(['username' => 'super']);
+        return $user;
+	}
+
+No UsersController.php
+
+	public function umUser()
+	{
+		$user = TableRegistry::get('Users');
+		$super = $user->umUser();
+		$this->set('super',$super); 
+	}
+
+No Template/Users criar um_user.ctp contendo:
+
+<h3>Usuário recebido do model através do controller</h3>
+
+<?php
+foreach($super as $campos){
+    print ' ID - '.$campos->id.'<br>';
+    print ' Grupo - '.$campos->group_id.'<br>';
+    print ' Username - '.$campos->username.'<br>';
+}
+
+Testar
+
+http://localhost/app_code/users/um_user
+
+
+O que vem agora:
+
+== Criar um método que pega somente um campo de um registro da tabela users
+
+<h3>Usuário recebido do model através do controller</h3>
+
+<?php
+foreach($super as $campos){
+    print 'Apenas o Username - '.$campos->username;
+}
+
+
+== Criar um método que pega todos os registros da tabela users
+
+Criar action todos() no controller Users:
+
+    public function todos()
+    {
+        $users = $this->paginate($this->Users);
+
+        $this->set(compact('users'));
+    }
+
+Criar uma view chamada todos.ctp assim:
+
+    <table>
+            <tr><td><b>ID</td><td><b>Grupo</td><td><b>Senha</td></tr>
+            <?php foreach ($users as $user): ?>
+            <tr>
+                <td><?= $user->id ?></td>
+                <td><?= h($user->group_id) ?></td>
+                <td><?= h($user->password) ?></td>
+            </tr>
+            <?php endforeach; ?>
+    </table>
+
+Chamar com:
+http://localhost/app_code/users/todos
+
+A seguir criaremos o aplicativo Finanças Pessoais
+
+

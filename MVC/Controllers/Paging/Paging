@@ -1,0 +1,58 @@
+Paginação
+https://book.cakephp.org/3.0/en/controllers/components/pagination.html
+
+Using Controller::paginate()
+
+In the controller, we start by defining the default query conditions pagination will use in the $paginate controller variable. These conditions, serve as the basis for your pagination queries. They are augmented by the sort, direction, limit, and page parameters passed in from the URL. It is important to note that the order key must be defined in an array structure like below:
+
+class ArticlesController extends AppController
+{
+    public $paginate = [
+        'limit' => 25,
+        'order' => [
+            'Articles.title' => 'asc'
+        ]
+    ];
+
+    public function initialize()
+    {
+        parent::initialize();
+        $this->loadComponent('Paginator');
+    }
+}
+
+
+You can also include any of the options supported by ORM\Table::find(), such as fields:
+
+class ArticlesController extends AppController
+{
+    public $paginate = [
+        'fields' => ['Articles.id', 'Articles.created'],
+        'limit' => 25,
+        'order' => [
+            'Articles.title' => 'asc'
+        ]
+    ];
+
+    public function initialize()
+    {
+        parent::initialize();
+        $this->loadComponent('Paginator');
+    }
+}
+
+
+
+Limit the Maximum Number of Rows per Page
+
+The number of results that are fetched per page is exposed to the user as the limit parameter. It is generally undesirable to allow users to fetch all rows in a paginated set. The maxLimit option asserts that no one can set this limit too high from the outside. By default CakePHP limits the maximum number of rows that can be fetched to 100. If this default is not appropriate for your application, you can adjust it as part of the pagination options, for example reducing it to 10:
+
+public $paginate = [
+    // Other keys here.
+    'maxLimit' => 10
+];
+
+If the request’s limit param is greater than this value, it will be reduced to the maxLimit value.
+
+
+

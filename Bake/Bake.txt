@@ -1,0 +1,51 @@
+Available bake commands:
+
+- all
+- behavior
+- cell
+- component
+- controller
+- fixture
+- form
+- helper
+- model
+- plugin
+- shell
+- template
+- test
+
+By using `cake bake [name]` you can invoke a specific bake task.
+
+bin/cake bake controller --help
+
+Geração de todo o código: controllers, models e templates
+bin/cake bake all clientes
+bin/cake bake all users
+
+Apenas controller, model e template
+bin/cake bake controller clientes
+bin/cake bake model clientes
+bin/cake bake template clientes
+
+Plugins
+
+Criar plugin ContactManager com tabela contacts
+
+cd /backup/www/cake/blog
+bin/cake bake plugin ContactManager
+bin/cake bake controller --plugin ContactManager Contacts
+bin/cake bake model --plugin ContactManager Contacts
+bin/cake bake template --plugin ContactManager Contacts
+
+Atualizando
+composer dumpautoload
+
+Componente
+bin/cake bake component Calculo
+
+Migrate
+bin/cake migrations
+bin/cake migrations migrate
+bin/cake migrations status --plugin PluginName
+
+

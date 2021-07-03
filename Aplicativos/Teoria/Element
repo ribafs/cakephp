@@ -1,0 +1,52 @@
+Templates 
+
+Criação de Menu com Element
+
+Este element deve funcionar apenas para aplicativos que aplicaram o plugin Acl e seus usuários chamam-se:
+admin, manager e user. Caso sejam diferentes faça as devidas alterações.
+
+Abrir o AppController.php
+
+Adicionar as linhas seguintes dentro do método initialize()
+
+	$loguser = $this->request->session()->read('Auth.User');	
+	$loguser = $loguser['username'];
+	$this->set('loguser',$loguser);
+
+Criar o arquivo topmenu.ctp contendo:
+
+<?php
+	$loggedno = 'Não Logado';
+	if(!$loguser) $loguser=$loggedno;
+
+	if($loguser == 'admin'){
+		echo $this->Html->link(__('Clientes'), array('plugin'=>null,'controller'=>'Clientes','action'=>'index'));
+		echo '&nbsp;'.$this->Html->link(__('Funcionários'), array('plugin'=>null,'controller'=>'Funcionarios','action'=>'index'));
+		echo '&nbsp;'.$this->Html->link(__('Grupos'), array('plugin'=>null,'controller'=>'Groups','action'=>'index'));
+		echo '&nbsp;'.$this->Html->link(__('Usuários'), array('plugin'=>null,'controller'=>'Users','action'=>'index'));
+		echo '&nbsp;'.$this->Html->link(__('Sair'), array('plugin'=>null,'controller'=>'Users','action'=>'logout'));
+	}elseif($loguser == 'manager'){
+		echo $this->Html->link(__('Clientes'), array('plugin'=>null,'controller'=>'Clientes','action'=>'index'));
+		echo '&nbsp;'.$this->Html->link(__('Funcionários'), array('plugin'=>null,'controller'=>'Funcionarios','action'=>'index'));
+		echo '&nbsp;'.$this->Html->link(__('Sair'), array('plugin'=>null,'controller'=>'Users','action'=>'logout'));
+	}elseif($loguser == 'user'){
+		echo $this->Html->link(__('Clientes'), array('plugin'=>null,'controller'=>'Clientes','action'=>'index'));
+		echo '&nbsp;'.$this->Html->link(__('Sair'), array('plugin'=>null,'controller'=>'Users','action'=>'logout'));
+		/* Modelo
+		echo $this->Html->link(__('Sair'), array('plugin'=>null,'controller'=>'Users','action'=>'logout'),['class' => 'button', 'target' => '_blank']); */
+	}
+	echo '&nbsp;&nbsp;&nbsp;Logado como: '. $loguser; 
+
+Salvar topmenu.ctp em scr/Template/Element
+
+Editar src\Template\Layout\default.ctp
+
+E adicionar a linha seguinte logo após a linha 
+<nav class="top-bar expanded" data-topbar role="navigation">:
+
+<?php echo $this->element('topmenu');?>
+
+Mudar a linha 10 so src\webroot\css\cake.css para
+	color: #ffffff;
+
+

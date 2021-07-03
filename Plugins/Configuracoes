@@ -1,0 +1,24 @@
+Configuração do Plugin
+
+Os métodos load() e loadAll() podem ajudar na configuração do plugin E roteamento. Talvez você queira carregar todos os plugins automaticamente enquanto especifica Rotas personalizadas e arquivos bootstrap para determinados plugins:
+
+// No config/bootstrap.php,
+// ou in Application::bootstrap()
+
+// Usando loadAll()
+Plugin::loadAll([
+    'Blog' => ['routes' => true],
+    'ContactManager' => ['bootstrap' => true],
+    'CakeAclBr' => ['bootstrap' => true],
+    'WebmasterTools' => ['bootstrap' => true, 'routes' => true],
+]);
+
+Ou você pode carregar os plugins individualmente:
+
+// Carregando apenas o blog e inclui rotas
+Plugin::load('Blog', ['routes' => true]);
+
+    // Inclua o arquivo configuration/initializer do bootstrap.
+Plugin::load('CakeAclBr', ['bootstrap' => true]);
+
+

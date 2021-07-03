@@ -1,0 +1,69 @@
+CRUD com PDO e BootStrap
+
+Já estive procurando soluções de CRUD com PDO e Bootstrap para a criação rápida de um aplicativo com apenas uma tabela.
+O título foi apenas para chamar a atenção, pois usarei a solução mais prática e flexível que conheço para a criação de um CRUD, que é o framework CakePHP 3.
+
+Vou criar um CRUD com um banco agenda de telefones, com os seguintes campos:
+banco - agenda
+tabela - amigos
+
+create table amigos(
+    id int primary key auto_increment,
+    nome char(50) not null,
+    email char(50),
+    facebook char(50),
+    fone char(15),
+    site char(50)
+);
+
+Instalar o Cake
+cd /var/www/html
+composer create-project --prefer-dist cakephp/app agenda
+
+Criação do banco
+Configuração do banco no CakePHP.
+config/app.php
+
+Configurar routes
+config/routes.php
+    $routes->connect('/', ['controller' => 'Compromissos', 'action' => 'index']);
+
+Primeira Parte - Somente o Cake
+
+Sem plugin, diretamente alterando o código, partindo do tutorial abaixo:
+https://freshwebdev.com/newbie-tips-use-bootstrap-cakephp.html
+
+Gerar o CRUD
+
+bin/cake bake all amigos
+
+Já pode acessar a agenda
+
+http://localhost/agenda
+
+
+Agora usando um Plugin que implementa Bootstrap
+Encontrei alguns poucos plugins que fazem isso, mas todos que encontrei fazem muita coisa e requerem várias configurações.
+Então decidi criar o meu, aquele que atendesse minhas exigências e que fosse o mais simples possível.
+Fiz um clone do twbs-cake-plugin e removi o less e outras partes e adicionei o Bootstrap, deixando como quero e publiquei.
+Se interessar como fiz isso veja o artigo ... em meu site.
+Isso é um grande mérito do software livre e aberto.
+
+Instalar o plugin twbs-cake-css - https://github.com/ribafs/twbs-cake-css
+composer require ribafs/twbs-cake-css
+
+Habilitar o plugin
+bin/cake plugin load Bootstrap
+
+Habilitar o tema
+
+Adicionar ao src/Controller/appController.php, no método beforeRender():
+    $this->viewBuilder()->theme('Bootstrap');
+
+Gerando novamente o código, sobrescrevendo o existente sem perguntar:
+bin/cake bake all amigos --theme Bootstrap --force
+
+http://localhost/agenda
+
+Veja a diferença. Além de usar o Bootstrap, usa também os Glyphicons.
+

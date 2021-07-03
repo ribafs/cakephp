@@ -1,0 +1,37 @@
+/* Adicionar ao início do webroot/css/cake.css */
+
+/* Adiconei */
+a:hover {
+    color: #000000; /* Remova ou comente o a:hover existente */
+}
+
+.button{
+	font-weight:normal;
+	padding: 4px 8px;
+	background: #dcdcdc;
+	background-image: -moz-linear-gradient(top, #fefefe, #dcdcdc);
+	color:#333;
+	border:1px solid #bbb;
+	border-radius: 4px;
+	text-decoration: none;
+	text-shadow: #fff 0px 1px 0px;
+	min-width: 0;
+	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3), 0px 1px 1px rgba(0, 0, 0, 0.2);
+}
+
+.logado{
+	font-weight:normal;
+	float: right;
+	padding: 4px 8px;
+	background: #dcdcdc;
+	background-image: -moz-linear-gradient(top, #fefefe, #dcdcdc);
+	color:#333;
+	border:1px solid #bbb;
+	border-radius: 4px;
+	text-decoration: none;
+	text-shadow: #fff 0px 1px 0px;
+	min-width: 0;
+	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3), 0px 1px 1px rgba(0, 0, 0, 0.2);
+	display: inline-block;
+}
+/* \Adiconei */

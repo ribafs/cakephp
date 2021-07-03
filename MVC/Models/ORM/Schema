@@ -1,0 +1,60 @@
+https://book.cakephp.org/3.0/pt/orm/schema-system.html
+
+Schema
+
+O CakePHP possui um sistema de schema que é capaz de refletir e gerar informaçes de schema para tabelas em SQL datastores. O sistema de schema pode gerar/refletir schema para qualquer plataforma que o CakePHP suporte.
+
+As partes principais do sistema de schema são Cake\Database\Schema\Collection e Cake\Database\Schema\TableSchema. Essas classes te oferecem acesso a todo o banco de dados e recursos de tabela individual respectivamente.
+
+O uso primário de sistema de schema é para Fixtures. No entanto, isso também ser usado em sua aplicação se requerido.
+Objetos Schema\TableSchema
+
+class Cake\Database\Schema\TableSchema
+
+O subsistema de schema oferece um simples objeto TableSchema para guardar dados sobre uma tabela do banco de dados. Este objeto é retornado pelos recursos de reflexão de schema:
+
+use Cake\Database\Schema\TableSchema;
+
+// Criar uma tabela, uma coluna por vez.
+$schema = new TableSchema('posts');
+$schema->addColumn('id', [
+  'type' => 'integer',
+  'length' => 11,
+  'null' => false,
+  'default' => null,
+])->addColumn('title', [
+  'type' => 'string',
+  'length' => 255,
+  // Cria um campo de tamanho fixo (char field)
+  'fixed' => true
+])->addConstraint('primary', [
+  'type' => 'primary',
+  'columns' => ['id']
+]);
+
+// Classes Schema\TableSchema também podem ser criados com array de dados
+$schema = new TableSchema('posts', $columns);
+
+Objetos Schema\TableSchema permitem você construir apartir de informações sobre schema de tabelas. Isto ajuda a normalizar e validar os dados usados para descrever uma tabela. Por exemplo, as duas formas a seguir são equivalentes:
+
+$schema->addColumn('title', 'string');
+// e
+$schema->addColumn('title', [
+  'type' => 'string'
+]);
+
+Enquanto equivalete, a 2ª forma permite mais detalhes e controle. Isso emula os recursos existentes disponíveis em arquivos de Schema + os schema de fixture em 2.x.
+
+
+$db = ConnectionManager::get('default');
+
+// Criar uma coleção de schema.
+$collection = $db->schemaCollection();
+
+// Obtem os nomes das tabelas.
+$tables = $collection->listTables();
+
+// Obtem uma tabela específica (instância de Schema\TableSchema)
+$tableSchema = $collection->describe('clientes');
+
+debug($tableSchema);

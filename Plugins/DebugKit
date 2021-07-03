@@ -1,0 +1,31 @@
+DebugKit
+https://book.cakephp.org/3.0/pt/debug-kit.html
+
+Debug Kit
+
+DebugKit é um plugin suportado pelo time principal do CakePHP que oferece uma barra de ferramentas para auxiliar na depuração de aplicações do CakePHP.
+
+Já vem instalado por default no CakePHP 3
+
+Para usar clique no botão abaixo e à direita, para ver as opções:
+
+Cache
+Environment
+History
+Include
+Log
+Mail
+Packages
+Request
+Routes
+Session
+Sql
+Log
+Timer
+Variables 
+
+Clique numa opção para ver detalhes
+
+Exemplo: Sql, mostra as consultas que levaram ao que aparece na tela
+
+

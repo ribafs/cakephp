@@ -1,0 +1,16 @@
+Behavior
+
+Eu criei um behavior que salva o ID, a entidade, a ação, as informações antigas, e as informações novas. Junto com a data e quem fez essa alteração.
+
+public function log($user_id, $primary_id, $event_name, $original_data, $new_data)
+{
+    $Log = TableRegistry::get("Log");
+    $log = $Log->newEntity([
+        'user_id' => $user_id,
+        'primary_key' => $primary_id,
+        'event' => $event_name,
+        'original_data' => $original_data,
+        'new_data' => $new_data
+    ]);
+    $Log->save($log);
+}

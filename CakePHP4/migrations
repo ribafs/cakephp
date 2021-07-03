@@ -1,0 +1,11 @@
+composer require cakephp/migrations
+composer require cakephp/migrations "@stable"
+
+
+bin/cake plugin load Migrations
+
+https://github.com/cakephp/migrations
+
+https://book.cakephp.org/migrations/2/en/index.html
+
+https://book.cakephp.org/migrations/3/en/index.html

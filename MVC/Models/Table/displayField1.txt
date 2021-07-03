@@ -1,0 +1,27 @@
+Implementação do displayField()
+
+Tenho duas tabelas relacionadas: users e clientes.
+Clientes tem um campo user_id
+
+Em
+src/Model/Table/UsersTable.php
+
+Mude o displayField para mostrar não o id mas o username
+
+        $this->displayField('username');
+        
+Aproveite e torne requerido o campo user_id em clientes
+
+src/Model/Table/ClientesTable.php
+
+Adicione
+
+        $validator
+            ->notBlank('user_id');
+
+
+No Clientes/index.ctp no valor do user_id:
+
+                <td><?= $cliente->has('user') ? $this->Html->link($cliente->user->id, ['controller' => 'Users', 'action' => 'view', $cliente->user->id]) : '' ?></td>
+
+

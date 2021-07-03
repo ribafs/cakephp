@@ -1,0 +1,313 @@
+Quarto Aplicativo
+
+Agora é a hora de conhecer melhor o CakePHP, conhecer seu código. Vamos começar a criação de um código para controle de acesso. Para isso vamos criar uma função no controller AppController. Este controller fica em:
+src/Controller/AppController.php
+
+Depois de pronto o código que iremos implementar, moveremos para um componente. Mais a frente criaremos um plugin contendo o código das tabelas groups, users e privileges e também o componente e algo mais. Este plugin controlará o acesso ao nosso aplicativo de forma bem flexível. Poderemos definir que ations cada usuários poderá acessar, alterar, criar e excluir.
+
+Criar Aplicativo
+
+Acessar o terminal e criar o aplicativo app4:
+
+Ctrl+Alt+C
+comp app4
+
+Customizar o bake para facilitar a geração de código do controller Users.
+
+Por padrão o bake gera somente os actions e views default, que são: index, edit, add, delete e view. Mas quando for o caso do controller Users precisamos de mais dois actions: login e logout e de uma view login.
+
+Altere o arquivo app3/config/bootstrap_cli.php para que fique assim:
+
+<?php
+use Cake\Core\Configure;
+use Cake\Core\Exception\MissingPluginException;
+use Cake\Core\Plugin;
+// Adicionar os 3 abaixo
+use Cake\Event\Event;
+use Cake\Event\EventManager;
+use Cake\Utility\Hash;
+
+// Set logs to different files so they don't have permission conflicts.
+Configure::write('Log.debug.file', 'cli-debug');
+Configure::write('Log.error.file', 'cli-error');
+
+try {
+    Plugin::load('Bake');
+} catch (MissingPluginException $e) {
+    // Do not halt if the plugin is missing
+}
+// Adicionar daqui pra frente
+EventManager::instance()->on(
+    'Bake.beforeRender.Controller.controller',
+    function (Event $event) {
+        $view = $event->subject();
+        if ($view->viewVars['name'] == 'Users') {
+            // add the login and logout actions to the Users controller
+            $view->viewVars['actions'] = [
+                'login',
+                'logout',
+                'index',
+                'view',
+                'add',
+                'edit',
+                'delete'
+            ];
+        }
+    }
+);
+
+Criando modelo de aplicativo
+
+Também podemos criar um aplicativo com o composer e logo que tenha sido criado copiar seu diretório. Exemplo: criar o app4 e copiar para modelo. A partir de agora iremos copiar o aplicativo modelo para gerar o app5 e seguintes.
+
+Com algum tempo nosso aplicativo pode ficar com o CakePHP desatualizado, então executaremos:
+
+Ctrl+Alt+C
+cd app4
+composer update
+
+Assim o composer atualiza nosso framework para a última versão estável.
+
+Banco de Dados
+
+Criar o banco app4. Importe o script app4.sql.
+
+Usaremos o mesmo banco do app3, com mais a tabela privileges já com alguns registros cadastrados. 
+
+Agora precisamos que cada tabela adicionada, como clientes, funcionarios, produtos ou qualquer outra, contenha o campo user_id por conta do uso do componente Auth, que precisa relacionar as tabelas com users.
+
+Configuração
+
+Configure o app.php para o banco app4 e o routes.php da mesma forma que o app3, sendo Clientes nosso raiz.
+
+Estrutura de diretórios
+
+Para conhecer a estrutura de arquivos e diretórios do CakePHP 3 percorra seu app4. Para saber detalhes sobre a mesma veja:
+http://book.cakephp.org/3.0/en/installation.html 
+
+Implementando a criptografia bcrypt para as senhas dos usuários
+
+Adicionando hash bCrypt para a Senha
+
+Isso é feito no Model, especificamente na classe Entity User.php:
+
+Adicione:
+
+use Cake\Auth\DefaultPasswordHasher;
+
+Ao final da classe adicione a função abaixo:
+
+    protected function _setPassword($password)
+    {
+        return (new DefaultPasswordHasher)->hash($password);
+    }
+
+
+Criar Grupos e Usuários
+
+Vamos criar 3 usuários, um para cada grupo:
+
+Groups	Users		Password
+Admins	admin		admin
+Managers	manager	manager
+Users		user		user
+
+Acesse
+http://localhost/treinamento/app4/groups/add
+
+E cadastro os 3 grupos acima.
+
+Acesse
+http://localhost/treinamento/app4/users/add
+
+E cadastre os 3 usuários acima com as respectivas senhas.
+Após cadastrar os usuários vemos um hash bem grande criado pelo algoritmo do bcrypt.
+É interessante editar as views src/Template/Users/index.ctp, view.ctp e edit.ctp removendo o campo senha do form.
+
+
+Criação de Funções para o Controle de Acesso
+
+Por enquanto, para fazer as coisas mais simples, iremos criar as funções uma de cada vez, para ir testando e depois juntaremos todas em um componente. Aliás, aqui eu já mostro o código todo debugado, com os erros que encontrei corrigidos. A intenção é criar a coisa de forma modular para facilitar.
+
+Depois criaremos o componente e moveremos as 3 funções para ele. Um componente guarda código que colabora com os controllers.
+
+Depois então criaremos um plugin e moveremos o componente, assim como o código
+do groups, users e privileges para o plugin. Um plugin praticamente é um aplicativo que roda dentro do nosso aplicativo, já trazendo controllers, models, templates, configurações, etc.
+
+Iremos criar a função populate() no src/Controller/PrivilegesController.php que cadastrará todos os actions de um grupo para uma tabela. 
+Ela tem como objetivo cadastrar os actions de todos os controllers para os grupos das tabelas que sejam diferentes de users, groups e privileges, para clientes e outras que adicionarmos.
+
+Edite o arquivo:
+src/Controller/PrivilegesController.php
+
+Adicione ao seu início:
+use Cake\Datasource\ConnectionManager;
+use Cake\ORM\TableRegistry;
+
+E adicione o código abaixo:
+
+	public function populate($group, $controller){
+		// Somente se nenhum action tiver sido cadastrado na tabela privileges para o referido grupo
+		$conn = ConnectionManager::get('default');
+		//$tables = $conn->query("show tables");
+
+		$conn->execute("insert into privileges (group_name,controller,action) values ('$group', '$controller', 'index')");
+		$conn->execute("insert into privileges (group_name,controller,action) values ('$group', '$controller', 'view')");
+		$conn->execute("insert into privileges (group_name,controller,action) values ('$group', '$controller', 'add')");
+		$conn->execute("insert into privileges (group_name,controller,action) values ('$group', '$controller', 'edit')");
+		$conn->execute("insert into privileges (group_name,controller,action) values ('$group', '$controller', 'delete')");
+	}
+
+Adicionar as linhas abaixo para o método beforeFilter:
+
+$this->populate('Admins', 'Clientes');
+$this->populate('Managers', 'Clientes');
+Então chame o aplicativo no navegador apenas uma vez e comente as duas linhas acima. Caso execute novamente o aplicativo sem antes comentar as linhas verá erro de violação de integridade.
+
+Este método/função precisa ser chamado para que seja executado, visto que não é um dos métodos nativos do CakePHP.
+
+O beforeFilter() ficará assim:
+
+    public function beforeFilter(\Cake\Event\Event $event) {
+	    parent::beforeFilter($event);
+
+	$this->populate('Admins', 'Clientes');
+	$this->populate('Managers', 'Clientes');
+}
+
+Caso adicionemos uma nova tabela, produtos por exemplo, então adicionamos a tabela, geramos o código para ela e adicionamos a linha:
+
+	$this->populate('Admins', 'Produtos');
+
+Para o beforeFilter() do controller Privileges e executamos apenas uma vez para comentar a linha.
+
+Estou refletindo agora e acho que podemos melhorar esta função populate(), de forma que não precisemos ficar comentando e descomentando. Podemos fazer um select inicialmente na tabela privileges de forma que verifique se o action está cadastrado e somente faça o insert se não existir.
+Vejamos como ficará:
+
+	public function populate($group, $controller){
+		$conn = ConnectionManager::get('default');
+
+		$actions = $conn->execute("SELECT action FROM `privileges` WHERE group_name = '$group' and controller = '$controller' and action='index'")->fetchAll();
+
+		if(!$actions){
+			$conn->execute("insert into privileges (group_name,controller,action) values ('$group', '$controller', 'index')");
+			$conn->execute("insert into privileges (group_name,controller,action) values ('$group', '$controller', 'view')");
+			$conn->execute("insert into privileges (group_name,controller,action) values ('$group', '$controller', 'add')");
+			$conn->execute("insert into privileges (group_name,controller,action) values ('$group', '$controller', 'edit')");
+			$conn->execute("insert into privileges (group_name,controller,action) values ('$group', '$controller', 'delete')");
+		}
+	}
+
+Como está esta função somente irá cadastrar os 5 actions, caso ainda não tenhamos cadastrado nenhum action desse controller.
+Importante:
+
+Lembre de adicionar a linha abaixo ao UsersController.php:
+use Cake\Event\Event;
+
+Função Group
+
+Função que recebe o group_name de privileges, de acordo com o group_id do usuário logado.
+
+Retorna o group_name, se existir
+Ou false se não existir
+
+	public function group_priv($controller,$action,$group){
+		//$controller = $this->request->controller;
+		//$action = $this->request->action;
+
+		$conn = ConnectionManager::get('default');
+		$group = $conn->execute("select group_name from privileges where controller = '$controller' and action ='$action' and group_name='$group'")->fetchAll();
+
+		if($group){
+			$grouppriv = $group[0][0];
+			return $grouppriv;
+		}else{
+			return false;
+		}
+	}
+
+Ela será chamada de beforeFilter() por enquanto:
+
+		// Chamar a função group_priv()
+		if($username == 'admin'){
+			$this->group_priv($controller, $action,'Admins');
+		}elseif($username == 'manager'){
+			$this->group_priv($controller, $action,'Managers');
+		}elseif($username == 'user'){
+			$this->group_priv($controller, $action,'Users');			
+		}
+
+
+
+O beforeFilter() agora deve ficar assim:
+
+    public function beforeFilter(\Cake\Event\Event $event) {
+	    parent::beforeFilter($event);
+
+		$controller = $this->request->controller;
+		$action = $this->request->action;
+		$user = $this->request->session()->read('Auth.User');
+		$username=$user['username'];
+
+		$this->Auth->allow(['view', 'index','edit']);
+
+		if($username == 'admin'){
+			$group='Admins';
+		}elseif($username == 'manager'){
+			$group='Managers';
+		}elseif($username == 'user'){
+			$group='Users';			
+		}
+
+		$denied='Acesso Negado!';
+		$privilege = 'Privilégio não Cadastrado!';
+		if($action != 'login' && $action != 'logout'){
+			if($this->go($controller,$action,$group)==false){	
+				$this->Flash->error(__($denied));
+				// Voltar para onde veio, ou seja, nem sair de onde está
+				return $this->redirect($this->referer());
+				// return $this->redirect(['controller' => 'Users','action' => 'login']);
+				// $this->redirect($this->Auth->logout());							
+			}else{
+				if($this->msg == 'priv'){
+					$this->Flash->set(__($this->privilege));
+				}
+			}
+		}
+	}
+
+E nossa função go() assim:
+
+	public function go($controller,$action,$groupo){
+		$user = $this->request->session()->read('Auth.User');
+		$username=$user['username'];
+		if($username == 'admin'){
+			$groupo='Admins';
+		}elseif($username == 'manager'){
+			$groupo='Managers';
+		}elseif($username == 'user'){
+			$groupo='Users';			
+		}
+
+		$conn = ConnectionManager::get('default');
+		$group = $conn->execute("select group_name from privileges where controller = '$controller' and action ='$action' and group_name='$groupo'")->fetchAll();
+
+		if($group){
+			$group = $group[0][0];
+		}
+
+		if($username == 'admin' && $group=='Admins'){	
+			return true;
+		}elseif($username == 'manager' && $group == 'Managers' && $controller == 'Clientes'){
+			return true;
+		}elseif($username == 'user' && $group == 'Users' && $controller == 'Clientes' && ($action == 'index' || $action == 'view')){
+			return true;
+		}else{
+			return false;
+		}
+	}
+
+Controle de Acesso
+Precisamos lembrar que devemos cadastrar o acesso no controller Privileges e também ajustar o acesso devido no módulo go(). No caso, o usuário user está com acesso somente ao action index e ao view.
+
+

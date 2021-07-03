@@ -1,0 +1,163 @@
+Dicas de CakePHP
+
+action index resumido
+
+public function index()
+{
+	$this->set('posts', $this->paginate($this->Posts));
+}
+
+ou
+$this->set('categories', $this->Despesas->find('all'));
+
+action view
+
+public function view($id = null)
+{
+	$post = $this->Posts->get($id);
+	$this->set('posts', $posts);
+}
+
+action add
+    function add() {
+        if (!empty($this->data)) {
+            if ($this->Category->save($this->data)) {
+                $this->Session->setFlash('Your category has been saved.');
+                $this->redirect(array('action' => 'index'));
+            }
+        }
+    }
+
+Alterar combo na index
+Que mostra id para mostrar o campo nome ou descrição
+No Caso o campo Medico do Casos/index, relacionado com Medicos
+Editar casos/index.ctp (onde era medico->id mudar para mdeico->nome)
+                <td><?= $caso->has('medico') ? $this->Html->link($caso->medico->nome, ['controller' => 'Medicos', 'action' => 'view', $caso->medico->id]) : '' ?></td>
+
+Apenas acessar o RolesTable.php
+e mudar o DisplayField() de id para 'role'.
+
+
+== Criar uma área administrativa
+https://www.youtube.com/watch?v=eWu6r5aO1Jc&index=6&list=PL83b6tjXNFHe-OVRROawG3YdIN_-Kbc6j
+
+Difinir prefixo
+
+config/routes.php
+
+Pouter::prefix('admin', function ($routes) {
+	$routes->fallbacks(DashedRoute::class);
+});
+
+Em controller criar a pasta:
+Admin
+
+Template nova pasta
+Admin
+
+Mover os controllers Roles e Users para a apsta Controller/Admin
+
+Mover também  as respecitivas views/templates (Roles e Users)
+
+Editar os dois controllers de Admin e mudar o namespace adicionando Admin, assim:
+use App\Controller\AppController\Admin;
+
+Para chamar os dois controllers pela url preceda com admin:
+
+http://localhost/logins/admin/users
+
+Para que um controller permita o acesso completo:
+
+use Cake\Event\Event;
+
+public function beforeFilter(Event $event)
+{
+	$this->Auth->allow();
+}
+
+
+Autenticação de e-mail
+https://www.youtube.com/watch?v=cEwf9PpbMcQ
+
+config/app.php
+
+...
+    'EmailTransport' => [
+        'default' => [
+            'className' => 'Mail',
+            // The following keys are used in SMTP transports
+            'host' => 'localhost',
+            'port' => 25,
+            'timeout' => 30,
+            'username' => 'user',
+            'password' => 'secret',
+            'client' => null,
+            'tls' => null,
+            'url' => env('EMAIL_TRANSPORT_DEFAULT_URL', null),
+        ],
+		'gmail' => [
+			'className' => 'Smtp',
+			'host' => 'ssl://smtp.gmail.com',
+			'port' => 465,
+			'timeout' => 30,
+			'username' => 'ribafs@gmail.com',
+			'password' => 'zmxn1029g',
+			'client' => null,
+			'tls' => null,
+			'url' => env('EMAIL_TRANSPORT_DEFAULT_URL', null)
+    ],
+
+Profile
+
+'Email' => [
+        'default' => [
+            'transport' => 'default',
+            'from' => 'you@localhost',
+            //'charset' => 'utf-8',
+            //'headerCharset' => 'utf-8',
+        ],
+		'ribaportal' => [
+			'transport' => 'gmail',
+			'from' => ['ribafs@gmail.com'=>'Portal do RibaFS'],
+		],
+    ],
+
+Criar classe mailler usando o bake
+
+bin/cake bake mailer user
+
+Criar classes no controller e no model
+
+Abrir src/Controller/Mailer/UserMailer.php
+
+Adicionar após a linha 
+static ...
+
+	public function welcome($user)
+	{
+		$this->to($user->email)
+		->profile('ribaportal')
+		->emailFormat('html')
+		->template('welcome_email_template')
+		->layout('default')
+		->viewVars(['nome' => $user->name])
+		->subject(sprintf('Bem vindo, %s', $user->name));
+	}
+
+Criar o template para o e-mail
+
+src/Template/Email/html/welcome_email_template.ctp
+
+<h1>Seja bem-vindo(a), <?php echo $nome;?></h1>
+<p>
+	Apenas um teste de envio de e-mail pelo CakePHP.
+</p>
+
+Para testar criei um novo usuário e veja se ele enviou o e-mail.
+
+
+Recuperação de senha
+
+https://www.youtube.com/watch?v=cEwf9PpbMcQ
+
+

@@ -1,0 +1,71 @@
+Implementação de busca no CakePHP 3
+
+Adaptação de:
+http://www.tayron.com.br/blog/121/criando-um-formulario-de-pesquisa-com-cakephp3
+
+O exemplo aqui apresentado foi com um aplicativo criado através do bake.
+Apenas duas tabelas:
+
+CREATE TABLE IF NOT EXISTS `groups` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(100) NOT NULL,
+  `created` datetime DEFAULT NULL,
+  `modified` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`)
+);
+
+CREATE TABLE IF NOT EXISTS `users` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `username` varchar(255) NOT NULL,
+  `password` char(255) NOT NULL,
+  `group_id` int(11) NOT NULL,
+  `created` datetime DEFAULT NULL,
+  `modified` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `username` (`username`)
+);
+
+Banco - busca
+Diretório - busca
+
+Os dados do formulário deve ser enviado via query string (get).
+E a action do formulário deve sempre apontas para o método index, exemplo: 
+www.site.com.br/users/index.
+
+View Users/index.ctp
+
+Entendido as duas regras acima vamos criar nosso formulário na nossa view
+antes da tag <table>:
+
+<?php
+    echo $this->Form->create(null, ['type' => 'get']);
+	    
+    echo $this->Form->input('search', 
+	['class' => 'form-control', 'label' => false, 
+	'placeholder' => 'Digite o username', 
+	'value' => $this->request->query('search')]);
+	    
+    echo $this->Form->button('Pesquisar');
+    echo $this->Form->end();
+?>
+
+<hr />
+
+Substitua o método index() existente do Controller/UserController.php por:
+
+public function index()
+{
+    $this->paginate = [
+        'contain' => ['Groups'],
+        'conditions' => ['and' => [
+            //'Users.people like' => '%' . $this->request->query('search') . '%',
+            'Users.username like' => '%' . $this->request->query('search') . '%'
+        ]],
+        'order' => ['Users.id' => 'DESC' ]
+    ];
+        
+    $this->set('users', $this->paginate($this->Users));
+    $this->set('_serialize', ['users']);
+}
+
+

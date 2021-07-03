@@ -1,0 +1,168 @@
+Relacionamentos
+https://book.cakephp.org/3.0/pt/orm/associations.html
+
+Dicas Sobre Relacionamentos
+
+Ao implementar o relacionamento entre duas tabelas seguindo as convenções do Cake recebemos vários recursos bem úteis:
+
+- O respectivo código para o relacionamento já será criado no model pelo bake. Caso estejamos criando manualmente o código estará disponível.
+- Campo da tabela relacionada é transformado em uma combo na view. Se seguirmos outra convenção para os nomes dos campos nas tabelas, o campo tabela_id se transforma em title ou name da tabela relacionada.
+
+Exemplo: temos 
+groups (id, name) e 
+users (id, username, password, group_id). 
+Criando o código dos CRUDs para as duas tabelas pelo bake, ao listar users, onde tem group_id aparecerá o name de groups.
+
+Associações - Conectando tabelas
+
+Definindo a relação entre diferentes objectos na sua aplicação deveria ser um processo natural. Por exemplo, um artigo deve ter muitos comentários, e pertencer a um autor. Autores deve ter muitos artigos e logo muitos comentários. O CakePHP torna fácil a gestão das relações entre os modelos. As quatro tipo de associações no CakePHP são: hasOne, hasMany, belongsTo, and belongsToMany.
+
+Relação 	        Tipo de associação 	Exemplo
+
+um para um 	        hasOne 	            Um usuário tem um perfil.
+um para muitos 	    hasMany 	        Um usuário pode ter vários artigos.
+muitos para um 	    belongsTo 	        Muitos artigos pertencem a um usuário.
+muitos para muitos 	belongsToMany 	    Muitas Tags pertencem a muitos artigos.
+
+Associações são definidas durante o método initialize() do objeto da sua tabela. Métodos que fechem com o tipo de associação permitem a você definir as associações da suaaplicação. Por exemplo se nós quisermos definir uma associação do tipo belongsTo em nosso ArticlesTable:
+
+namespace App\Model\Table;
+
+use Cake\ORM\Table;
+
+class ArticlesTable extends Table
+{
+    public function initialize(array $config)
+    {
+        $this->belongsTo('Authors');
+    }
+}
+
+A forma mais simples de definição de qualquer associação é usar o alias do modelo que você quer associar. Por padrão todos os detalhes das associações serão usadas as conveões do CakePHP. Se você quiser customizar a forma como as suas associações são trabalhadas, você pode modificar elas com os setters:
+
+class ArticlesTable extends Table
+{
+    public function initialize(array $config)
+    {
+        $this->belongsTo('Authors', [
+                'className' => 'Publishing.Authors'
+            ])
+            ->setForeignKey('authorid')
+            ->setProperty('person');
+    }
+}
+
+Você pode também usar arrays para customizar suas associações:
+
+$this->belongsTo('Authors', [
+    'className' => 'Publishing.Authors',
+    'foreignKey' => 'authorid',
+    'propertyName' => 'person'
+]);
+
+
+Como você pode ver, por especificar a chave da className , é possível utilizar a mesma tabela em diferentes associações para a mesma tabela. Você até mesmo pode criar uma auto associação da tabela, criando uma estrutura de relação pai-filho:
+
+class CategoriesTable extends Table
+{
+    public function initialize(array $config)
+    {
+        $this->hasMany('SubCategories', [
+            'className' => 'Categories'
+        ]);
+
+        $this->belongsTo('ParentCategories', [
+            'className' => 'Categories'
+        ]);
+    }
+}
+
+
+Você também pode definir associações em massa ao criar uma única chamada, para Table::addAssociations() onde aceita um array contendo o nome das tabelas por associação como um argumento:
+
+class PostsTable extends Table
+{
+    public function initialize(array $config)
+    {
+       $this->addAssociations([
+           'belongsTo' => [
+               'Users' => ['className' => 'App\Model\Table\UsersTable']
+           ],
+           'hasMany' => ['Comments'],
+           'belongsToMany' => ['Tags']
+       ]);
+    }
+}
+
+
+Nós também podemos definir uma relação mais especifica usando os setters:
+
+class AddressesTable extends Table
+{
+    public function initialize(array $config)
+    {
+        // Prior to 3.4 version, use foreignKey() and joinType()
+        $this->belongsTo('Users')
+            ->setForeignKey('user_id')
+            ->setJoinType('INNER');
+    }
+}
+
+
+Chaves possiveis para associações belongsTo arrays inclui:
+
+    className: o nome da classe do modelo que está sendo associado ao modelo atual. Se você está definindo que a relação ‘Profile belongsTo User’, a chave da className deveria ser igual a ‘Users’.
+    foreignKey: o nome da chave estrangeira encontrada na tabela atual. Este é especialmente acessível, se você precisar definir multiplas relações belongsTo ao mesmo modelo. O valor padrão para esta chave é o sublinhado, e nome singular do outro modelo, com o sufixo _id.
+    bindingKey: O nome da coluna da outra tabela, este ser´a usado para o match de foreignKey. Se não especificado, a chave primária (por exemplo o id da tabela Users) será usado.
+    conditions: como um array para o find(), compativel com as condições ou SQL como ['Users.active' => true]
+    joinType: o tipo de join a ser usado na query SQL, por padrão é LEFT aos quais não deve atender as suas necessidades para todas as situações, INNER deve ajudar quando você quiser do seu modelo ou associados ou nenhum deles.
+    propertyName: A propriedade nome deve preenchida com os dados das tabelas associadas e dos resultados. Pos padrão este é o sublinhado e nome singular da associação, então user em nosso exemplo.
+    strategy: Define uma estratégia de query a ser usada. Por padrão o ‘join’. O outro valor valido é ‘select’, aos quais utiliza uma query separada.
+    finder: O método finder é usado quando carregamos registros associados.
+
+Uma vez que esta associação é definida, operações to tipo dina para a tabela Addresses pode conter o registro de User se este existir:
+
+// No controller ou no metodo de table.
+$query = $addresses->find('all')->contain(['Users']);
+foreach ($query as $address) {
+    echo $address->user->username;
+}
+
+Abaixo emite um SQL que é similar a:
+
+SELECT * FROM addresses LEFT JOIN users ON addresses.user_id = users.id;
+
+
+Nós podemos definir uma associação hasMany em noos modelo de Articles seguindo:
+
+class ArticlesTable extends Table
+{
+    public function initialize(array $config)
+    {
+        $this->hasMany('Comments');
+    }
+}
+
+
+Podemos definir a associação belongsToMany em ambos os modelos da seguinte forma:
+
+// In src/Model/Table/ArticlesTable.php
+class ArticlesTable extends Table
+{
+    public function initialize(array $config)
+    {
+        $this->belongsToMany('Tags');
+    }
+}
+
+// In src/Model/Table/TagsTable.php
+class TagsTable extends Table
+{
+    public function initialize(array $config)
+    {
+        $this->belongsToMany('Articles');
+    }
+}
+
+
+

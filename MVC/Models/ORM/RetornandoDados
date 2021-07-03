@@ -1,0 +1,111 @@
+Retornando Dados
+https://book.cakephp.org/3.0/pt/orm/retrieving-data-and-resultsets.html
+
+Num controler
+
+use Cake\ORM\TableRegistry;
+
+$clientes = TableRegistry::get('Clientes');
+
+$query = $clientes->find('all');
+$results = $query->all();
+
+foreach($results as $result){
+debug($result->nome);
+}
+
+
+// No controller
+$query = $clientes->find('all', [
+    'conditions' => ['Clientes.nome >' => 'Ribamar FS2'],
+    'contain' => ['Users'],
+    'limit' => 10
+]);
+
+foreach($query as $q){
+debug($q->nome);
+}
+
+Opções suportadas por find() são:
+
+    - conditions provê acesso direto na cláusula Where.
+    - limit Limite o número de resultados.
+    - offset Uma página que você quer. Use page para cálculo simplificado.
+    - contain defina uma associação para carregar.
+    - fields Quais campos você deseja carregar somente? Quando carregar somente alguns campos o lembre-se dos plugins, callbacks.
+    - group adicione um GROUP BY. muito usado para funçoes agregadas.
+    - having adicionar HVAING.
+    - join Defina um Join específico.
+    - order Ordenar resultados por.
+
+
+Retornar o primeiro
+
+// No controller
+$query = $clientes->find('all', [
+    'order' => ['Clientes.nome' => 'DESC']
+]);
+$row = $query->first();
+
+//Ex: Retorne todos os artigos, mais quero somente o primeiro.
+
+foreach($query as $q){
+debug($q->nome);
+}
+
+
+Contar registros
+
+// No controller ou table.
+$query = $clientes->find('all', [
+    'conditions' => ['Clientes.nome LIKE' => '%Riba%']
+]);
+$number = $query->count();
+print_r($number);
+
+
+$clientes = TableRegistry::get('Clientes');
+
+// Select id & title from articles, but all fields off of Users, Comments and Tags.
+$query = $clientes->find();
+$query->select(['id', 'nome'])
+    ->contain(['Users'])
+    ->enableAutoFields(true)
+    ->contain(['Users' => function($q) {
+        return $q->enableAutoFields(true);
+    }]);
+foreach($query as $q){
+debug($q->nome);
+}
+
+Ordenando
+
+$clientes = TableRegistry::get('Clientes');
+
+$query = $clientes->find();
+$query->contain([
+    'Users' => [
+        'sort' => ['Users.username' => 'DESC']
+    ]
+]);
+
+foreach($query as $q){
+debug($q->nome);
+}
+
+
+Recebendo o primeiro e o último registros
+
+$clientes = TableRegistry::get('Clientes');
+
+$result = $clientes->find('all')->all();
+
+// Get the first and/or last result.
+$fir = $result->first();
+$las = $result->last();
+
+print 'Primeiro registro: '.$fir->nome;
+print '<br>Último registro: '.$las->nome;
+
+
+

@@ -1,0 +1,14 @@
+No topo da view
+
+echo $this->Html->script(array('ajaxupload.3.5.js'));
+
+echo $this->Html>css(array('new_layout.css'));
+
+
+<script type="text/javascript">
+function filldetails()
+{
+    document.getElementById('FirstName').value  = "hjshjsh"; 
+}
+</script>
+echo $this->Form->select('grupos',['onblur' =>grupo());

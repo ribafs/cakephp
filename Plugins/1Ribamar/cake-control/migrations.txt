@@ -1,0 +1,226 @@
+Implementação do plugin Migrations no plugin cake-control
+
+Um forte agradecimento ao generoso Edson Mollericona em seu curso em vídeo aulas
+http://www.edsonmm.com/curso-del-framework-cakephp3/
+
+Criar um novo aplicativo
+
+cd /var/www/html
+com cake-control
+cd cake-control
+composer require ribafs/cake-control
+
+Criar um novo banco cake-control
+Configurar o banco em config/app.php
+
+1) Criar o migration para a tabela groups
+bin/cake bake migration create_groups name:string created modified -p CakeControl
+
+Gerará um diretório vendor/ribafs/cake-control/config/Migrations com um arquivo *_Groups.php
+Edite o arquiuvo gerado em cake-control/vendor/ribafs/cake-control/config/Migrations:
+Apenas altere o limit do campo name para 8 e salve.
+
+
+2) Gerar o esquema da tabela no banco de dados:
+bin/cake migrations migrate -p CakeControl
+
+Já pode verificar a tabela criada no banco.
+
+
+3) Criar o seed (popular registros na tabela groups)
+bin/cake migrations create GroupsSeed -p CakeControl
+
+Editar o arquivo gerado e mudar o método de change para up, assim:
+
+	public function up(){ 
+		  $this->execute('INSERT INTO groups (name, created,  modified) VALUES ("Supers", now(), now())');
+		  $this->execute('INSERT INTO groups (name, created,  modified) VALUES ("Admins", now(), now())');  
+		  $this->execute('INSERT INTO groups (name, created,  modified) VALUES ("Managers", now(), now())');
+		  $this->execute('INSERT INTO groups (name, created,  modified) VALUES ("Users", now(), now())');  
+	}
+
+
+4) Adicionar os registros acima para a tabela groups
+bin/cake migrations migrate -p CakeControl
+
+
+5) Criar o arquivo de migrations da tabela users
+bin/cake bake migration create_users username:string password:string group_id:integer created modified -p CakeControl
+
+Editar o script gerado em vendor/ribafs/cake-control/config/Migrations 
+
+E alterar apenas o limit do campo username para 7, deixar password com 255 e salvar.
+
+
+6) Agora vamos executar o migrations para criar a tabela:
+bin/cake migrations migrate -p CakeControl
+
+7) Criar o seed para popular a tabela suers
+bin/cake migrations create UsersSeed -p CakeControl
+
+Editar o arquivo gerado e substituir por este código abaixo:
+
+<?php
+
+use Phinx\Migration\AbstractMigration;
+use Cake\Auth\DefaultPasswordHasher;
+
+class UsersSeed extends AbstractMigration
+{
+    /**
+     * Change Method.
+     *
+     * Write your reversible migrations using this method.
+     *
+     * More information on writing migrations is available here:
+     * http://docs.phinx.org/en/latest/migrations.html#the-abstractmigration-class
+     *
+     * The following commands can be used in this method and Phinx will
+     * automatically reverse them when rolling back:
+     *
+     *    createTable
+     *    renameTable
+     *    addColumn
+     *    renameColumn
+     *    addIndex
+     *    addForeignKey
+     *
+     * Remember to call "create()" or "update()" and NOT "save()" when working
+     * with the Table class.
+     */
+    public function up()
+    {
+		$faker = \Faker\Factory::create();
+		$populator = new Faker\ORM\CakePHP\Populator($faker);
+		
+		$populator->addEntity('Users', 1, [
+			'username' => 'super',	
+			'group_id' => 1,				
+			'password' => function (){
+				$hasher = new DefaultPasswordHasher();
+				return $hasher->hash('super');
+			},
+			'created' => function() use ($faker) {
+				return $faker->dateTimeBetween($startDate = 'now', $endDate = 'now');
+			},
+			'modified' => function() use ($faker) {
+				return $faker->dateTimeBetween($startDate = 'now', $endDate = 'now');
+			}
+		]);
+		$populator->execute();
+				
+		$populator->addEntity('Users', 1, [
+			'username' => 'admin',	
+			'group_id' => 2,							
+			'password' => function (){
+				$hasher = new DefaultPasswordHasher();
+				return $hasher->hash('admin');
+			},
+			'created' => function() use ($faker) {
+				return $faker->dateTimeBetween($startDate = 'now', $endDate = 'now');
+			},
+			'modified' => function() use ($faker) {
+				return $faker->dateTimeBetween($startDate = 'now', $endDate = 'now');
+			}
+		]);		
+		$populator->execute();
+				
+		$populator->addEntity('Users', 1, [
+			'username' => 'manager',	
+			'group_id' => 3,							
+			'password' => function (){
+				$hasher = new DefaultPasswordHasher();
+				return $hasher->hash('manager');
+			},
+			'created' => function() use ($faker) {
+				return $faker->dateTimeBetween($startDate = 'now', $endDate = 'now');
+			},
+			'modified' => function() use ($faker) {
+				return $faker->dateTimeBetween($startDate = 'now', $endDate = 'now');
+			}
+		]);				
+		$populator->execute();
+				
+		$populator->addEntity('Users', 1, [
+			'username' => 'user',	
+			'group_id' => 4,							
+			'password' => function (){
+				$hasher = new DefaultPasswordHasher();
+				return $hasher->hash('user');
+			},
+			'created' => function() use ($faker) {
+				return $faker->dateTimeBetween($startDate = 'now', $endDate = 'now');
+			},
+			'modified' => function() use ($faker) {
+				return $faker->dateTimeBetween($startDate = 'now', $endDate = 'now');
+			}
+		]);				
+		$populator->execute();
+    }
+}
+Os registros, 4 usuários, serão criados quando acessarmos o aplicativo pela primeira vez.
+
+
+7) Gerar o arquivo de migrations para a tabela permissions
+bin/cake bake migration create_permissions group_id:integer controller:string action:string created modified -p CakeControl
+
+Editar o arquico gerado e alterar o tamanho do campo controller para 15 e do action para 10.
+
+8) Gerando a tabela permissions:
+bin/cake migrations migrate -p CakeControl
+
+Não criar seed para a permissions, pois as permissões serão geradas pelo componente no aplicativo
+
+
+9) Gerar migrations para customers
+bin/cake bake migration create_customers name:string birthday:date phone:string user_id:integer observation:text created modified -p CakeControl
+
+Editar o arquico gerado e alterar o tamanho dos campos name para 50 e phone para 12.
+
+10) Gerando a tabela:
+bin/cake migrations migrate -p CakeControl
+
+
+11) Criar o seed para customers
+bin/cake migrations create CustomersSeed -p CakeControl
+
+Editar o arquivo gerado e mudar o método de change para up e gerar 100 registros assim:
+
+    public function up()
+    {
+		$faker = \Faker\Factory::create();
+		$populator = new Faker\ORM\CakePHP\Populator($faker);
+
+		$populator->addEntity('Customers', 100, [
+			'name'=> function() use ($faker) {
+				return $faker->name();
+			},
+			'birthday'=>function() use ($faker) {
+				return $faker->dateTimeBetween($startDate = 'now', $endDate = 'now');
+			},						
+			'phone'=> function() use ($faker) {
+				return $faker->phoneNumber();
+			},		
+			'user_id'=>function() use ($faker) {
+				return $faker->numberBetween($min = 1, $max = 4);
+			},													
+			'observation'=>function() use ($faker) {
+				return $faker->realText($faker->numberBetween(10,100));
+			},			
+			'created' => function() use ($faker) {
+				return $faker->dateTimeBetween($startDate = 'now', $endDate = 'now');
+			},
+			'modified' => function() use ($faker) {
+				return $faker->dateTimeBetween($startDate = 'now', $endDate = 'now');
+			}
+		]);
+		$populator->execute();
+	}
+
+
+12) Adicionar os registros para a tabela
+bin/cake migrations migrate -p CakeControl
+
+De forma semelhante podemos adicionar migrations para qualquer outra tabela.
+
+

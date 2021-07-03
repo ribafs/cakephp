@@ -1,0 +1,134 @@
+Plugins no CakePHP 3
+
+Antes de tentar usar ou extender o bake, tenha certeza que ele está instalado em sua aplicação. O bake é distribuído como um plugin que você pode instalar com o Composer:
+composer require --dev cakephp/bake:~1.0
+
+Formas Manuais de carregar um plugin:
+
+Adicionar ao config/bootstrap.php uma das formas abaixo:
+
+// In config/bootstrap.php
+// Loads a single plugin
+Plugin::load('ContactManager');
+
+// Loads a plugin with a vendor namespace at top level.
+Plugin::load('AcmeCorp/ContactManager');
+
+// Loads all plugins at once
+Plugin::loadAll();
+
+Carregar pela console:
+bin/cake plugin load NomePlugin
+
+Executar depois:
+composer dumpautoload
+
+Caso não consiga usar composer, altere a linha do bootstrap assim:
+Plugin::load('NomePlugin', ['autoload' => true]);
+
+Inserindo
+public $helpers = ['NomePlugin.ContactInfo'];
+
+Usando
+echo $this->ContactInfo->address($contact);
+
+Criação do Plugin
+
+Estrutura de diretórios de um plugin:
+/src
+/plugins
+    /ContactManager
+        /config
+        /src
+            /Controller
+                /Component
+            /Model
+                /Table
+                /Entity
+                /Behavior
+            /View
+                /Helper
+            /Template
+                /Layout
+        /tests
+            /TestCase
+            /Fixture
+        /webroot
+
+O nome do plugin deve ser o mesmo da pasta: ContactManager.
+
+Criar plugin usando o bake:
+
+O banco precisa ter uma tabela chamada Contacts
+
+cd /backup/www/cake/blog
+bin/cake bake plugin ContactManager
+bin/cake bake controller --plugin ContactManager Contacts
+bin/cake bake model --plugin ContactManager Contacts
+bin/cake bake template --plugin ContactManager Contacts
+
+Atualizar:
+composer dumpautoload
+
+Se acessarmos agora:
+http://localhost/cake/blog/contact-manager/
+
+Acusará a falta da view.
+
+Detalhes sobre Model ver http://book.cakephp.org/3.0/en/plugins.html
+
+View
+Funcionam da mesma forma que na aplicação
+
+Vamos criar a pasta Template com Contacts e a view index.ctp
+
+Criar plugins/ContactManager/src/Template/Contacts/index.ctp:
+<h1>Contacts</h1>
+<p>Following is a sortable list of your contacts</p>
+<!-- A sortable list of contacts would go here....-->
+
+Testar novamente:
+http://localhost/cake/blog/contact-manager/contacts
+
+Plugins can provide their own layouts. To add plugin layouts, place your template files inside plugins/[PluginName]/src/Template/Layout. To use a plugin layout in your controller you can do the following:
+
+public $layout = 'ContactManager.admin';
+
+
+Components
+
+// Component defined in 'ContactManager' plugin
+namespace ContactManager\Controller\Component;
+
+use Cake\Controller\Component;
+
+class ExampleComponent extends Component
+{
+}
+
+// Within your controllers
+public function initialize()
+{
+    parent::initialize();
+    $this->loadComponent('ContactManager.Example');
+}
+
+Depois de criar uma tabela qualquer com nome contacts e chamar:
+http://localhost/cake/blog/contact-manager/contacts
+
+Funcionou, mostrando:
+Contacts
+
+Following is a sortable list of your contacts
+
+É importante perceber que existem alterações criadas pelo bake que não percebo, portanto não consegui usar o plugin criado em outro app,
+mesmo ajustando o bootstrap.php.
+Agora é adaptar para criar algo útil.
+
+
+Criei um outro plugin chamado Agenda com a tabela contatos:
+Contendo apenas o controller AgendaController e a view Template/Contatos/index.ctp
+
+http://localhost/cake/blog_ribafs/agenda/contatos
+
+

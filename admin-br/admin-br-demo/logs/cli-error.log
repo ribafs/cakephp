@@ -1,0 +1,247 @@
+2021-05-14 20:37:59 Error: [Cake\Database\Exception] SQLSTATE[42S02]: Base table or view not found: 1146 Table 'medbra_db.documentos' doesn't exist in /backup/www/medbra/vendor/cakephp/cakephp/src/Database/Schema/Collection.php on line 132
+Stack Trace:
+#0 /backup/www/medbra/vendor/cakephp/cakephp/src/Database/Schema/Collection.php(98): Cake\Database\Schema\Collection->_reflect()
+#1 /backup/www/medbra/vendor/cakephp/cakephp/src/Database/Schema/CachedCollection.php(61): Cake\Database\Schema\Collection->describe()
+#2 /backup/www/medbra/vendor/cakephp/cakephp/src/ORM/Table.php(566): Cake\Database\Schema\CachedCollection->describe()
+#3 /backup/www/medbra/vendor/cakephp/cakephp/src/ORM/Table.php(691): Cake\ORM\Table->getSchema()
+#4 /backup/www/medbra/vendor/cakephp/bake/src/Shell/Task/ModelTask.php(221): Cake\ORM\Table->getPrimaryKey()
+#5 /backup/www/medbra/vendor/cakephp/bake/src/Shell/Task/ModelTask.php(131): Bake\Shell\Task\ModelTask->getAssociations()
+#6 /backup/www/medbra/vendor/cakephp/bake/src/Shell/Task/ModelTask.php(114): Bake\Shell\Task\ModelTask->getTableContext()
+#7 /backup/www/medbra/vendor/cakephp/bake/src/Shell/Task/ModelTask.php(101): Bake\Shell\Task\ModelTask->bake()
+#8 /backup/www/medbra/vendor/cakephp/bake/src/Shell/BakeShell.php(282): Bake\Shell\Task\ModelTask->main()
+#9 /backup/www/medbra/vendor/cakephp/cakephp/src/Collection/CollectionTrait.php(64): Bake\Shell\BakeShell->Bake\Shell\{closure}()
+#10 /backup/www/medbra/vendor/cakephp/bake/src/Shell/BakeShell.php(283): Cake\Collection\Collection->each()
+#11 /backup/www/medbra/vendor/cakephp/cakephp/src/Console/Shell.php(517): Bake\Shell\BakeShell->all()
+#12 /backup/www/medbra/vendor/cakephp/cakephp/src/Console/CommandRunner.php(384): Cake\Console\Shell->runCommand()
+#13 /backup/www/medbra/vendor/cakephp/cakephp/src/Console/CommandRunner.php(162): Cake\Console\CommandRunner->runShell()
+#14 /backup/www/medbra/bin/cake.php(12): Cake\Console\CommandRunner->run()
+#15 {main}
+
+
+Caused by: [PDOException] SQLSTATE[42S02]: Base table or view not found: 1146 Table 'medbra_db.documentos' doesn't exist in /backup/www/medbra/vendor/cakephp/cakephp/src/Database/Statement/MysqlStatement.php on line 37
+Stack Trace:
+#0 /backup/www/medbra/vendor/cakephp/cakephp/src/Database/Statement/MysqlStatement.php(37): PDOStatement->execute()
+#1 /backup/www/medbra/vendor/cakephp/cakephp/src/Database/Statement/StatementDecorator.php(173): Cake\Database\Statement\MysqlStatement->execute()
+#2 /backup/www/medbra/vendor/cakephp/cakephp/src/Database/Log/LoggingStatement.php(55): Cake\Database\Statement\StatementDecorator->execute()
+#3 /backup/www/medbra/vendor/cakephp/cakephp/src/Database/Connection.php(358): Cake\Database\Log\LoggingStatement->execute()
+#4 /backup/www/medbra/vendor/cakephp/cakephp/src/Core/Retry/CommandRetry.php(67): Cake\Database\Connection->Cake\Database\{closure}()
+#5 /backup/www/medbra/vendor/cakephp/cakephp/src/Database/Connection.php(361): Cake\Core\Retry\CommandRetry->run()
+#6 /backup/www/medbra/vendor/cakephp/cakephp/src/Database/Connection.php(310): Cake\Database\Connection->query()
+#7 /backup/www/medbra/vendor/cakephp/cakephp/src/Core/Retry/CommandRetry.php(67): Cake\Database\Connection->Cake\Database\{closure}()
+#8 /backup/www/medbra/vendor/cakephp/cakephp/src/Database/Connection.php(314): Cake\Core\Retry\CommandRetry->run()
+#9 /backup/www/medbra/vendor/cakephp/cakephp/src/Database/Schema/Collection.php(130): Cake\Database\Connection->execute()
+#10 /backup/www/medbra/vendor/cakephp/cakephp/src/Database/Schema/Collection.php(98): Cake\Database\Schema\Collection->_reflect()
+#11 /backup/www/medbra/vendor/cakephp/cakephp/src/Database/Schema/CachedCollection.php(61): Cake\Database\Schema\Collection->describe()
+#12 /backup/www/medbra/vendor/cakephp/cakephp/src/ORM/Table.php(566): Cake\Database\Schema\CachedCollection->describe()
+#13 /backup/www/medbra/vendor/cakephp/cakephp/src/ORM/Table.php(691): Cake\ORM\Table->getSchema()
+#14 /backup/www/medbra/vendor/cakephp/bake/src/Shell/Task/ModelTask.php(221): Cake\ORM\Table->getPrimaryKey()
+#15 /backup/www/medbra/vendor/cakephp/bake/src/Shell/Task/ModelTask.php(131): Bake\Shell\Task\ModelTask->getAssociations()
+#16 /backup/www/medbra/vendor/cakephp/bake/src/Shell/Task/ModelTask.php(114): Bake\Shell\Task\ModelTask->getTableContext()
+#17 /backup/www/medbra/vendor/cakephp/bake/src/Shell/Task/ModelTask.php(101): Bake\Shell\Task\ModelTask->bake()
+#18 /backup/www/medbra/vendor/cakephp/bake/src/Shell/BakeShell.php(282): Bake\Shell\Task\ModelTask->main()
+#19 /backup/www/medbra/vendor/cakephp/cakephp/src/Collection/CollectionTrait.php(64): Bake\Shell\BakeShell->Bake\Shell\{closure}()
+#20 /backup/www/medbra/vendor/cakephp/bake/src/Shell/BakeShell.php(283): Cake\Collection\Collection->each()
+#21 /backup/www/medbra/vendor/cakephp/cakephp/src/Console/Shell.php(517): Bake\Shell\BakeShell->all()
+#22 /backup/www/medbra/vendor/cakephp/cakephp/src/Console/CommandRunner.php(384): Cake\Console\Shell->runCommand()
+#23 /backup/www/medbra/vendor/cakephp/cakephp/src/Console/CommandRunner.php(162): Cake\Console\CommandRunner->runShell()
+#24 /backup/www/medbra/bin/cake.php(12): Cake\Console\CommandRunner->run()
+#25 {main}
+
+
+2021-05-14 20:38:00 Error: [Cake\Database\Exception] SQLSTATE[42S02]: Base table or view not found: 1146 Table 'medbra_db.especialidades' doesn't exist in /backup/www/medbra/vendor/cakephp/cakephp/src/Database/Schema/Collection.php on line 132
+Stack Trace:
+#0 /backup/www/medbra/vendor/cakephp/cakephp/src/Database/Schema/Collection.php(98): Cake\Database\Schema\Collection->_reflect()
+#1 /backup/www/medbra/vendor/cakephp/cakephp/src/Database/Schema/CachedCollection.php(61): Cake\Database\Schema\Collection->describe()
+#2 /backup/www/medbra/vendor/cakephp/cakephp/src/ORM/Table.php(566): Cake\Database\Schema\CachedCollection->describe()
+#3 /backup/www/medbra/vendor/cakephp/cakephp/src/ORM/Table.php(691): Cake\ORM\Table->getSchema()
+#4 /backup/www/medbra/vendor/cakephp/bake/src/Shell/Task/ModelTask.php(221): Cake\ORM\Table->getPrimaryKey()
+#5 /backup/www/medbra/vendor/cakephp/bake/src/Shell/Task/ModelTask.php(131): Bake\Shell\Task\ModelTask->getAssociations()
+#6 /backup/www/medbra/vendor/cakephp/bake/src/Shell/Task/ModelTask.php(114): Bake\Shell\Task\ModelTask->getTableContext()
+#7 /backup/www/medbra/vendor/cakephp/bake/src/Shell/Task/ModelTask.php(101): Bake\Shell\Task\ModelTask->bake()
+#8 /backup/www/medbra/vendor/cakephp/bake/src/Shell/BakeShell.php(282): Bake\Shell\Task\ModelTask->main()
+#9 /backup/www/medbra/vendor/cakephp/cakephp/src/Collection/CollectionTrait.php(64): Bake\Shell\BakeShell->Bake\Shell\{closure}()
+#10 /backup/www/medbra/vendor/cakephp/bake/src/Shell/BakeShell.php(283): Cake\Collection\Collection->each()
+#11 /backup/www/medbra/vendor/cakephp/cakephp/src/Console/Shell.php(517): Bake\Shell\BakeShell->all()
+#12 /backup/www/medbra/vendor/cakephp/cakephp/src/Console/CommandRunner.php(384): Cake\Console\Shell->runCommand()
+#13 /backup/www/medbra/vendor/cakephp/cakephp/src/Console/CommandRunner.php(162): Cake\Console\CommandRunner->runShell()
+#14 /backup/www/medbra/bin/cake.php(12): Cake\Console\CommandRunner->run()
+#15 {main}
+
+
+Caused by: [PDOException] SQLSTATE[42S02]: Base table or view not found: 1146 Table 'medbra_db.especialidades' doesn't exist in /backup/www/medbra/vendor/cakephp/cakephp/src/Database/Statement/MysqlStatement.php on line 37
+Stack Trace:
+#0 /backup/www/medbra/vendor/cakephp/cakephp/src/Database/Statement/MysqlStatement.php(37): PDOStatement->execute()
+#1 /backup/www/medbra/vendor/cakephp/cakephp/src/Database/Statement/StatementDecorator.php(173): Cake\Database\Statement\MysqlStatement->execute()
+#2 /backup/www/medbra/vendor/cakephp/cakephp/src/Database/Log/LoggingStatement.php(55): Cake\Database\Statement\StatementDecorator->execute()
+#3 /backup/www/medbra/vendor/cakephp/cakephp/src/Database/Connection.php(358): Cake\Database\Log\LoggingStatement->execute()
+#4 /backup/www/medbra/vendor/cakephp/cakephp/src/Core/Retry/CommandRetry.php(67): Cake\Database\Connection->Cake\Database\{closure}()
+#5 /backup/www/medbra/vendor/cakephp/cakephp/src/Database/Connection.php(361): Cake\Core\Retry\CommandRetry->run()
+#6 /backup/www/medbra/vendor/cakephp/cakephp/src/Database/Connection.php(310): Cake\Database\Connection->query()
+#7 /backup/www/medbra/vendor/cakephp/cakephp/src/Core/Retry/CommandRetry.php(67): Cake\Database\Connection->Cake\Database\{closure}()
+#8 /backup/www/medbra/vendor/cakephp/cakephp/src/Database/Connection.php(314): Cake\Core\Retry\CommandRetry->run()
+#9 /backup/www/medbra/vendor/cakephp/cakephp/src/Database/Schema/Collection.php(130): Cake\Database\Connection->execute()
+#10 /backup/www/medbra/vendor/cakephp/cakephp/src/Database/Schema/Collection.php(98): Cake\Database\Schema\Collection->_reflect()
+#11 /backup/www/medbra/vendor/cakephp/cakephp/src/Database/Schema/CachedCollection.php(61): Cake\Database\Schema\Collection->describe()
+#12 /backup/www/medbra/vendor/cakephp/cakephp/src/ORM/Table.php(566): Cake\Database\Schema\CachedCollection->describe()
+#13 /backup/www/medbra/vendor/cakephp/cakephp/src/ORM/Table.php(691): Cake\ORM\Table->getSchema()
+#14 /backup/www/medbra/vendor/cakephp/bake/src/Shell/Task/ModelTask.php(221): Cake\ORM\Table->getPrimaryKey()
+#15 /backup/www/medbra/vendor/cakephp/bake/src/Shell/Task/ModelTask.php(131): Bake\Shell\Task\ModelTask->getAssociations()
+#16 /backup/www/medbra/vendor/cakephp/bake/src/Shell/Task/ModelTask.php(114): Bake\Shell\Task\ModelTask->getTableContext()
+#17 /backup/www/medbra/vendor/cakephp/bake/src/Shell/Task/ModelTask.php(101): Bake\Shell\Task\ModelTask->bake()
+#18 /backup/www/medbra/vendor/cakephp/bake/src/Shell/BakeShell.php(282): Bake\Shell\Task\ModelTask->main()
+#19 /backup/www/medbra/vendor/cakephp/cakephp/src/Collection/CollectionTrait.php(64): Bake\Shell\BakeShell->Bake\Shell\{closure}()
+#20 /backup/www/medbra/vendor/cakephp/bake/src/Shell/BakeShell.php(283): Cake\Collection\Collection->each()
+#21 /backup/www/medbra/vendor/cakephp/cakephp/src/Console/Shell.php(517): Bake\Shell\BakeShell->all()
+#22 /backup/www/medbra/vendor/cakephp/cakephp/src/Console/CommandRunner.php(384): Cake\Console\Shell->runCommand()
+#23 /backup/www/medbra/vendor/cakephp/cakephp/src/Console/CommandRunner.php(162): Cake\Console\CommandRunner->runShell()
+#24 /backup/www/medbra/bin/cake.php(12): Cake\Console\CommandRunner->run()
+#25 {main}
+
+
+2021-05-14 20:38:00 Error: [Cake\Database\Exception] SQLSTATE[42S02]: Base table or view not found: 1146 Table 'medbra_db.medicos' doesn't exist in /backup/www/medbra/vendor/cakephp/cakephp/src/Database/Schema/Collection.php on line 132
+Stack Trace:
+#0 /backup/www/medbra/vendor/cakephp/cakephp/src/Database/Schema/Collection.php(98): Cake\Database\Schema\Collection->_reflect()
+#1 /backup/www/medbra/vendor/cakephp/cakephp/src/Database/Schema/CachedCollection.php(61): Cake\Database\Schema\Collection->describe()
+#2 /backup/www/medbra/vendor/cakephp/cakephp/src/ORM/Table.php(566): Cake\Database\Schema\CachedCollection->describe()
+#3 /backup/www/medbra/vendor/cakephp/cakephp/src/ORM/Table.php(691): Cake\ORM\Table->getSchema()
+#4 /backup/www/medbra/vendor/cakephp/bake/src/Shell/Task/ModelTask.php(221): Cake\ORM\Table->getPrimaryKey()
+#5 /backup/www/medbra/vendor/cakephp/bake/src/Shell/Task/ModelTask.php(131): Bake\Shell\Task\ModelTask->getAssociations()
+#6 /backup/www/medbra/vendor/cakephp/bake/src/Shell/Task/ModelTask.php(114): Bake\Shell\Task\ModelTask->getTableContext()
+#7 /backup/www/medbra/vendor/cakephp/bake/src/Shell/Task/ModelTask.php(101): Bake\Shell\Task\ModelTask->bake()
+#8 /backup/www/medbra/vendor/cakephp/bake/src/Shell/BakeShell.php(282): Bake\Shell\Task\ModelTask->main()
+#9 /backup/www/medbra/vendor/cakephp/cakephp/src/Collection/CollectionTrait.php(64): Bake\Shell\BakeShell->Bake\Shell\{closure}()
+#10 /backup/www/medbra/vendor/cakephp/bake/src/Shell/BakeShell.php(283): Cake\Collection\Collection->each()
+#11 /backup/www/medbra/vendor/cakephp/cakephp/src/Console/Shell.php(517): Bake\Shell\BakeShell->all()
+#12 /backup/www/medbra/vendor/cakephp/cakephp/src/Console/CommandRunner.php(384): Cake\Console\Shell->runCommand()
+#13 /backup/www/medbra/vendor/cakephp/cakephp/src/Console/CommandRunner.php(162): Cake\Console\CommandRunner->runShell()
+#14 /backup/www/medbra/bin/cake.php(12): Cake\Console\CommandRunner->run()
+#15 {main}
+
+
+Caused by: [PDOException] SQLSTATE[42S02]: Base table or view not found: 1146 Table 'medbra_db.medicos' doesn't exist in /backup/www/medbra/vendor/cakephp/cakephp/src/Database/Statement/MysqlStatement.php on line 37
+Stack Trace:
+#0 /backup/www/medbra/vendor/cakephp/cakephp/src/Database/Statement/MysqlStatement.php(37): PDOStatement->execute()
+#1 /backup/www/medbra/vendor/cakephp/cakephp/src/Database/Statement/StatementDecorator.php(173): Cake\Database\Statement\MysqlStatement->execute()
+#2 /backup/www/medbra/vendor/cakephp/cakephp/src/Database/Log/LoggingStatement.php(55): Cake\Database\Statement\StatementDecorator->execute()
+#3 /backup/www/medbra/vendor/cakephp/cakephp/src/Database/Connection.php(358): Cake\Database\Log\LoggingStatement->execute()
+#4 /backup/www/medbra/vendor/cakephp/cakephp/src/Core/Retry/CommandRetry.php(67): Cake\Database\Connection->Cake\Database\{closure}()
+#5 /backup/www/medbra/vendor/cakephp/cakephp/src/Database/Connection.php(361): Cake\Core\Retry\CommandRetry->run()
+#6 /backup/www/medbra/vendor/cakephp/cakephp/src/Database/Connection.php(310): Cake\Database\Connection->query()
+#7 /backup/www/medbra/vendor/cakephp/cakephp/src/Core/Retry/CommandRetry.php(67): Cake\Database\Connection->Cake\Database\{closure}()
+#8 /backup/www/medbra/vendor/cakephp/cakephp/src/Database/Connection.php(314): Cake\Core\Retry\CommandRetry->run()
+#9 /backup/www/medbra/vendor/cakephp/cakephp/src/Database/Schema/Collection.php(130): Cake\Database\Connection->execute()
+#10 /backup/www/medbra/vendor/cakephp/cakephp/src/Database/Schema/Collection.php(98): Cake\Database\Schema\Collection->_reflect()
+#11 /backup/www/medbra/vendor/cakephp/cakephp/src/Database/Schema/CachedCollection.php(61): Cake\Database\Schema\Collection->describe()
+#12 /backup/www/medbra/vendor/cakephp/cakephp/src/ORM/Table.php(566): Cake\Database\Schema\CachedCollection->describe()
+#13 /backup/www/medbra/vendor/cakephp/cakephp/src/ORM/Table.php(691): Cake\ORM\Table->getSchema()
+#14 /backup/www/medbra/vendor/cakephp/bake/src/Shell/Task/ModelTask.php(221): Cake\ORM\Table->getPrimaryKey()
+#15 /backup/www/medbra/vendor/cakephp/bake/src/Shell/Task/ModelTask.php(131): Bake\Shell\Task\ModelTask->getAssociations()
+#16 /backup/www/medbra/vendor/cakephp/bake/src/Shell/Task/ModelTask.php(114): Bake\Shell\Task\ModelTask->getTableContext()
+#17 /backup/www/medbra/vendor/cakephp/bake/src/Shell/Task/ModelTask.php(101): Bake\Shell\Task\ModelTask->bake()
+#18 /backup/www/medbra/vendor/cakephp/bake/src/Shell/BakeShell.php(282): Bake\Shell\Task\ModelTask->main()
+#19 /backup/www/medbra/vendor/cakephp/cakephp/src/Collection/CollectionTrait.php(64): Bake\Shell\BakeShell->Bake\Shell\{closure}()
+#20 /backup/www/medbra/vendor/cakephp/bake/src/Shell/BakeShell.php(283): Cake\Collection\Collection->each()
+#21 /backup/www/medbra/vendor/cakephp/cakephp/src/Console/Shell.php(517): Bake\Shell\BakeShell->all()
+#22 /backup/www/medbra/vendor/cakephp/cakephp/src/Console/CommandRunner.php(384): Cake\Console\Shell->runCommand()
+#23 /backup/www/medbra/vendor/cakephp/cakephp/src/Console/CommandRunner.php(162): Cake\Console\CommandRunner->runShell()
+#24 /backup/www/medbra/bin/cake.php(12): Cake\Console\CommandRunner->run()
+#25 {main}
+
+
+2021-05-14 20:38:00 Error: [Cake\Database\Exception] SQLSTATE[42S02]: Base table or view not found: 1146 Table 'medbra_db.casos' doesn't exist in /backup/www/medbra/vendor/cakephp/cakephp/src/Database/Schema/Collection.php on line 132
+Stack Trace:
+#0 /backup/www/medbra/vendor/cakephp/cakephp/src/Database/Schema/Collection.php(98): Cake\Database\Schema\Collection->_reflect()
+#1 /backup/www/medbra/vendor/cakephp/cakephp/src/Database/Schema/CachedCollection.php(61): Cake\Database\Schema\Collection->describe()
+#2 /backup/www/medbra/vendor/cakephp/cakephp/src/ORM/Table.php(566): Cake\Database\Schema\CachedCollection->describe()
+#3 /backup/www/medbra/vendor/cakephp/cakephp/src/ORM/Table.php(691): Cake\ORM\Table->getSchema()
+#4 /backup/www/medbra/vendor/cakephp/bake/src/Shell/Task/ModelTask.php(221): Cake\ORM\Table->getPrimaryKey()
+#5 /backup/www/medbra/vendor/cakephp/bake/src/Shell/Task/ModelTask.php(131): Bake\Shell\Task\ModelTask->getAssociations()
+#6 /backup/www/medbra/vendor/cakephp/bake/src/Shell/Task/ModelTask.php(114): Bake\Shell\Task\ModelTask->getTableContext()
+#7 /backup/www/medbra/vendor/cakephp/bake/src/Shell/Task/ModelTask.php(101): Bake\Shell\Task\ModelTask->bake()
+#8 /backup/www/medbra/vendor/cakephp/bake/src/Shell/BakeShell.php(282): Bake\Shell\Task\ModelTask->main()
+#9 /backup/www/medbra/vendor/cakephp/cakephp/src/Collection/CollectionTrait.php(64): Bake\Shell\BakeShell->Bake\Shell\{closure}()
+#10 /backup/www/medbra/vendor/cakephp/bake/src/Shell/BakeShell.php(283): Cake\Collection\Collection->each()
+#11 /backup/www/medbra/vendor/cakephp/cakephp/src/Console/Shell.php(517): Bake\Shell\BakeShell->all()
+#12 /backup/www/medbra/vendor/cakephp/cakephp/src/Console/CommandRunner.php(384): Cake\Console\Shell->runCommand()
+#13 /backup/www/medbra/vendor/cakephp/cakephp/src/Console/CommandRunner.php(162): Cake\Console\CommandRunner->runShell()
+#14 /backup/www/medbra/bin/cake.php(12): Cake\Console\CommandRunner->run()
+#15 {main}
+
+
+Caused by: [PDOException] SQLSTATE[42S02]: Base table or view not found: 1146 Table 'medbra_db.casos' doesn't exist in /backup/www/medbra/vendor/cakephp/cakephp/src/Database/Statement/MysqlStatement.php on line 37
+Stack Trace:
+#0 /backup/www/medbra/vendor/cakephp/cakephp/src/Database/Statement/MysqlStatement.php(37): PDOStatement->execute()
+#1 /backup/www/medbra/vendor/cakephp/cakephp/src/Database/Statement/StatementDecorator.php(173): Cake\Database\Statement\MysqlStatement->execute()
+#2 /backup/www/medbra/vendor/cakephp/cakephp/src/Database/Log/LoggingStatement.php(55): Cake\Database\Statement\StatementDecorator->execute()
+#3 /backup/www/medbra/vendor/cakephp/cakephp/src/Database/Connection.php(358): Cake\Database\Log\LoggingStatement->execute()
+#4 /backup/www/medbra/vendor/cakephp/cakephp/src/Core/Retry/CommandRetry.php(67): Cake\Database\Connection->Cake\Database\{closure}()
+#5 /backup/www/medbra/vendor/cakephp/cakephp/src/Database/Connection.php(361): Cake\Core\Retry\CommandRetry->run()
+#6 /backup/www/medbra/vendor/cakephp/cakephp/src/Database/Connection.php(310): Cake\Database\Connection->query()
+#7 /backup/www/medbra/vendor/cakephp/cakephp/src/Core/Retry/CommandRetry.php(67): Cake\Database\Connection->Cake\Database\{closure}()
+#8 /backup/www/medbra/vendor/cakephp/cakephp/src/Database/Connection.php(314): Cake\Core\Retry\CommandRetry->run()
+#9 /backup/www/medbra/vendor/cakephp/cakephp/src/Database/Schema/Collection.php(130): Cake\Database\Connection->execute()
+#10 /backup/www/medbra/vendor/cakephp/cakephp/src/Database/Schema/Collection.php(98): Cake\Database\Schema\Collection->_reflect()
+#11 /backup/www/medbra/vendor/cakephp/cakephp/src/Database/Schema/CachedCollection.php(61): Cake\Database\Schema\Collection->describe()
+#12 /backup/www/medbra/vendor/cakephp/cakephp/src/ORM/Table.php(566): Cake\Database\Schema\CachedCollection->describe()
+#13 /backup/www/medbra/vendor/cakephp/cakephp/src/ORM/Table.php(691): Cake\ORM\Table->getSchema()
+#14 /backup/www/medbra/vendor/cakephp/bake/src/Shell/Task/ModelTask.php(221): Cake\ORM\Table->getPrimaryKey()
+#15 /backup/www/medbra/vendor/cakephp/bake/src/Shell/Task/ModelTask.php(131): Bake\Shell\Task\ModelTask->getAssociations()
+#16 /backup/www/medbra/vendor/cakephp/bake/src/Shell/Task/ModelTask.php(114): Bake\Shell\Task\ModelTask->getTableContext()
+#17 /backup/www/medbra/vendor/cakephp/bake/src/Shell/Task/ModelTask.php(101): Bake\Shell\Task\ModelTask->bake()
+#18 /backup/www/medbra/vendor/cakephp/bake/src/Shell/BakeShell.php(282): Bake\Shell\Task\ModelTask->main()
+#19 /backup/www/medbra/vendor/cakephp/cakephp/src/Collection/CollectionTrait.php(64): Bake\Shell\BakeShell->Bake\Shell\{closure}()
+#20 /backup/www/medbra/vendor/cakephp/bake/src/Shell/BakeShell.php(283): Cake\Collection\Collection->each()
+#21 /backup/www/medbra/vendor/cakephp/cakephp/src/Console/Shell.php(517): Bake\Shell\BakeShell->all()
+#22 /backup/www/medbra/vendor/cakephp/cakephp/src/Console/CommandRunner.php(384): Cake\Console\Shell->runCommand()
+#23 /backup/www/medbra/vendor/cakephp/cakephp/src/Console/CommandRunner.php(162): Cake\Console\CommandRunner->runShell()
+#24 /backup/www/medbra/bin/cake.php(12): Cake\Console\CommandRunner->run()
+#25 {main}
+
+
+2021-05-19 14:31:49 Error: [InvalidArgumentException] There was a problem connecting to the database: SQLSTATE[HY000] [1045] Access denied for user 'admin_us'@'localhost' (using password: YES) in /backup/www/admin-br-demo/vendor/robmorgan/phinx/src/Phinx/Db/Adapter/PdoAdapter.php on line 82
+Stack Trace:
+#0 /backup/www/admin-br-demo/vendor/robmorgan/phinx/src/Phinx/Db/Adapter/MysqlAdapter.php(116): Phinx\Db\Adapter\PdoAdapter->createPdoConnection()
+#1 /backup/www/admin-br-demo/vendor/robmorgan/phinx/src/Phinx/Db/Adapter/PdoAdapter.php(148): Phinx\Db\Adapter\MysqlAdapter->connect()
+#2 /backup/www/admin-br-demo/vendor/robmorgan/phinx/src/Phinx/Db/Adapter/AdapterWrapper.php(496): Phinx\Db\Adapter\PdoAdapter->getConnection()
+#3 /backup/www/admin-br-demo/vendor/cakephp/migrations/src/CakeAdapter.php(56): Phinx\Db\Adapter\AdapterWrapper->getConnection()
+#4 /backup/www/admin-br-demo/vendor/cakephp/migrations/src/Command/CommandTrait.php(78): Migrations\CakeAdapter->__construct()
+#5 /backup/www/admin-br-demo/vendor/robmorgan/phinx/src/Phinx/Console/Command/Migrate.php(63): Migrations\Command\Migrate->bootstrap()
+#6 /backup/www/admin-br-demo/vendor/cakephp/migrations/src/Command/CommandTrait.php(35): Phinx\Console\Command\Migrate->execute()
+#7 /backup/www/admin-br-demo/vendor/cakephp/migrations/src/Command/Migrate.php(66): Migrations\Command\Migrate->parentExecute()
+#8 /backup/www/admin-br-demo/vendor/symfony/console/Command/Command.php(256): Migrations\Command\Migrate->execute()
+#9 /backup/www/admin-br-demo/vendor/symfony/console/Application.php(971): Symfony\Component\Console\Command\Command->run()
+#10 /backup/www/admin-br-demo/vendor/symfony/console/Application.php(290): Symfony\Component\Console\Application->doRunCommand()
+#11 /backup/www/admin-br-demo/vendor/symfony/console/Application.php(166): Symfony\Component\Console\Application->doRun()
+#12 /backup/www/admin-br-demo/vendor/cakephp/migrations/src/Shell/MigrationsShell.php(108): Symfony\Component\Console\Application->run()
+#13 /backup/www/admin-br-demo/vendor/cakephp/cakephp/src/Console/Shell.php(531): Migrations\Shell\MigrationsShell->main()
+#14 /backup/www/admin-br-demo/vendor/cakephp/migrations/src/Shell/MigrationsShell.php(169): Cake\Console\Shell->runCommand()
+#15 /backup/www/admin-br-demo/vendor/cakephp/cakephp/src/Console/CommandRunner.php(384): Migrations\Shell\MigrationsShell->runCommand()
+#16 /backup/www/admin-br-demo/vendor/cakephp/cakephp/src/Console/CommandRunner.php(162): Cake\Console\CommandRunner->runShell()
+#17 /backup/www/admin-br-demo/bin/cake.php(12): Cake\Console\CommandRunner->run()
+#18 {main}
+
+
+Caused by: [PDOException] SQLSTATE[HY000] [1045] Access denied for user 'admin_us'@'localhost' (using password: YES) in /backup/www/admin-br-demo/vendor/robmorgan/phinx/src/Phinx/Db/Adapter/PdoAdapter.php on line 79
+Stack Trace:
+#0 /backup/www/admin-br-demo/vendor/robmorgan/phinx/src/Phinx/Db/Adapter/PdoAdapter.php(79): PDO->__construct()
+#1 /backup/www/admin-br-demo/vendor/robmorgan/phinx/src/Phinx/Db/Adapter/MysqlAdapter.php(116): Phinx\Db\Adapter\PdoAdapter->createPdoConnection()
+#2 /backup/www/admin-br-demo/vendor/robmorgan/phinx/src/Phinx/Db/Adapter/PdoAdapter.php(148): Phinx\Db\Adapter\MysqlAdapter->connect()
+#3 /backup/www/admin-br-demo/vendor/robmorgan/phinx/src/Phinx/Db/Adapter/AdapterWrapper.php(496): Phinx\Db\Adapter\PdoAdapter->getConnection()
+#4 /backup/www/admin-br-demo/vendor/cakephp/migrations/src/CakeAdapter.php(56): Phinx\Db\Adapter\AdapterWrapper->getConnection()
+#5 /backup/www/admin-br-demo/vendor/cakephp/migrations/src/Command/CommandTrait.php(78): Migrations\CakeAdapter->__construct()
+#6 /backup/www/admin-br-demo/vendor/robmorgan/phinx/src/Phinx/Console/Command/Migrate.php(63): Migrations\Command\Migrate->bootstrap()
+#7 /backup/www/admin-br-demo/vendor/cakephp/migrations/src/Command/CommandTrait.php(35): Phinx\Console\Command\Migrate->execute()
+#8 /backup/www/admin-br-demo/vendor/cakephp/migrations/src/Command/Migrate.php(66): Migrations\Command\Migrate->parentExecute()
+#9 /backup/www/admin-br-demo/vendor/symfony/console/Command/Command.php(256): Migrations\Command\Migrate->execute()
+#10 /backup/www/admin-br-demo/vendor/symfony/console/Application.php(971): Symfony\Component\Console\Command\Command->run()
+#11 /backup/www/admin-br-demo/vendor/symfony/console/Application.php(290): Symfony\Component\Console\Application->doRunCommand()
+#12 /backup/www/admin-br-demo/vendor/symfony/console/Application.php(166): Symfony\Component\Console\Application->doRun()
+#13 /backup/www/admin-br-demo/vendor/cakephp/migrations/src/Shell/MigrationsShell.php(108): Symfony\Component\Console\Application->run()
+#14 /backup/www/admin-br-demo/vendor/cakephp/cakephp/src/Console/Shell.php(531): Migrations\Shell\MigrationsShell->main()
+#15 /backup/www/admin-br-demo/vendor/cakephp/migrations/src/Shell/MigrationsShell.php(169): Cake\Console\Shell->runCommand()
+#16 /backup/www/admin-br-demo/vendor/cakephp/cakephp/src/Console/CommandRunner.php(384): Migrations\Shell\MigrationsShell->runCommand()
+#17 /backup/www/admin-br-demo/vendor/cakephp/cakephp/src/Console/CommandRunner.php(162): Cake\Console\CommandRunner->runShell()
+#18 /backup/www/admin-br-demo/bin/cake.php(12): Cake\Console\CommandRunner->run()
+#19 {main}
+
+

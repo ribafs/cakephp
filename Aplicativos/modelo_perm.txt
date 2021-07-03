@@ -1,0 +1,83 @@
+Modelo_perm
+
+Criação de um aplicativo modelo contendo o componente Control e o plugin Twitter Bootstrap.
+
+Banco - modelo_perm
+Tabelas - groups, users permissions e clientes
+
+Editar modelo_perm.sql e
+remover as tabelas clientes e produtos
+
+Remover os controller, model e template de privileges e produtos.
+
+Implementar o plugin Twitter Bootstrap:
+
+composer require cakephp-brasil/twitter-bootstrap
+
+bin/cake plugin load TwitterBootstrap
+
+bin/cake bake all Users --theme TwitterBootstrap --force
+bin/cake bake all Groups --theme TwitterBootstrap --force
+bin/cake bake all Permissions --theme TwitterBootstrap --force
+bin/cake bake all Clientes --theme TwitterBootstrap --force
+
+Para cada nova tabela adicionada executar:
+bin/cake bake all NomeTabels --theme TwitterBootstrap
+
+Adicionar ao src/View/AppView.php
+
+public function initialize()
+{
+    $this->loadHelper('Form', ['className' => 'TwitterBootstrap.Form']);
+}
+
+Add ao initialize() do AppController:
+
+		$this->set('project_name', 'Título do Aplicativo');
+		$this->viewBuilder()->theme('TwitterBootstrap');
+        $loguser = $this->request->session()->read('Auth.User');    
+        $loguser = $loguser['username'];
+        $this->set('loguser',$loguser);
+
+Copiar o element topmenu.ctp para src/Template/Element
+
+Editar o
+/vendor/cakephp-braisl/twitter-bootstrap/src/Template/Layout/default.ctp
+E mudar a linha:
+   	$default_nav_bar_right = ROOT.DS.'src'.DS.'Template'.DS.'Element'.DS.'nav-bar-right.ctp';
+
+Para:
+  	$default_nav_bar_right = ROOT.DS.'src'.DS.'Template'.DS.'Element'.DS.'topmenu.ctp';
+
+ainda no default.ctp, Comentar o trecho:
+
+/*
+	      	$default_nav_bar_right = ROOT.DS.'src'.DS.'Template'.DS.'Element'.DS.'nav-bar-right.ctp';
+	      	if (file_exists($default_nav_bar_right)) {
+	      		ob_start();
+	      		include $default_nav_bar_right;
+	      		echo ob_get_clean();
+	      	}
+	      	else {
+	      		echo $this->element('nav-bar-right');
+	      	}
+*/
+
+Publicando todas as views automaticamente:
+
+bin/cake TwitterBootstrap.publish
+
+
+Descomente a linha no beforeFilter():
+$this->Auth->allow(['index','add']);
+
+Acesse:
+http://localhost/treinamento/modelo_perm/users
+Adicione os 4 usuários: super, admin, manager e user
+
+Comente novamente a linha:
+//$this->Auth->allow(['index','add']);
+
+Acesse o aplicativo e teste com os 4 usuários as várias seções do aplicativo.
+
+

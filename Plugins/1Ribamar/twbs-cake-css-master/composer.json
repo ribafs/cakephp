@@ -1,0 +1,28 @@
+{
+    "name": "ribafs/twbs-cake-css",
+    "authors": [
+        {
+            "name": "Ribamar FS",
+            "email": "ribafs@gmail.com",
+            "homepage": "http://racotecnic.com",
+            "role": "Developer"
+        }
+    ],
+    "description": "Twitter Bootstrap Plugin for CakePHP 3",
+    "type": "cakephp-plugin",
+    "keywords": ["cakephp", "bootstrap", "plugin", "template"],
+    "license": "MIT",
+    "support": {
+        "issues": "https://github.com/ribafs/twbs-cake-css/issues",
+        "source": "https://github.com/ribafs/twbs-cake-css.git"
+    },
+    "homepage": "https://github.com/ribafs/twbs-cake-css",
+    "require": {
+        "cakephp/cakephp": "^3.3"
+    },
+    "autoload": {
+        "psr-4": {
+            "Bootstrap\\": "src"
+        }
+    }
+}

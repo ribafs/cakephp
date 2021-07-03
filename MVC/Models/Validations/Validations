@@ -1,0 +1,234 @@
+Validações
+https://book.cakephp.org/3.0/en/core-libraries/validation.html
+
+When building an entity with validation enabled the following occurs:
+
+    The validator object is created.
+    The table and default validation provider are attached.
+    The named validation method is invoked. For example validationDefault.
+    The Model.buildValidator event will be triggered.
+    Request data will be validated.
+    Request data will be type-cast into types that match the column types.
+    Errors will be set into the entity.
+    Valid data will be set into the entity, while fields that failed validation will be excluded.
+
+If you’d like to disable validation when converting request data, set the validate option to false:
+
+$article = $articles->newEntity(
+    $this->request->getData(),
+    ['validate' => false]
+);
+
+The same can be said about the patchEntity() method:
+
+$article = $articles->patchEntity($article, $newData, [
+    'validate' => false
+]);
+
+Creating A Default Validation Set
+
+Validation rules are defined in the Table classes for convenience. This defines what data should be validated in conjunction with where it will be saved.
+
+To create a default validation object in your table, create the validationDefault() function:
+
+use Cake\ORM\Table;
+use Cake\Validation\Validator;
+
+class ArticlesTable extends Table
+{
+    public function validationDefault(Validator $validator)
+    {
+        $validator
+            ->requirePresence('title', 'create')
+            ->notEmpty('title');
+
+        $validator
+            ->allowEmpty('link')
+            ->add('link', 'valid-url', ['rule' => 'url']);
+
+        ...
+
+        return $validator;
+    }
+}
+
+No caso de clientes o bake gerou este código:
+
+    public function validationDefault(Validator $validator)
+    {
+        $validator
+            ->integer('id')
+            ->allowEmpty('id', 'create');
+
+        $validator
+            ->scalar('nome')
+            ->maxLength('nome', 45)
+            ->requirePresence('nome', 'create')
+            ->notEmpty('nome');
+
+        $validator
+            ->email('email')
+            ->allowEmpty('email');
+
+        return $validator;
+    }
+
+Como o nome do campo é email ele já valida de acordo.
+
+O campo nome tem maxlength de acordo com o tamanho do campo na tabela.
+
+Validação de senha
+$validator->add('password', 'length', ['rule' => ['lengthBetween', 8, 100]]);
+
+When a validation rule is created you can name the provider of that rule. For example, if your table has an isValidRole method you can use it as a validation rule:
+
+use Cake\ORM\Table;
+use Cake\Validation\Validator;
+
+class UsersTable extends Table
+{
+    public function validationDefault(Validator $validator)
+    {
+        $validator
+            ->add('role', 'validRole', [
+                'rule' => 'isValidRole',
+                'message' => __('You need to provide a valid role'),
+                'provider' => 'table',
+            ]);
+        return $validator;
+    }
+
+    public function isValidRole($value, array $context)
+    {
+        return in_array($value, ['admin', 'editor', 'author'], true);
+    }
+
+}
+
+
+Creating a Rules Checker
+
+Rules checker classes are generally defined by the buildRules() method in your table class. Behaviors and other event subscribers can use the Model.buildRules event to augment the rules checker for a given Table class:
+
+use Cake\ORM\RulesChecker;
+
+// In a table class
+public function buildRules(RulesChecker $rules)
+{
+    // Add a rule that is applied for create and update operations
+    $rules->add(function ($entity, $options) {
+        // Return a boolean to indicate pass/failure
+    }, 'ruleName');
+
+    // Add a rule for create.
+    $rules->addCreate(function ($entity, $options) {
+        // Return a boolean to indicate pass/failure
+    }, 'ruleName');
+
+    // Add a rule for update
+    $rules->addUpdate(function ($entity, $options) {
+        // Return a boolean to indicate pass/failure
+    }, 'ruleName');
+
+    // Add a rule for the deleting.
+    $rules->addDelete(function ($entity, $options) {
+        // Return a boolean to indicate pass/failure
+    }, 'ruleName');
+
+    return $rules;
+}
+
+Your rules functions can expect to get the Entity being checked and an array of options. The options array will contain errorField, message, and repository. The repository option will contain the table class the rules are attached to. Because rules accept any callable, you can also use instance functions:
+
+$rules->addCreate([$this, 'uniqueEmail'], 'uniqueEmail');
+
+or callable classes:
+
+$rules->addCreate(new IsUnique(['email']), 'uniqueEmail');
+
+When adding rules you can define the field the rule is for and the error message as options:
+
+$rules->add([$this, 'isValidState'], 'validState', [
+    'errorField' => 'status',
+    'message' => 'This invoice cannot be moved to that status.'
+]);
+
+The error will be visible when calling the errors() method on the entity:
+
+$entity->errors(); // Contains the domain rules error messages
+
+Creating Unique Field Rules
+
+Because unique rules are quite common, CakePHP includes a simple Rule class that allows you to define unique field sets:
+
+use Cake\ORM\Rule\IsUnique;
+
+// A single field.
+$rules->add($rules->isUnique(['email']));
+
+// A list of fields
+$rules->add($rules->isUnique(
+    ['username', 'account_id'],
+    'This username & account_id combination has already been used.'
+));
+
+When setting rules on foreign key fields it is important to remember, that only the fields listed are used in the rule. This means that setting $user->account->id will not trigger the above rule.
+Foreign Key Rules
+
+While you could rely on database errors to enforce constraints, using rules code can help provide a nicer user experience. Because of this CakePHP includes an ExistsIn rule class:
+
+// A single field.
+$rules->add($rules->existsIn('article_id', 'Articles'));
+
+// Multiple keys, useful for composite primary keys.
+$rules->add($rules->existsIn(['site_id', 'article_id'], 'Articles'));
+
+The fields to check existence against in the related table must be part of the primary key.
+
+You can enforce existsIn to pass when nullable parts of your composite foreign key are null:
+
+// Example: A composite primary key within NodesTable is (id, site_id).
+// A Node may reference a parent Node but does not need to. In latter case, parent_id is null.
+// Allow this rule to pass, even if fields that are nullable, like parent_id, are null:
+$rules->add($rules->existsIn(
+    ['parent_id', 'site_id'], // Schema: parent_id NULL, site_id NOT NULL
+    'ParentNodes',
+    ['allowNullableNulls' => true]
+));
+
+// A Node however should in addition also always reference a Site.
+$rules->add($rules->existsIn(['site_id'], 'Sites'));
+
+In most SQL databases multi-column UNIQUE indexes allow multiple null values to exist as NULL is not equal to itself. While, allowing multiple null values is the default behavior of CakePHP, you can include null values in your unique checks using allowMultipleNulls:
+
+// Only one null value can exist in `parent_id` and `site_id`
+$rules->add($rules->existsIn(
+    ['parent_id', 'site_id'],
+    'ParentNodes',
+    ['allowMultipleNulls' => false]
+));
+
+New in version 3.3.0: The allowNullableNulls and allowMultipleNulls options were added.
+
+
+Using Conditional Rules
+
+You may want to conditionally apply rules based on entity data:
+
+$rules->add(function ($entity, $options) use($rules) {
+    if ($entity->role == 'admin') {
+        $rule = $rules->existsIn('user_id', 'Admins');
+
+        return $rule($entity, $options);
+    }
+    if ($entity->role == 'user') {
+        $rule = $rules->existsIn('user_id', 'Users');
+
+        return $rule($entity, $options);
+    }
+
+    return false;
+}, 'userExists');
+
+
+

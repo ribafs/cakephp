@@ -1,0 +1,12 @@
+No CakePHP 3 temos duas opções de plugin:
+
+aplicativo/plugins
+aplicativo/vendor/vendorname/plugin
+
+Instalando um plugin pelo composer
+
+cd aplicativo
+composer require vendorname/plugin-name
+
+
+

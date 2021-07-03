@@ -1,0 +1,36 @@
+Passando variáveis pela URL para uma view
+
+Na URL:
+localhost/cake-control-demo/pages/home?lang=en&temp=default
+
+No AppController
+
+    public function initialize()
+    {
+        parent::initialize();
+
+        $this->loadComponent('RequestHandler');
+        $this->loadComponent('Flash');
+
+		$lang=$this->request->query('lang');
+		$temp=$this->request->query('temp');		
+		
+		$this->set('lang',$lang);		
+		$this->set('template',$temp);
+    }
+
+Na View :
+
+    <div id="content">
+        <div class="row">
+            <div class="columns large-12 ctp-warning checks">
+                <?php print "<h1>Idioma: ".$lang." Template: ".$template."</h1>"; ?>
+
+Links:
+
+http://ribafs.org/cakephp/cake-control-demo/users/login?lang=en&temp=default
+http://ribafs.org/cakephp/cake-control-demo/users/login?lang=en&temp=bootstrap
+http://ribafs.org/cakephp/cake-control-demo/users/login?lang=pt&temp=default
+http://ribafs.org/cakephp/cake-control-demo/users/login?lang=en&temp=bootstrap
+
+

@@ -1,0 +1,24 @@
+== displayField()
+
+Vamos configurar para que em Use ao cadastrar um novo cliente apareça o username ao invés do id na combo
+
+Mudar em src/Model/Table/UsersTable.php
+
+        $this->setDisplayField('id');
+Para
+        $this->setDisplayField('username');
+
+Tente cadastrar com um e-mail inválido. Veja que não fizemos nada para tratar os e-mails e por default o Cake os trata.
+
+Caso acuse uns error, limpe o cache e repita.
+
+== Valor default
+
+Vamos fazer outra alteração interessante. Ao cadastrar um cliente que apareça uma mensagem padrão no campo User, ao invés de em branco
+
+Vamos alterar src/Template/Clientes/add.ctp
+De
+            echo $this->Form->control('user_id', ['options' => $users, 'empty' => true]);
+Para
+            echo $this->Form->control('user_id', ['options' => $users, 'empty' => true, 'empty'=>'Usuário']);
+

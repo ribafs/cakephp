@@ -1,0 +1,63 @@
+Mudar largura de campo de form:
+
+<?= $this->Form->input('username',['style'=>'width: 200px']) ?>
+
+Ou então criar classes no arquivo webroot/css/custom.css
+
+/* Para a customização da largura dos campos de form: echo $this->Form->input('grupo',['class'=>'col2']); */
+.col1{
+    width:50px;
+}
+
+.col2{
+    width:100px;
+}
+...
+
+
+== Select com valor default e customização do label
+
+echo $this->Form->control('categoria', $options,['label'=>'Categoria','empty'=>'Selecione a Categoria']);
+
+
+== Select múltiplo (permite selecionar várias opções)
+
+	print $this->Form->input('pilot_ratings',[
+		'type' => 'select',
+		'class' => 'listbox',
+		'size' => 5,
+		'id' => 'pilot_ratings',
+		'multiple' => 'multiple',
+		'options' => [
+		    ['name' => 'Habilitación de Vuelo Nocturno Local', 'value' => '1'],
+		    ['name' => 'Habilitación Cat. II / Cat. III', 'value' => '2'],
+		    ['name' => 'Habilitación de Remolque de Planeador', 'value' => '5']
+		]
+	]);
+
+
+== src/Template/Clientes/add.ctp ou edit.ctp
+
+Ano mínimo sendo 13 anos antes do atual e máximo sendo 100 anos antes do atual, ou seja, como estou em 2018 de 1918 até 2005
+
+		echo $this->Form->input('nascimento',['label' => 'Nascimento',
+	        'dateFormat'    => 'DMY',
+	        'minYear'       => date('Y') - 100,
+	        'maxYear'       => date('Y') - 13,
+	        'empty'         => [
+	            'day'       => 'Dia',
+	            'month'     => 'Mês',
+	            'year'      => 'Ano'
+            ]
+        ]);
+
+
+== Criando dois selects estáticos para os campos controller e action em Permissions/add.ctp
+
+$options = ['Customers'=>'Customers','Groups'=>'Groups', 'Users'=>'Users', 'Permissions'=>'Permissions', 'Products'=>'Products', 'ProductItems'=>'ProductItems', 'value'=>'Selecione'];            
+echo $this->Form->input('controller',['options'=>$options,'required'=>'false', 'class'=>'col-md-12','empty'=>'Selecione']);
+			
+$options2 = ['index'=>'index','add'=>'add','edit'=>'edit','view'=>'view','delete'=>'delete'];
+echo $this->Form->input('action', ['options'=>$options2,'required'=>'false', 'class'=>'col-md-12', 'empty'=>'Selecione']);
+
+São estáticos, portanto sempre que precisar adicionar um novo controller ou action, precisa alterar este código.

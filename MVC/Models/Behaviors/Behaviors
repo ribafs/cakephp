@@ -1,0 +1,129 @@
+Behaviors
+https://book.cakephp.org/3.0/pt/orm/behaviors.html
+
+Cake\ORM\Table::addBehavior($name, array $options = [])
+
+Behaviors (Comportamentos)
+
+Os behaviors são um modo de organizar e habilitar o reuso de lógica da camada do Model (Modelo). Conceitualmente, eles são semelhantes a traits. No entanto, os behaviors são implementados como classes separadas. Isso permite que eles se connectem aos callbacks de ciclo de vida que os modelos emitem, ao mesmo tempo que fornecem recursos semelhantes a traits.
+
+Os behaviors fornecem uma maneira conveniente de compor comportamentos que são comuns em vários modelos. Por exemplo, CakePHP inclui um TimestampBehavior. Vários modelos irão querer campos de timestamp, e a lógica para gerenciar esses campos não é especifica para nenhum modelo. São esses tipos de cenários em que os behaviors são perfeitos.
+Usando Behaviors
+
+Behaviors fornecem uma maneira fácil de criar partes de lógica horizontalmente reutilizáveis relacionadas às classes de tabela. Você pode estar se perguntando por que os behaviors são classes regulares e não traits. O principal motivo para isso é event listeners. Enquanto as traits permitiriam partes reutilizáveis de lógica, eles complicariam o uso de eventos.
+
+Para adicionar um behavior à sua tabela, você pode chamar o método addBehavior(). Geralmente o melhor lugar para fazer isso é no método initialize():
+
+namespace App\Model\Table;
+
+use Cake\ORM\Table;
+
+class ArticlesTable extends Table
+{
+    public function initialize(array $config)
+    {
+        $this->addBehavior('Timestamp');
+    }
+}
+
+
+Como acontece com as associações, você pode usar sintaxe plugin e fornecer opções de configuração adicionais:
+
+namespace App\Model\Table;
+
+use Cake\ORM\Table;
+
+class ArticlesTable extends Table
+{
+    public function initialize(array $config)
+    {
+        $this->addBehavior('Timestamp', [
+            'events' => [
+                'Model.beforeSave' => [
+                    'created_at' => 'new',
+                    'modified_at' => 'always'
+                ]
+            ]
+        ]);
+    }
+}
+
+Core Behaviors
+
+    CounterCache
+    Timestamp
+    Translate
+    Tree
+
+
+Criando Behavior
+
+Nos exemplos a seguir, criaremos um bem simples SluggableBehavior. Esse behavior nos permitirá preencher um campo slug com o resultado de Text::slug() baseado em outro campo.
+
+Antes de criar nosso behavior, devemos entender as convensão para behaviors:
+
+    Behavior estão localizados em src/Model/Behavior, ou MyPlugin\Model\Behavior.
+    Classes de Behavior devem estar no namespace App\Model\Behavior, ou no namespace MyPlugin\Model\Behavior.
+    Classes de Behavior terminam com Behavior.
+    Behaviors estendem Cake\ORM\Behavior.
+
+Para criar nosso behavior sluggable. Coloque o seguinte em src/Model/Behavior/SluggableBehavior.php:
+
+namespace App\Model\Behavior;
+
+use Cake\ORM\Behavior;
+
+class SluggableBehavior extends Behavior
+{
+}
+
+Semelhante a classes de tabela (table classes), behaviors também tem um método initialize() onde você pode colocar o código de inicialização do seu behavior, se necessário:
+
+public function initialize(array $config)
+{
+    // Algum código de inicialização aqui
+}
+
+Agora nós podemos adicionar esse behavior a uma de nossas classes de tabela (table classes). Neste exemplo, nós usaremos um ArticlesTable, pois artigos normalmente tem propriedades de slug para criar URLs amigáveis:
+
+namespace App\Model\Table;
+
+use Cake\ORM\Table;
+
+class ArticlesTable extends Table
+{
+
+    public function initialize(array $config)
+    {
+        $this->addBehavior('Sluggable');
+    }
+}
+
+Nosso novo behavior não faz muita coisa no momento. Em seguida, iremos adicionar um método de mixin e um event listener para que, quando salvarmos entidades nós podemos realizar slug automaticamento de um campo.
+
+
+
+Removendo Behaviors Carregados
+
+Para remover um behavior da sua tabela, você pode chamar o método removeBehavior():
+
+// Remove the loaded behavior
+$this->removeBehavior('Sluggable');
+
+
+Acessando Behaviors Carregados
+
+Uma vez que você anexou behaviors à sua instância da Table você pode conferir os behaviors carregados ou acessar behaviors específicos usando o BehaviorRegistry:
+
+// Verifica quais behaviors estão carregados
+$table->behaviors()->loaded();
+
+// Verifica se um behavior especifico está carregado
+// Lembre-se de omitir o prefixo de plugin.
+$table->behaviors()->has('CounterCache');
+
+// Obtem um behavior carregado
+// Lembre-se de omitir o prefixo de plugin
+$table->behaviors()->get('CounterCache');
+
+

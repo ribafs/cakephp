@@ -1,0 +1,64 @@
+Quando executar
+
+bin/cake plugin load migrations
+
+E ele reclamar:
+Your Application class does not have a bootstrap() method. Please add one.
+
+Adicione ao src/Application.php
+
+    public function bootstrap()
+    {   
+        parent::bootstrap();
+    }
+
+
+Loading a Plugin
+
+If you want to use a plugin’s routes, console commands, middleware, or event listeners you will need to load the plugin. Plugins are loaded in your application’s bootstrap() function:
+
+// In src/Application.php. Requires at least 3.6.0
+use Cake\Http\BaseApplication;
+use ContactManager\Plugin as ContactManager;
+
+class Application extends BaseApplication {
+    public function bootstrap()
+    {
+        parent::bootstrap();
+        // Load the contact manager plugin by class name
+        $this->addPlugin(ContactManager::class);
+
+        // Load a plugin with a vendor namespace by 'short name'
+        $this->addPlugin('AcmeCorp\ContactManager');
+    }
+}
+
+If you just want to use helpers, behaviors or components from a plugin you do not need to load a plugin.
+
+viewBuilder()->layout()
+
+Para
+viewBuilder()->setLayout()
+
+$this->request->data
+
+para
+
+$this->request->getData
+
+----
+
+$this->response->getType();// Era apenas type() no 3.5
+
+TableSchema::columnType() is deprecated. Use TableSchema::setColumnType() or TableSchema::getColumnType() instead
+
+ServerRequest::session() is deprecated. Use getSession() instead.
+		$user = $this->request->getSession()->read('Auth.User');
+
+controller, use getParam()
+$this->request->getParam('controller'); 
+
+ Accessing routing parameters through `action` will removed in 4.0.0. Use `getParam()` instead.
+		$action = $this->request->getParam('action');
+
+RequestHandlerComponent::beforeRedirect() is deprecated. This functionality will be removed in 4.0.0. Set the `enableBeforeRedirect` option to `false` to disable this warning.

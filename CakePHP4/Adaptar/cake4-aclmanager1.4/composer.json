@@ -1,0 +1,32 @@
+{
+    "name": "ribafs/cakephp4-aclmanager",
+    "description": "AclManager plugin for CakePHP 4.x",
+    "keywords": ["cakephp", "cakephp4", "cake4", "plugin", "acl", "manager"],
+    "homepage": "https://github.com/ribafs/cakephp4-aclmanager",
+    "type": "cakephp-plugin",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Ribamar FS",
+            "homepage": "https://ribafs.me",
+            "role": "Adapter"
+        },
+        {
+            "name": "Ivan Amat",
+            "homepage": "http://www.ivanamat.es",
+            "role": "Author"
+        }
+    ],
+    "require": {
+        "php": ">=7.2",
+        "composer/installers": "*",
+        "cakephp/cakephp": "~4.0",
+        "cakephp/plugin-installer": "~1.3",
+        "cakephp/acl": "~0.7"
+    },
+    "autoload": {
+        "psr-4": {
+            "AclManager\\": "src"
+        }
+    }
+}

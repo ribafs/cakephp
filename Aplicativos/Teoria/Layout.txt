@@ -1,0 +1,105 @@
+Layout
+
+Layouts no CakePHP 3
+
+Os layouts são camadas de software que organizam o espaço nas páginas.
+Definem o que fica no cabeçalho, menus etc.
+O que fica na região de conteúdo.
+Na região de cabeçalho,
+etc.
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title><?= h($this->fetch('title')) ?></title>
+<link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+<!-- Include external files and scripts here (See HTML helper for more info.) -->
+<?php
+echo $this->fetch('meta');
+echo $this->fetch('css');
+echo $this->fetch('script');
+?>
+</head>
+<body>
+
+<!-- If you'd like some sort of menu to
+show up on all of your views, include it here -->
+<div id="header">
+    <div id="menu">...</div>
+</div>
+
+<!-- Here's where I want my views to be displayed -->
+<?= $this->fetch('content') ?>
+
+<!-- Add a footer to each displayed page -->
+<div id="footer">...</div>
+
+</body>
+</html>
+
+Podemos definir vários layouts para nosso aplicativo.
+
+Os layouts devem ficar no diretório
+src/Template/Layout
+
+O CakePHP já vem com um layout default.ctp.
+
+Atribuindo título para o aplicativo e definindo um layout no AppController:
+
+
+class UsersController extends AppController
+{
+    public function view_active()
+    {
+        $this->set('title', 'View Active Users');
+        $this->viewBuilder()->layout('default_small_ad');
+   }
+
+    public function view_image()
+    {
+        $this->viewBuilder()->layout('image');
+    }
+}
+
+View add.ctp
+
+<div class="row">
+    <div class="col-xs-12">
+        <div class="actions">
+            <ul class="side-nav btn-group">
+                <li class="btn btn-info btn-sm"><?= $this->Html->link(__('List Users'), ['action' => 'index']) ?></li>
+            </ul>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-xs-12">
+        <div class="users form">
+            <?= $this->Form->create($user, ['role' => 'form']) ?>
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title"><?= __('Add User') ?></h3>
+                </div>
+                <div class="box-body">
+                    <div class="form-group">
+                        <?php
+                        echo $this->Form->input('username', ['class' => 'form-control', 'placeholder' => __('Enter ...')]);
+                        echo $this->Form->input('password', ['class' => 'form-control', 'placeholder' => __('Enter ...')]);
+                        echo $this->Form->input('email', ['class' => 'form-control', 'placeholder' => __('Enter ...')]);
+                        echo $this->Form->input('name', ['class' => 'form-control', 'placeholder' => __('Enter ...')]);
+                        echo $this->Form->input('surname', ['class' => 'form-control', 'placeholder' => __('Enter ...')]);
+                        ?>
+                    </div>
+                </div>
+                <div class="box-footer">
+                    <?= $this->Form->button(__('Submit'), ['class'=>'btn btn-primary']) ?>
+                    <?= $this->Html->link(__('Cancel'), ['controller' => 'users'], ['class' => 'btn btn-warning']) ?>
+                </div>
+            </div>
+            <?= $this->Form->end() ?>
+        </div>
+    </div>
+</div>
+
+

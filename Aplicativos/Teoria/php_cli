@@ -1,0 +1,3 @@
+echo "Adding plugin helpers to AppController";
+php -r '$d = file_get_contents("src/Controller/AppController.php"); $d=str_replace("class AppController extends Controller\n{","class AppController extends Controller\n{\n\n    public \$helpers = [\n        \"BootstrapUI.Form\",\n        \"BootstrapUI.Html\",\n        \"BootstrapUI.Flash\",\n        \"BootstrapUI.Paginator\"\n    ];",$d); file_put_contents("src/Controller/AppController.php",$d);';
+

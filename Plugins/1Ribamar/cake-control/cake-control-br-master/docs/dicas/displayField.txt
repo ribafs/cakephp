@@ -1,0 +1,10 @@
+Implementação do displayField()
+
+Tenho duas tabelas relacionadas: users e customers.
+Customers tem um campo user_id
+
+No Template/Customers/index.ctp no valor do user_id, 
+mude apenas a primeira ocorrência de $customer->user->id para $customer->user->username:
+
+                <td><?= $customer->has('user') ? $this->Html->link($customer->user->username, ['controller' => 'Users', 'action' => 'view', $customer->user->id]) : '' ?></td>
+

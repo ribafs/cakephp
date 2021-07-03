@@ -1,0 +1,47 @@
+Componentes são classes auxiliares dos controllers. Os Components podem ser considerados como formas de criar pedaços reutilizáveis de código relacionado a controllers com uma característica específica ou conceito. Os components também podem ligar-se ao evento do ciclo de vida do controller e interagir com a sua aplicação.
+
+Criar o arquivo
+CalcularComponent.php, contendo:
+
+<?php
+namespace App\Controller\Component;
+
+use Cake\Controller\Component;
+
+class CalcularComponent extends Component
+{
+    public function soma($valor1, $valor2)
+    {
+        $s =$valor1 + $valor2;
+		return $s;
+    }
+}
+
+E copiar para a pasta src/Controller/Component
+
+Adicionar uma chamada no src/Controller/AppController
+
+    public function initialize()
+    {
+        parent::initialize();
+        $this->loadComponent('Auth');
+        $this->loadComponent('RequestHandler');
+        $this->loadComponent('Flash');
+		$this->loadComponent('Calcular');
+    }
+
+Executar num action, como o src/Controller/ClientesController.php
+
+    public function index()
+    {
+		print 'Componente Soma: '.$this->Calcular->soma(2,3);
+
+Estando no AppController ele será visto por todos os demais controllers e seus métodos estarão disponíveis
+logo que cada controller seja executado.
+CAso queira que apenas um controller tenha acesso ao mesmo, insira uma chamada somente neste controller, assim:
+
+$this->loadComponent('Calcular');
+
+$soma = $this->Calcular->soma(2,4);
+print 'Calcular: '.$soma;
+

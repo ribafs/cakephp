@@ -1,0 +1,11 @@
+clear;
+echo "Aguarde enquanto configuro as permissões do /backup/www/$1";
+echo "";
+chown -R www-data:webdevel /backup/www/$1;
+chmod -R g+s /var/www/html;
+find /backup/www/$1 -type d -exec chmod 2775 {} \;
+find /backup/www/$1 -type f -exec chmod 2664 {} \;
+#chmod +x /backup/www/$1/bin/cake
+echo "";
+echo "Concluído!";
+

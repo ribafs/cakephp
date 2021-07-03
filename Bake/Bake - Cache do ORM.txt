@@ -1,0 +1,15 @@
+Bake - Cache do ORM
+
+Reconstruir o cache dos metadados de todas as tabelas da conexão default
+bin/cake orm_cache build --connection default
+
+Para reconstruir o cache dos emtadados apenas da tabela artigos
+bin/cake orm_cache build --connection default artigos
+
+Remover o cache de todos os metadados:
+bin/cake orm_cache clear
+
+Remover o cache de todos os metadados da tabela aratigos
+bin/cake orm_cache clear artigos
+
+

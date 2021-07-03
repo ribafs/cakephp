@@ -1,0 +1,76 @@
+Meu Esqueleto do CakePHP 4
+
+Hospedar no GH e Packagist
+
+- Instalar cakephp 4
+
+composer create-project --prefer-dist cakephp/app:~4.0 cake4-skeleton
+
+- Algumas configurações no app_local.php:
+    'Datasources' => [
+        'default' => [
+            'host' => 'localhost',
+            'username' => 'root',
+            'password' => '',
+            'database' => 'testes',
+
+Plugins e componentes que já vem no core:
+
+- debug_kit
+- authentication
+- authorization
+- bake
+- validation
+
+Instalei alguns plugins
+
+- composer.phar require robmorgan/phinx -W
+https://book.cakephp.org/phinx/0/en/index.html
+Indicar tutorial meu no GH
+
+- composer require cakephp/acl
+
+bin/cake plugin load Acl
+
+Criar tabelas
+composer require cakephp/migrations "@stable"
+bin/cake plugin load Migrations
+
+bin/cake migrations migrate -p Acl
+
+Attaching the behavior
+
+Add the Acl behavior to your table so it will automatically create an aco whenever a new record is saved:
+
+public function initialize(array $config)
+{
+    parent::initialize($config);
+
+    $this->addBehavior('Acl.Acl', ['controlled']);
+}
+
+Updating the entity
+
+Before you can start using the behavior, you MUST add the parentNode() method to the corresponding Entity file or the AclBehavior will not be able to determine the parent->child relationships. Also make make sure the method returns either null or a parent Model reference.
+
+public function parentNode() {
+    return null;
+}
+
+    If things went well you should now see an entry appearing in the acos database table whenever you save a new record.
+
+- Alguns tutoriais texto
+
+Criar:
+- migrations com phinx
+- acl
+- bake
+
+https://book.cakephp.org/chronos/2/en/index.html
+https://book.cakephp.org/migrations/3/en/index.html
+https://github.com/cakephp/acl
+https://book.cakephp.org/bake/2/en/index.html
+https://book.cakephp.org/authentication/2/en/index.html
+https://book.cakephp.org/authorization/2/en/index.html
+https://book.cakephp.org/4/en/core-libraries/validation.html
+

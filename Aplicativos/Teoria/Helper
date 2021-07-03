@@ -1,0 +1,237 @@
+Form Helper
+
+Dicas sobre data e hora
+
+Para o CakePHP os campos do tipo data, datatime ou timestamp obrigatoriamente devem usar DEFAULT NULL:
+
+nascimento date DEFAULT NULL
+
+E também não podemos alterar sua validação para exigir preenchimento com notEmpty ou notBlank. Caso contrário
+o Cake não reconhece e não adiciona o registro.
+
+
+src/Template/Clientes/add.ctp ou edit.ctp
+
+Ano mínimo sendo 13 anos antes do atual e máximo sendo 100 anos antes do atual, ou seja, 
+como estou em 2016 de 1916 até 2003
+
+		echo $this->Form->input('nascimento',['label' => 'Nascimento',
+	        'dateFormat'    => 'DMY',
+	        'minYear'       => date('Y') - 100,
+	        'maxYear'       => date('Y') - 13,
+	        'empty'         => [
+	            'day'       => 'Dia',
+	            'month'     => 'Mês',
+	            'year'      => 'Ano'
+            ]
+        ]);
+
+Select com valor default
+
+$options = ['A'=>'Val1',
+            'B'=>'Val2',
+            'C'=>'Val3',
+            'D'=>'Val4',
+            'E'=>'Val5'];			
+ print $this->Form->select('category', $options,['multiple'=>'checkbox', 'required'=>'false', 'label'=>'Category','class'=>'col-md-12','value'=>'E']);
+
+
+Select múltiplo (permite selecionar várias opções)
+
+	print $this->Form->input('pilot_ratings',[
+		'type' => 'select',
+		'class' => 'listbox',
+		'size' => 5,
+		'id' => 'pilot_ratings',
+		'multiple' => 'multiple',
+		'options' => [
+		    ['name' => 'Habilitación de Vuelo Nocturno Local', 'value' => '1'],
+		    ['name' => 'Habilitación Cat. II / Cat. III', 'value' => '2'],
+		    ['name' => 'Habilitación de Remolque de Planeador', 'value' => '5']
+		]
+	]);
+
+
+src/Template/Clientes/add.ctp ou edit.ctp
+
+Ano mínimo sendo 13 anos antes do atual e máximo sendo 100 anos antes do atual, ou seja, 
+como estou em 2016 de 1916 até 2003
+
+		echo $this->Form->input('nascimento',['label' => 'Nascimento',
+	        'dateFormat'    => 'DMY',
+	        'minYear'       => date('Y') - 100,
+	        'maxYear'       => date('Y') - 13,
+	        'empty'         => [
+	            'day'       => 'Dia',
+	            'month'     => 'Mês',
+	            'year'      => 'Ano'
+            ]
+        ]);
+
+
+HTML
+
+Para que Html->Link permita CSS:
+
+<?= $this->Html->Link('<span class="glyphicon glyphicon-plus"></span> Novo', ['controller'=>'Bookmaarks','action'=>'add'], 
+	['class'=>'btn tbn-primary pull-right']);
+	
+Assim ele mostrará o código <span...</span>	
+
+Para que permita o CSS, use:
+
+<?= $this->Html->link('<span class="glyphicon glyphicon-plus"></span> Novo', ['controller'=>'Bookmaarks','action'=>'add'], 
+	['class'=>'btn tbn-primary pull-right', 'escape'=>false]);
+	
+Observação: 
+classe Html, método link. Classe com inicial máiúscuça e método tudo em minúsculas.	
+
+
+Form
+
+Mudar o tipo de um campo
+
+O Cake gerou um campo com o tipo textarea em um form.
+Para mudar podemos fazer isso:
+
+print $this->Form->input('url',['label', 'URL']);
+
+Mudar para tipo text (campo texto) assim:
+
+print $this->Form->input('url',['type'=>'text','label', 'URL']);
+
+
+Helpers CakePHP 3
+
+Os helpers contém código de apresentação que é compartilhado entre muitas views, elements ou layouts.
+
+O Cake já traz alguns bem úteis Helpers:
+- Flash
+- Form
+- Html
+- Number
+- Paginator
+- Text
+- Time
+- Url
+
+Carregamos Helpers no Cake declarando em classes views.
+
+Class AppView extends View
+{
+	public function initialize()
+	{
+		parent::initialize();
+		$this->loadHelper('Html');
+		$this->loadHelper('Form');
+		$this->loadHelper('Flash');
+	}
+}
+
+Carregando Helpers em Plugins
+
+$this->loadHelper('ContactManager.Comentario');
+
+Podemos carregar helper condicionalmente
+class AppView extends View
+{
+    public function initialize()
+    {
+        parent::initialize();
+        if ($this->request->action === 'index') {
+		$this->loadHelper('Message');
+        }
+    }
+}
+Usando o Helper
+
+$this->Form->create($article);
+Alguns helpers são carregados pelo Cake automaticamente, como é o caso do Form.
+Também podemos usar o método beforeRender() dos controllers para carregar Helpers.
+
+
+class ArticlesController extends AppController
+{
+    public function beforeRender(Event $event)
+    {
+        parent::beforeRender($event);
+        $this->viewBuilder()->helpers(['MyHelper']);
+    }
+}
+
+Criando Helpers
+
+Podemos criar classes Helper para usar em aplicações ou em plugins.
+
+Os Helpers têm algumas convenções que ajudam se seguirmos:
+- Arquivos de classe Helper devem ficar em src/View/Helper. Exemplo:
+	src/View/Helper/LinkHelper.php
+- Classes helpers devem ser sufixadas com Helper. Exemplo:
+	LinkHelper
+- Quando referenciar classes helper deve omitir o sufixo Helper:
+	$this->loadHelper('Link');
+
+Criando o esqueleto de um Helper chamado Message com o bake:
+
+cd c:\xampp\htdocs\aplicativo
+bin\cake bake helper Message
+
+Editar o src\View\Helper\MessageHelper.php e adicionar as funções, assim:
+
+<?php
+namespace App\View\Helper;
+
+use Cake\View\Helper;
+use Cake\View\View;
+
+/**
+ * Table helper
+ */
+class TableHelper extends Helper
+{
+
+    /**
+     * Default configuration.
+     *
+     * @var array
+     */
+	protected $_defaultConfig = [];
+	
+	public function msg($msg)
+	{
+		return '<h2>'.$msg.'</h1>';
+	}
+}
+
+Carregar na classe AppView
+
+Editar src/View/AppView.php e adicionar o loadHelper()
+
+class AppView extends View
+{
+    public function initialize()
+    {
+        parent::initialize();
+        if ($this->request->action === 'index') {
+		$this->loadHelper('Message');
+        }
+    }
+}
+Atente para o fato de que na classe acima ele restringe para que somente no action index.ctp o helper apareça. Para mostrar em todas as actions use:
+Observação – pelos meus testes nem precisa carregar na AppView e o helper ficará disponível automaticamente.
+    public function initialize()
+    {
+		$this->loadHelper('Message');
+    }
+
+Usando o Helper
+Editar a view index.ctp e adicionar:
+
+<?=$this->Message->msg('Minha Mensagem Helper') ?>
+
+Ao chamar no navegador verá a mensagem com título h2.
+Um helper bem simples para mostrar o caminho das pedras.
+
+Documentação oficial:
+http://book.cakephp.org/3.0/en/views/helpers.html 
+

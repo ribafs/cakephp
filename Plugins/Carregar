@@ -1,0 +1,58 @@
+Carregando um Plugin
+
+Depois de instalar um plugin e configurar o autoloader, você deve carregar O plugin. Você pode carregar plugins um a um, ou todos eles com um único método:
+
+// In config/bootstrap.php
+// Or in Application::bootstrap()
+
+// Carrega um único plugin
+Plugin::load('ContactManager');
+
+// Carrega um plugin com um namespace no nível superior.
+Plugin::load('AcmeCorp/ContactManager');
+
+    public function initialize()
+    {
+        parent::initialize();
+
+        $this->loadComponent('RequestHandler');
+        $this->loadComponent('Flash');
+		$this->loadComponent('CakeControlBr.Control');
+
+// Carrega todos os plugins de uma só vez
+Plugin::loadAll();
+
+loadAll() carrega todos os plugins disponíveis, permitindo que você especifique determinadas configurações para plugins. load() funciona de forma semelhante, mas apenas carrega o Plugins que você especifica explicitamente.
+
+Recomenda-se não usar o loadAll().
+
+Plugin::loadAll() não irá carregar os plugins no namespace vendor que não são definidos em vendor/cakephp-plugins.php.
+
+Há também um comando de shell acessível para habilitar o plugin. Execute a seguinte linha:
+
+bin/cake plugin load ContactManager
+
+Isso colocará o plugin Plugin::load('ContactManager'); no bootstrap para você.
+
+
+Autoloading Plugin Classes
+
+Ao usar bake para criar um plugin ou quando instalar um plugin usando o Composer, você normalmente não precisa fazer alterações em seu aplicativo para faça com que o CakePHP reconheça as classes que vivem dentro dele.
+
+Em qualquer outro caso, você precisará modificar o arquivo do composer.json do seu aplicativo. Para conter as seguintes informações:
+
+    "autoload": {
+        "psr-4": {
+            "CakeControlBr\\": "src"
+        }
+    }
+
+
+"psr-4": {
+    (...)
+    "MyPlugin\\": "./plugins/MyPlugin/src",
+    "MyPlugin\\Test\\": "./plugins/MyPlugin/tests"
+}
+
+
+

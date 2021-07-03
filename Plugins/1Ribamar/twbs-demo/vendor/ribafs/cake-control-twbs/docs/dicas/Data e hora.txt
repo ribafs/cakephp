@@ -1,0 +1,34 @@
+Dicas sobre data e hora
+
+Para o CakePHP os campos do tipo data, datatime ou timestamp obrigatoriamente devem usar DEFAULT NULL:
+
+nascimento date DEFAULT NULL
+
+E também não podemos alterar sua validação para exigir preenchimento com notEmpty ou notBlank. Caso contrário
+o Cake não reconhece e não adiciona o registro.
+
+
+src/Template/Clientes/add.ctp ou edit.ctp
+
+Por padrão o Cake mostra apenas os anos de 2011 até 2021 na combo Ano.
+
+Vamos alterar para que o ano mínimo seja 13 anos antes do atual 
+e máximo seja 100 anos antes do atual, ou seja, como estou em 2016,
+que mostre de 1916 até 2003, mas isso deve ser pensado para atender ao requisito
+da tabela/aplicativo. No nosso caso, do DNOCS, devemos usar 18 anos antes, 
+ou mais para o primeiro?
+E 100 antes do atual ou mais para o segundo.
+Precisamos saber da legislação e usar a favor da segurança, deixando uma margem.
+
+		echo $this->Form->input('nascimento',['label' => 'Nascimento',
+	        'dateFormat'    => 'DMY',
+	        'minYear'       => date('Y') - 100,
+	        'maxYear'       => date('Y') - 13,
+	        'empty'         => [
+	            'day'       => 'Dia',
+	            'month'     => 'Mês',
+	            'year'      => 'Ano'
+            ]
+        ]);
+
+

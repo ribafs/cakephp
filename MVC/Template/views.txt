@@ -1,0 +1,9 @@
+					<?php 
+					// Usuário user não pode visualizar Excluir
+					if($group != 4){
+                    print $this->Form->postLink(__('Excluir'), ['action' => 'delete', $cliente->id], ['confirm' => __('Tem certeza de que deseja excluir o registro # {0}?', $cliente->id), 'class'=>'btn btn-danger btn-xs']);
+                    }
+                    ?>
+
+
+

@@ -1,0 +1,106 @@
+﻿Criação de Aplicativos com o CakePHP 3
+
+Exste uma pasta contendo o modelo de aplicativo, já pré-configurada e contendo
+muita coisa pronta, inclusive com o BootStrap que torna mais agradável o visual:
+	/var/www/html/intranet/1modelo
+
+Neste exemplo estaremos criando o aplicativo k1, nas pasta:
+	/var/www/html/intranet/dp/k1
+
+Sequência
+
+- Criação do banco intranet
+
+- Criação dos usuários. Um para cada esquema com o mesmo nome do esquema
+	create user dp_k1 WITH LOGIN password 'senha';
+
+- Criação dos esquemas:
+	dg
+	da
+	dp
+		dp_k1
+	di
+Criar esquema dp_k1 e tornar dono dele o usuário dp_k1
+
+	create schema dp_k1 authorization dp_k1;
+
+  Usaremos
+  http://10.0.0.4/devel/ferramentas/adminer/
+  SGBD - PostgreSQL
+  banco - intranet
+  esquema - dp_k1
+  user - dp_k1
+
+Lembrar de usar o esquema basico para armaeznar as tabelas básicas, como
+cests, ceps, cadastro de servidores, etc. São tabelas que são usadas por
+vários esquemas.
+ 
+  Ajustar o estilo de datas no PostgreSQL para SQL, DMY
+  SHOW DATESTYLE;
+  ALTER DATABASE intranet SET datestyle TO SQL, DMY;
+  SHOW DATESTYLE;
+
+  Assim podemos inserir campos data desta forma
+	31/12/2016 
+
+- Duplicar a pasta existente:
+	/var/www/html/intranet/1modelo
+	
+	para
+	/var/www/html/intranet/dp/k1
+	
+- Configurar
+	config/app.php  - mudar apenas o nome do esquema para dp_k1, usuário
+	para dp_k1 e respectica senha
+	config/routes.php muda a linha existente:
+	$routes->connect('/', ['controller' => 'Controllers', 'action' => 'index']);
+	
+	para
+	$routes->connect('/', ['controller' => 'Lotes', 'action' => 'index']);
+	
+	Assim quando abrir no navegador
+	http://10.0.0.4/intranet/dp/k1
+	
+	Já será aberto automaticamente o controller LotesController.php, sem precisar indicar na URL.
+	Caso queira que abra Perimentros indique no lugar de Lotes.
+
+- Atualizar o CakePHP
+
+Abra a console do servidor usando o Putty ou o Git Bash
+	
+- Gerar o código com o bake
+cd /var/www/html/intranet/dp/k1
+
+Executar para cada tabela o comando que cria todo o CRUD para a mesma, como abaixo
+
+bin/cake bake all perimetro_codigos
+bin/cake bake all tipo_perimetros
+bin/cake bake all perimetros
+bin/cake bake all tipo_cobrancas
+bin/cake bake all tipo_lotes
+bin/cake bake all lotes
+bin/cake bake all contratos
+bin/cake bake all irrigante_pfs
+bin/cake bake all irrigante_pjs
+bin/cake bake all indice_correcoes
+bin/cake bake all publicados
+bin/cake bake all tipo_motivos
+bin/cake bake all cobrancas
+bin/cake bake all prorrogacoes
+
+Caso ao tentar executar o bin/cake dê permissão negada, então execute:
+chmod +x bin/cake 
+e repita o comando
+
+Caso encontre alguma mensagem para sobrescrever/overwrite, então use o parâmetro -f ao final de cada linha.
+
+Ajustes:
+- displayField nas tabelas relacionadas que aparecem nas index
+- Formatação: data, moeda, etc
+- Validações
+	- datas
+	- cpf
+	- cnpj
+	- telefone
+	- cep
+	etc

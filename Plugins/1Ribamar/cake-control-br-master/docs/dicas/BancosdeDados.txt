@@ -1,0 +1,67 @@
+Dicas sobre Bancos de dados
+
+Tabelas
+
+Se um campo não for importante não adicionemos na tabela
+Mas se for importante precisa ser requerido
+
+Conexão do aplicativo Cake com PostgreSQL
+
+config/app.php
+
+Altere a seção Datasource de acordo com seu banco
+Caso use um esquema diferente do public, use como abaixo
+
+...
+            'driver' => 'Cake\Database\Driver\Postgres',
+...
+            //'port' => 'non_standard_port_number',
+            'username' => 'postgres',
+            'password' => 'postgres',
+            'database' => 'dn_modelo',
+            'schema' => 'basico',            
+..
+
+Relacionamentos
+
+O campo secundário do relacionamento precisa ser NOT NULL na tabela.
+
+Exemplo
+users com clientes
+
+Em clientes temos o campo user_id que relaciona as tabelas.
+Na tabela clientes o campo user_id precisa ser:
+
+user_id int not null
+
+Caso contrário teremos sérios problemas de cadastramento de todos os registros 
+vazios e fura o relacionamento.
+
+Relacionamentos no Banco e no Cake
+
+O CakePHP tem uma convenção para relacionamento entre tabelas, como visto acima, 
+de forma que nem precisamos implementar o relacionamento pelo SGBD, pois o Cake cuida disso pra nós.
+
+Acontece que no nosso exemplo de script, onde não implementamos o relacionamento pelo banco, temos
+100 registros de servidores, todos relacionados com users e ainda não temos nenhum user cadastrado.
+Isto não é coerente. Só deveriamos adicionar um servidor, quando antes tivéssemos cadastrado o user respectivo.
+
+Recomendação: sempre implemente os relacionamentos no banco, que fica mais coerente e mais seguro.
+
+Para implementar relacionamento entre servidores e users na tabela servidores faça assim (mas isso no 
+início, antes de criar servidores):
+
+CREATE TABLE servidores (
+	id SERIAL PRIMARY KEY,
+	nome varchar(55) NOT NULL,
+	nascimento date default null, -- Requerido default null em campos data peço cake
+	cpf char(11),
+	fone varchar(14),
+	user_id integer not null,
+    created timestamp(0) without time zone DEFAULT NULL,
+    modified timestamp(0) without time zone DEFAULT NULL,  
+	observacao text,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE RESTRICT
+);
+
+Esta sintaxe funciona no PostgreSQL e também no MySQL.

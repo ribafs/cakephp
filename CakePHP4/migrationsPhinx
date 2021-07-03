@@ -1,0 +1,84 @@
+Utilizando migrations em PHP com Phinx
+
+Fala pessoal, tudo certo?
+
+Hoje irei escrever sobre este tema que é muito bacana e que ainda não está totalmente difundido na comunidade de desenvolvimento de software.
+Migrations
+
+Basicamente consiste em manter o versionamento da base de dados de uma aplicação e realizar sua manipulação através do código, possibilitando o compartilhamento de todo o seu histórico de alterações.
+
+Isso facilita muito a vida de qualquer equipe de desenvolvimento, uma vez que torna possível alterar o schema da aplicação apenas com a execução do código responsável por isso, que também é versionado e compartilhado com o resto do projeto.
+Phinx
+
+É um componente que torna o gerenciamento de migrações algo ridiculamente fácil (palavras da própria biblioteca) e portanto iremos utilizá-lo.
+
+Existem diversas opções de bibliotecas com este mesmo propósito e geralmente os frameworks já carregam consigo um componente para essa finalidade. Por exemplo: O Phinx é um projeto do Rob Morgan e inclusive já vem “embutido” como padrão no framework CakePHP.
+Instalando e inicializando o Phinx
+
+composer require robmorgan/phinx
+Configurações
+
+Em primeiro lugar, execute o comando abaixo:
+
+vendor\bin\phinx init
+
+Um arquivo .yml será criado no diretório raiz da projeto e é nele que você deverá definir o diretório onde serão geradas as migrações, bem como as credenciais de acesso ao banco de dados.
+
+Na linha 2 do arquivo phinx.yml defina o diretório das migrations:
+
+migrations: '%%PHINX_CONFIG_DIR%%/db/migrations'
+
+Então crie essa estrutura de diretórios:
+
+Em seguida, configure o acesso ao banco de dados:
+
+Lembrando que estes dados são dados de exemplo e você deverá informar as credenciais de acesso de acordo com a configuração do seu projeto.
+
+O Phinx oferece três “ambientes” de execução, sendo eles: production, development e testing. Você pode definir qual deseja utilizar na linha 7 do arquivo phinx.yml através da flag default_database.
+Criando uma migration
+
+vendor\bin\phinx create CreateTasksTable
+
+O comando acima irá criar um arquivo no diretório db/migrations com a estrutura base de uma migration. Como o nome da migration sugere, iremos escrever o código responsável por criar a nossa tabela de tarefas (tasks) e definir os seus atributos.
+
+Para isso, iremos alterar o método change() com o seguinte conteúdo:
+
+$table = $this->table('tasks');
+$table->addColumn('description', 'string')
+      ->create();
+
+Na linha 1 definimos o nome da tabela. Já na linha 2, adicionamos a coluna description e na linha 5, invocamos o método create(), responsável por de fato realizar as alterações no schema.
+Executando
+
+vendor\bin\phinx migrate
+
+No console, você deve obter este resultado:
+
+E sucesso! Vejam como de fato as alterações foram realizadas na base de dados:
+Caso de uso
+
+Desenvolvimento local:
+
+Sempre que houver qualquer alteração no schema do projeto, a equipe deverá obter as migrations (que são versionadas com o restante do código) e os desenvolvedores, apenas executando o comando vendor\bin\phinx migrate, terão todas as alterações repassadas para sua base local, maravilha não?
+
+Deploy:
+
+Uma prática bastante utilizada no processo de implantação de aplicações é definir em uma pipeline a execução das migrations, dessa forma é possível manter o schema de produção sempre atualizado sem a necessidade de acessar o banco de dados manualmente.
+Observações
+
+Percebam que o campo id foi criado automaticamente pelo Phinx sem que fosse necessário eu informar isso no código da migration.
+
+Existem diversos métodos que podem ser utilizados para manipular schemas com a finalidade de criar e renomear tabelas e colunas, definir foreign keys e outros, além de existir a possibilidade de realizar consultas, inserir dados e até mesmo executar SQL, se necessário.
+
+Sugiro fortemente que acessem a documentação oficial do Phinx para descobrir todas as possibilidades de uso e aprender sobre tópicos avançados deste incrível componente.
+Rollback
+
+É possível reverter as alterações realizadas no seu schema, para isso basta executar o seguinte comando:
+
+vendor\bin\phinx rollback
+Conclusão
+
+Sem dúvidas o uso de migrations facilita a manutenção de bancos de dados em projetos de software, agregando o poder do versionamento e compartilhamento de código já difundidos em nosso cotidiano.
+
+Espero de verdade que este conteúdo tenha colaborado com seu aprendizado e até a próxima!
+https://imasters.com.br/php/utilizando-migrations-em-php-com-phinx

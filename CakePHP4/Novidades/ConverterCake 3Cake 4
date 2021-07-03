@@ -1,0 +1,45 @@
+Conversão do Cake 3 para o Cake 4
+
+Para converter um plugin remoto, no GitHub
+Uma boa ideia é criar um plugin local com o bake:
+
+bin/cake bake plugin AdminBr
+
+EventManager
+
+Mudou para
+getEventManager::instance()->on(
+
+O método subject() mudou para
+
+getSubject()
+Assim como vários outros
+
+Carregar o plugin, sem o --bootstrap
+bin/cake plugin load AdminBr
+
+Rotas
+
+Trocar
+ $routes->connect('/', ['controller' => 'Users', 'action' => 'login']);
+
+por
+    $builder->connect('/', ['controller' => 'Users', 'action' => 'login']);
+
+Em src/Application.php
+
+    public function bootstrap(): void
+
+$this->addPlugin('ribafs/AdminBr');
+
+$this->addPlugin(ContactManagerPlugin::class, ['routes' => false]);
+
+ou
+// Use the disable/enable to configure hooks.
+$plugin = new ContactManagerPlugin();
+
+$plugin->disable('bootstrap');
+$plugin->enable('routes');
+$this->addPlugin($plugin);
+
+https://book.cakephp.org/4/en/appendices/4-0-migration-guide.html

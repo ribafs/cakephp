@@ -1,0 +1,46 @@
+
+
+O Query Builder do CakePHP funciona basicamente em dois passos. O primeiro passo você monta a query, no segundo passo você executa a query e ela pode lhe retornar um objeto da sua entity ou uma collection.
+
+No exemplo que você apresentou, você está executando apenas o primeiro passo, que é montar a query. Quando você dá um echo na sua view, ele está excutando o método toString do Query Builder, e não executando a query que ele montou.
+
+Para executar a query e retorna um objeto com os dados do seu banco de dados, você pode usar um dos seguintes métodos: all(), toArray(), first(), extract() e para métodos que façam insert, delete ou update o método execute(). Recomendo que teste-os para ver o funcionamento e seu comportamento.
+
+No seu caso, você poderia fazer da seguinte maneira:
+
+use Cake\ORM\TableRegistry;
+
+public function index()
+{
+   $contratacoes = TableRegistry::get('Contratacoes');
+   $query = $contratacoes->find();
+   $soma_financiamento = $query
+      ->select(['sum' =>$query->func()->sum('vlr_financiamento')])
+      ->first();
+
+   // Descomente a linha abaixo para ver o resultado da query
+   // debug($soma_financiamento);
+
+   $this->set(['soma_financiamento' => $soma_financiamento->sum]);
+}
+
+Existe outras maneiras de fazer isso. O Query Builder armazena internamente uma colletion com os dados da sua query. Ela é populada quando é chamado um método da colletion com o estado atual do seu Query Builder.
+
+Sendo assim outra possível solução é:
+
+use Cake\ORM\TableRegistry;
+
+public function index()
+{
+   $contratacoes = TableRegistry::get('Contratacoes');
+   $query = $contratacoes->find();
+
+   $this->set(['soma_financiamento' => $query->sumOf('vlr_financiamento')]);
+}
+
+Referencias e leitura recomendada da documentaçãodo CakePHP:
+
+    https://book.cakephp.org/3.0/en/orm/query-builder.html
+    https://book.cakephp.org/3.0/en/core-libraries/collections.html#aggregation
+
+

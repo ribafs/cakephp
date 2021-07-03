@@ -1,0 +1,65 @@
+Select com valor default
+
+$options = ['A'=>'Val1',
+            'B'=>'Val2',
+            'C'=>'Val3',
+            'D'=>'Val4',
+            'E'=>'Val5'];			
+ print $this->Form->select('category', $options,['multiple'=>'checkbox', 'required'=>'false', 'label'=>'Category','class'=>'col-md-12','value'=>'E']);
+
+
+Select múltiplo (permite selecionar várias opções)
+
+	print $this->Form->input('pilot_ratings',[
+		'type' => 'select',
+		'class' => 'listbox',
+		'size' => 5,
+		'id' => 'pilot_ratings',
+		'multiple' => 'multiple',
+		'options' => [
+		    ['name' => 'Habilitación de Vuelo Nocturno Local', 'value' => '1'],
+		    ['name' => 'Habilitación Cat. II / Cat. III', 'value' => '2'],
+		    ['name' => 'Habilitación de Remolque de Planeador', 'value' => '5']
+		]
+	]);
+
+
+src/Template/Clientes/add.ctp ou edit.ctp
+
+Ano mínimo sendo 13 anos antes do atual e máximo sendo 100 anos antes do atual, ou seja, 
+como estou em 2016 de 1916 até 2003
+
+		echo $this->Form->input('nascimento',['label' => 'Nascimento',
+	        'dateFormat'    => 'DMY',
+	        'minYear'       => date('Y') - 100,
+	        'maxYear'       => date('Y') - 13,
+	        'empty'         => [
+	            'day'       => 'Dia',
+	            'month'     => 'Mês',
+	            'year'      => 'Ano'
+            ]
+        ]);
+
+
+Criando selects estáticos para os campos controller e action em Permissions/add.ctp
+
+        <?php
+            echo $this->Form->input('group_id', ['options' => $groups,'empty'=>'Grupo']);
+//            echo $this->Form->input('controller');
+		$options = ['Servidores'=>'Servidores',
+            'Groups'=>'Groups',
+            'Users'=>'Users',
+            'Permissions'=>'Permissions',
+            'empty'=>'Controller'];			
+			print $this->Form->select('controller', $options,['required'=>'false', 'label'=>'Controller','class'=>'col-md-12','value'=>'empty']);
+//            echo $this->Form->input('action');
+			$options = ['index'=>'index',
+            'add'=>'add',
+            'edit'=>'edit',
+            'view'=>'view',
+            'delete'=>'delete',            
+            'empty'=>'Action'];			
+			 print $this->Form->select('action', $options,['required'=>'false', 'label'=>'Action','class'=>'col-md-12','value'=>'empty']);
+        ?>
+
+São estáticos, portanto sempre que precisar adicionar um novo controller ou action, precisa alterar este código.

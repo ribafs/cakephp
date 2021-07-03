@@ -1,0 +1,52 @@
+Terceiro Aplicativo
+
+Agora vamos adicionar 3 tabelas: groups, users e privileges. A grande intenção destas tabelas é criar uma área restrita para usuários, ou melhor, criar um controle de acesso, liberando apenas certos usuários para certas seções do aplicativo.
+
+Criar o aplicativo
+
+Ctrl+Alt+C
+comp app4
+
+Banco de Dados
+
+Banco – app3
+Tabelas: clientes, groups e users. 
+Crie o banco e importe o script app3.sql
+
+Configurações
+
+app3/config/app.php
+
+Altere:
+
+            'username' => 'root',
+            'password' => '',
+            'database' => 'app3',
+
+app3/config/routes.php
+
+Adicione a linha, acima da existente:
+    $routes->connect('/', ['controller' => 'Clientes', 'action' => 'index']);
+
+Gerando o código
+cd /backup/www/treinamento
+
+bin/cake bake all clientes
+bin/cake bake all groups
+bin/cake bake all users
+
+Acesse pelo navegador
+
+http://localhost/treinamento/app3 
+
+Experimente acessar
+http://localhost/treinamento/app3/users/login 
+Já estão lá, os actions login() e logout() e a view login.ctp.
+
+Navegue entre as tabelas/controllers assim:
+http://localhost/treinamento/app3   – clientes
+http://localhost/treinamento/app3/users
+http://localhost/treinamento/app3/groups
+Mais a frente adicionaremos um menu para tornar isso mais prático. O Cake tem um recurso chamado Element, que pode ser usado para adicionar um menu ao aplicativo, bastando apenas que adicionemos o arquivo e um link ao layout.
+
+

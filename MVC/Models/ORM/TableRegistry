@@ -1,0 +1,198 @@
+TableRegsitry
+https://book.cakephp.org/3.0/en/orm/table-objects.html
+
+== Retornando os nomes dos clientes no src/Controller/ClientesController.php
+
+O bake já faz isso, mas é importante saber fazer isso manualmente:
+
+Editar o controller Clientes e no action index() adicionar ao final
+
+$clientes = TableRegistry::get('Clientes');
+$query = $clientes->find();
+foreach ($query as $row) {
+    echo '<h3>'.$row->nome.'</h3>';
+}
+
+Adicionar ao início do arquivo:
+
+use Cake\ORM\TableRegistry;
+
+Chame o aplicativo pelo navegador e veja os nomes dos clientes acima
+Também podemos retornar qualquer um dos demais campos.
+
+$clientes = TableRegistry::get('Clientes');
+$query = $clientes->find();
+
+echo '<h3>ID Nome E-mail Usuário</h3>';
+foreach ($query as $row) {
+    echo '<h4>'.$row->id.'-'.$row->nome.'-'.$row->email.'-'.$row->user_id.'</h4>';
+}
+
+Num controller
+
+$clientes = TableRegistry::get('Clientes');
+
+$query = $clientes
+    ->find()
+    ->select(['id', 'nome'])
+    ->where(['id !=' => 1])
+    ->order(['email' => 'DESC']);
+
+foreach ($query as $cliente) {
+    debug($cliente->nome);
+}
+
+
+$resultsIteratorObject = $clientes
+    ->find()
+    ->where(['id >' => 1])
+    ->all();
+
+foreach ($resultsIteratorObject as $cliente) {
+    debug($cliente->id);
+}
+
+$resultsArray = $clientes
+    ->find()
+    ->where(['id >' => 1])
+    ->toList();
+
+foreach ($resultsArray as $cliente) {
+    debug($cliente->id);
+}
+
+debug($resultsArray[0]->nome);
+
+$cliente = $clientes
+    ->find()
+    ->where(['id' => 1])
+    ->first();
+
+debug($cliente->nome);
+
+// Use the combine() method from the collections library
+// This is equivalent to find('list')
+$keyValueList = $clientes->find()->combine('id', 'title');
+
+// An advanced example
+$results = $clientes->find()
+    ->where(['id >' => 1])
+    ->order(['nome' => 'DESC'])
+    ->map(function ($row) { // map() is a collection method, it executes the query
+        $row->trimmedNome = trim($row->nome);
+        return $row;
+    })
+    ->combine('id', 'trimmedNome') // combine() is another collection method
+    ->toArray(); // Also a collections library method
+
+foreach ($results as $id => $trimmedNome) {
+    echo "$id : $trimmedNome";
+}
+
+
+$query = $clientes->find();
+$query->select(['id', 'nome', 'email']);
+foreach ($query as $row) {
+    debug($row->nome);
+}
+
+
+// Results in SELECT id AS pk, title AS aliased_title, body ...
+$query = $clientes->find();
+$query->select(['pk' => 'id', 'aliased_nome' => 'nome', 'email']);
+
+
+// Results in SELECT DISTINCT country FROM ...
+$query = $articles->find();
+$query->select(['country'])
+    ->distinct(['country']);
+
+
+Limite  epágina
+
+// Fetch rows 50 to 100
+$query = $articles->find()
+    ->limit(50)
+    ->page(2);
+
+
+
+$total = $clientes->find()->where(['nome' => 'Ribamar FS2'])->count();
+debug($total);
+
+
+$query = $articles->find();
+$query->select(['Articles.id', $query->func()->count('Comments.id')])
+    ->matching('Comments')
+    ->group(['Articles.id']);
+$total = $query->count();
+
+
+Inserir registro
+
+$clientes = TableRegistry::get('Clientes');
+
+$query = $clientes->query();
+$query->insert(['nome', 'email'])
+    ->values([
+        'nome' => 'Elias Ferreira',
+        'email' => 'meu@amigo.com'
+    ])
+    ->execute();
+
+
+Vários
+$query = $articles->query();
+$query->insert(['title', 'body'])
+    ->values([
+        'title' => 'First post',
+        'body' => 'Some body text'
+    ])
+    ->values([
+        'title' => 'Second post',
+        'body' => 'Another body text'
+    ])
+    ->execute();
+
+Unindo select com insert
+
+$select = $articles->find()
+    ->select(['title', 'body', 'published'])
+    ->where(['id' => 3]);
+
+$query = $articles->query()
+    ->insert(['title', 'body', 'published'])
+    ->values($select)
+    ->execute();
+
+
+Update
+
+$id=2;
+$query = $clientes->query();
+$query->update()
+    ->set(['email' => 'teste@tes.com'])
+    ->where(['id' => $id])
+    ->execute();
+
+
+Delete
+
+$query = $articles->query();
+$query->delete()
+    ->where(['id' => $id])
+    ->execute();
+
+
+Cake 3.6
+
+// Prior to 3.6.0 use association() instead.
+$matchingComment = $articles->getAssociation('Comments')->find()
+    ->select(['article_id'])
+    ->distinct()
+    ->where(['comment LIKE' => '%CakePHP%']);
+
+$query = $articles->find()
+    ->where(['id IN' => $matchingComment]);
+
+

@@ -1,0 +1,136 @@
+Criação de um aplicativo tipo CRUD com o CakePHP3
+
+O principal objetivo aqui é criar um aplicativo tipo CRUD com bons recursos e de forma bem prática.
+
+Vamos começar usando o recurso mais prático do CakePHP, que é o gerador de aplicativos chamado bake.
+Iremos criar um simples CRUD mas já é um recurso muito prático e funcional, que pode ser utilizado para a criação de aplicativos simples para nosso dia a dia. Mais a frente iremos abordar recursos mais avançados.
+
+Estou usando o Linux com diretório web em
+/var/www/html
+
+Caso esteja usando outro sistema operacional faça os devidos ajustes
+
+Caso esteja usando outro ambiente ou em outro diretório web altera o caminho abaixo
+
+- Criar o aplicativo base usando o composer na pasta crud
+    cd /var/www/html
+    composer create-project --prefer-dist cakephp/app crud
+
+Aguarde a instalação e ao final apenas tecle ENTER.
+
+Para saber qual a versão atual do Cake visite este site:
+
+https://github.com/cakephp/cakephp/releases
+
+Ou então, depois de instalado, visualize este arquivos:
+vendor/cakephp/cakephp/VERSION.txt
+
+- Criar o banco de dados no MySQL chamado 'crud' com apenas uma tabela chamada 'clientes'
+Sugestão de gerenciador de bancos de dados: o gerenciador web em PHP http://adminer.org
+
+CREATE TABLE `clientes` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `nome` char(45) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `email` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  PRIMARY KEY (`id`)
+);
+
+INSERT INTO `clientes` (`nome`, `email`) VALUES
+('Ribamar FS',	'ribafs@gmail.com'),
+('João Britu Cunha',	'joao@gmail.com'),
+('Pedro Álvares',	'pedro@gmail.com'),
+('Antônio',	'ant@gm.com'),
+('Jorge',	'jo@df.com'),
+('Cliente',	'cli@cli.com'),
+('Apagar',	'pa@cli.com'),
+('Apagar2',	'pa@cli.com2'),
+('Apagar22',	'pa@cli.com22');
+
+- Configurar o banco no aplicativo
+    cd /var/www/html/crud
+    nano config/app.php
+Como usaremos o mysql basta alterar estar linhas em Datasource
+            'username' => 'root',
+            'password' => '',
+            'database' => 'crud',
+
+- Acessar o aplicativo pelo navegador
+    http://localhost/crud
+
+Ele nos mostra uma página padrão criada automaticamente pelo Cake, mas sem nada do nosso banco
+
+- Configurar o routes.php para Clientes com index
+    nano config/routes.php
+
+Mudar apenas esta linha
+    cd /var/www/html/crud
+    $routes->connect('/', ['controller' => 'Pages', 'action' => 'display', 'home']);
+Para
+    $routes->connect('/', ['controller' => 'Clientes', 'action' => 'index']);
+
+- Gerar o CRUD com o bake
+
+    Execute
+
+    cd /var/www/html/crud
+    bin/cake bake all clientes
+
+    Observe que ele mostra mensagens de que criou todo o nosso código: controller, model, view/template entre outros recursos
+
+Chame pelo navegador
+
+    http://localhost/crud
+
+Ele nos mostra um aplicativo completo, com todo o CRUD, com CSS padrão, paginação, ordenação dos campos apensa clicando em seus labels, etc.
+
+Clique em New Criante e crie um novo cliente.
+
+Entre um nome e entre um e-mail incompleto, apenas o login e clique em SUBMIT.
+Ele já traz validação para o e-mail. Ele verificou na tabela o nome do campo "email" e já aplicou validação.
+Uma beleza. 
+
+Dica: Para que o CakePHP nos preste este serviço o campo email na tabela deve ser NOT NULL.
+
+Corrija e clique em SUBMIT
+
+Como a equipe do Cake está se preparando para lançar a versão 4.0, talvez receba a mensagem de erro:
+
+Deprecated (16384): RequestHandlerComponent::beforeRedirect() is deprecated. This functionality will be removed in 4.0.0. Set the `enableBeforeRedirect` option to `false` to disable this warning. - /backup/www/crud/vendor/cakephp/cakephp/src/Event/EventManager.php, line: 353
+ You can disable deprecation warnings by setting `Error.errorLevel` to `E_ALL & ~E_USER_DEPRECATED` in your config/app.php. [CORE/src/Core/functions.php, line 307]
+
+Caso receba edite novamente o arquivo
+
+config/app.php
+
+E altere a linha
+
+'errorLevel' => E_ALL,
+
+Para
+'errorLevel' => E_ALL & ~E_USER_DEPRECATED,
+
+E chame novamente
+
+    http://localhost/crud
+
+Veja que temos um CRUD funcional (Add, Edit, View e Delete, além de outrosr ecursos), que podemos usar para o cadastro de clientes, uma agenda e qualquer outra finalidade.
+
+Sugestões de leitura:
+
+Uma recomendação é instalar o plugin cake-acl-br, que instala um template com o Bootstrap e um controle de acesso para o aplicativo:
+
+https://github.com/ribafs/cake-acl-br
+
+O site oficial do CakePHP é uma das grandes forças do framework, com tutoriais de exemplo de vários aplicativos:
+https://book.cakephp.org/3.0/en/tutorials-and-examples.html
+https://book.cakephp.org/3.0/en/tutorials-and-examples/blog/blog.html
+https://book.cakephp.org/3.0/en/tutorials-and-examples/blog-auth-example/auth.html
+https://book.cakephp.org/3.0/en/tutorials-and-examples/bookmarks/intro.html
+
+E uma ótima documentação, que pode ser vista online
+https://book.cakephp.org/3.0/en/index.html
+
+Ou offline em PDF ou Epub
+https://book.cakephp.org/3.0/_downloads/en/CakePHPCookbook.pdf
+https://book.cakephp.org/3.0/_downloads/en/CakePHPCookbook.epub
+

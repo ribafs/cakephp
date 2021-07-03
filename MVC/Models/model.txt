@@ -1,0 +1,16 @@
+Classes e Métodos da camada Controller
+
+$post->created = date("d/m/Y H:i:s");
+
+
+Classes e Métodos da camada model
+
+Classe Table
+
+newEntity() - cria uma nova entity e passa esta para o método save(). 
+
+
+Classe Entity
+
+patchEntity() - une um array de dados com uma entity existente.
+

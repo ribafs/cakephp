@@ -1,0 +1,21 @@
+Usando Plugins
+
+Você pode fazer referência aos controllers, models, components, behaviors, e helpers, prefixando o nome do plugin antes
+
+Por exemplo, vamos supor que você queria usar o plugin do ContactManager ContactInfoHelper para produzir algumas informações de contato legítimas em uma das suas opiniões. No seu controller, o $helpers array poderia ficar assim:
+
+public $helpers = ['ContactManager.ContactInfo'];
+
+Esse nome de classe separado por pontos é denominado sintaxe plugin.
+
+Você poderia então acessar o ContactInfoHelper como qualquer outro helper em sua view, como:
+
+echo $this->ContactInfo->address($contact);
+
+		if($loguser == 'user' || $loguser == 'manager'){
+			$this->viewBuilder()->layout('CakeAclBr.default');
+		}else{
+			$this->viewBuilder()->layout('CakeAclBr.admin');
+		}
+
+

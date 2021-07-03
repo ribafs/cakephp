@@ -1,0 +1,28 @@
+Passando dados entre controllers
+
+No cookbook você pode ver um método chamado loadModel(), com ele é possível vocês utilizar o Model de usuários dentro do seu controller livros.
+Exemplo:
+
+$this->loadModel('User');
+$users = $this->User->find('all');
+
+Caso queira carregar um dado específico de outro Model você pode usar:
+
+$this->loadModel('Livro', 2);
+$livro = $this->Livro->read();
+
+Caso você tenha feito o relacionamento corretamente entre as tabelas e criado os Models corretamente você pode usar o sequinte para manipular os dados relacionados
+
+$users = $this->User->Livro->find('all');
+$livros = $this->Livro->User->find('all');
+
+Para obter os dados do usuário logado no cakephp você pode utilizar a seção ou o component Auth
+Auth
+
+$this->Auth->user('id');
+
+Session
+
+$this->Session->read('User.id');
+
+

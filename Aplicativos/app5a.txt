@@ -1,0 +1,54 @@
+Aplicativo app5a
+
+Neste aplicativo apenas melhorarei o componente Control.
+
+Fiz uma cópia do diretório para app5a e copiei também o banco para app5a.
+
+Após copiar diretório e banco e configurar, experimente e veja a diferença. Em termos de funcionalidades para o usuário não mudou tanto mas em termos de código eu procurei otimizar ao máximo e melhorei algumas coisas, confira.
+
+
+Aplicativo app5b
+
+
+Aplicativo app5c
+
+
+Grupos de Usuários
+
+Agora são 4:
+
+Supers - poder total, acessam tudo do aplicativo
+Admins -acesso total às tabelas administrativas: groups, users e permissions (agora mudou de privileges para permissions)
+Managers - acessam tudo que Admins não acessam: todas as tabelas diferentes de groups, users e permissions
+Users - inicialmente tem acesso somente ao login e logout. Para que possa acessar qualquer outro action precisa que seja cadastrado nos actions respectivos. Basta acessar como um Supers ou Admins e cadastrar suas permissões.
+
+Observe que como está os registros na tabela permissions somente serão cadastrados quando for feito o primeiro login no sistema.
+
+Após o primeiro login e execução do sistema, pode comentar as duas linhas respectivas de execução da função populate() no AppController.
+
+Crie o aplicativo fazendo uma cópia do app5b para app5c.
+
+Crie o banco pelo app5c.sql.
+
+Configure o banco, pois as rotas já estão ok.
+
+Abra o aplicativo:
+
+http://localhost/treinamento/app5c
+
+Descomente a linha para permitir add e index no AppController e acesse:
+http://localhost/treinamento/app5c/users 
+
+Então cadastre 4 usuários, um usuário para cada grupo:
+
+Usuário	Senha	Grupo
+super		super		Supers
+admin		admin		Admins
+manager	manager	Managers
+user		user		Users
+
+Então comente novamente a linha que permite add e index.
+
+Faça login no sistema com cada um dos usuários e teste o acesso ao aplicativo.
+
+

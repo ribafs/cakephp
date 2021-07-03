@@ -1,0 +1,63 @@
+Rutas y controladores en CakePHP 3
+Publicado el 21 marzo, 2016 por Edson Mollericona Marín | Categoría:
+
+    Desarrollo Web
+
+Las rutas en CakePHP 3 son un punto de entrada del usuario a nuestra aplicación y a la vez este punto de entrada va representar una petición a dicha aplicación. Cada una de estas rutas apuntará a un controlador para que este posteriormente interactué con cada una de las acciones (métodos) que lo contiene y finalmente se generará una respuesta enviada al usuario ya sea en formato HTML mediante las vistas o puede ser también en formato JSON.
+
+Durante esta lección vamos a conocer los fundamentos necesarios para ir creando nuestras propias rutas, si recuerdas en la segunda lección hemos hablado de la estructura de directorios de CakePHP 3 en el que mencionamos un archivo dentro del directorio config denominado routes.php, es en este archivo en el que vamos a ir componiendo cada una de nuestras rutas que va formar parte de nuestra aplicación. Dentro de las amplias características y opciones que nos trae las rutas cabe resaltar que podemos crear 2 tipos de rutas:
+
+1. Mediante un método estático:
+Router::connect('/', ['controller' => 'Users', 'action' => 'index']);
+1
+	
+Router::connect('/', ['controller' => 'Users', 'action' => 'index']);
+
+2. Mediante un scope que agrupa varias rutas:
+Router::scope('/users', function ($routes) {
+    $routes->connect('/index', ['controller' => 'Users', 'action' => 'index']);
+});
+1
+2
+3
+	
+Router::scope('/users', function ($routes) {
+    $routes->connect('/index', ['controller' => 'Users', 'action' => 'index']);
+});
+
+Si te fijas ambas formas de crear rutas tienen algo en común: Estas van a apuntar a un controlador y ejecutar una acción en concreto. Un controlador va representar la capa de la lógica del negocio, es decir, que cada una de las acciones (métodos) que lo componga va tener su propia lógica o funcionalidad de acuerdo a los requerimientos de la aplicación, por ejemplo si nos referimos al controlador UsersController y la acción index() este va manejar toda la lógica para recuperar una lista de todos los usuarios registrados en nuestra aplicación.
+
+
+Rutas y controladores en CakePHP 3	
+Rutas y controladores en CakePHP 3
+Publicado el 21 marzo, 2016 por Edson Mollericona Marín | Categoría:
+
+    Desarrollo Web
+
+Las rutas en CakePHP 3 son un punto de entrada del usuario a nuestra aplicación y a la vez este punto de entrada va representar una petición a dicha aplicación. Cada una de estas rutas apuntará a un controlador para que este posteriormente interactué con cada una de las acciones (métodos) que lo contiene y finalmente se generará una respuesta enviada al usuario ya sea en formato HTML mediante las vistas o puede ser también en formato JSON.
+
+Durante esta lección vamos a conocer los fundamentos necesarios para ir creando nuestras propias rutas, si recuerdas en la segunda lección hemos hablado de la estructura de directorios de CakePHP 3 en el que mencionamos un archivo dentro del directorio config denominado routes.php, es en este archivo en el que vamos a ir componiendo cada una de nuestras rutas que va formar parte de nuestra aplicación. Dentro de las amplias características y opciones que nos trae las rutas cabe resaltar que podemos crear 2 tipos de rutas:
+
+1. Mediante un método estático:
+Router::connect('/', ['controller' => 'Users', 'action' => 'index']);
+1
+	
+Router::connect('/', ['controller' => 'Users', 'action' => 'index']);
+
+2. Mediante un scope que agrupa varias rutas:
+Router::scope('/users', function ($routes) {
+    $routes->connect('/index', ['controller' => 'Users', 'action' => 'index']);
+});
+1
+2
+3
+	
+Router::scope('/users', function ($routes) {
+    $routes->connect('/index', ['controller' => 'Users', 'action' => 'index']);
+});
+
+Si te fijas ambas formas de crear rutas tienen algo en común: Estas van a apuntar a un controlador y ejecutar una acción en concreto. Un controlador va representar la capa de la lógica del negocio, es decir, que cada una de las acciones (métodos) que lo componga va tener su propia lógica o funcionalidad de acuerdo a los requerimientos de la aplicación, por ejemplo si nos referimos al controlador UsersController y la acción index() este va manejar toda la lógica para recuperar una lista de todos los usuarios registrados en nuestra aplicación.
+
+Sin más te dejo con el nuevo video donde te hablo de todo lo mencionado anteriormente y otras características más puestas a la práctica:
+
+Ahora dime tu, qué te pareció el manejo y la creación de rutas en CakePHP 3? si viste toda lección a detalle te habrás dado cuenta que al final te muestro una grandiosa característica del framework que es el enrutamiento por defecto que nos trae en base a un controlador y su respectiva acción, desde luego este debe seguir cada una de las convenciones de CakePHP para su correcto funcionamiento. Quisiera por favor que me cuentes acá abajo en la caja de comentarios como te fue a ti en esta lección, de verdad que me interesa mucho saberlo, por otra parte y ya para finalizar quisiera pedirte por favor que compartas esta lección en tus redes sociales, de esa manera mi trabajo llega a mas personas interesadas en aprender de este maravilloso framework 8-)

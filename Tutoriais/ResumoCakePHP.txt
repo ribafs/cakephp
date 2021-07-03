@@ -1,0 +1,796 @@
+=== Um Resumo da codificicação do CakePHP
+
+class ArticlesController extends AppController
+{
+
+    public function index()
+    {
+         $this->set('articles', $this->Articles->find('all'));
+    }
+
+    public function view($id = null)
+    {
+        $article = $this->Articles->get($id);
+        $this->set(compact('article'));
+    }
+}
+
+Repare que você está usando get() ao invés de find('all') porquê nós queremos a informação de apenas um artigo.
+
+Repare que nossa action recebe um parâmetro: o ID do artigo que gostariamos de visualizar.
+Se o usuário requisitar /articles/view/3, então o valor '3' é passado como $id para a action.
+
+
+== Para receber segurança com strings nos forms, usar a função h():
+
+<!-- File: src/Template/Articles/view.ctp -->
+
+<h1><?= h($article->title) ?></h1>
+<p><?= h($article->body) ?></p>
+
+
+== Testar se uma requisição é realmente post:
+
+if ($this->request->is('post')) {
+
+
+== Debugar
+
+degub($variavel);exit;
+
+
+== Métodos success e error do FlashComponent para definir mensagens
+
+if ($this->Articles->save($article)) {
+                $this->Flash->success(__('Seu artigo foi salvo.'));
+                return $this->redirect(['action' => 'index']);
+            }
+            $this->Flash->error(__('Não é possível adicionar o seu artigo.'));
+
+
+== Validação dos Forms
+Para tirar proveito dos recursos de validação do Cake, você vai precisar usar o Form helper em suas views.
+Basta usar $this->Form->.
+
+Exemplo de view add:
+
+<!-- File: src/Template/Articles/add.ctp -->
+<h1>Add Article</h1>
+<?php
+    echo $this->Form->create($article);
+    echo $this->Form->input('title');
+    echo $this->Form->input('body', ['rows' => '3']);
+    echo $this->Form->button(__('Salvar artigo'));
+    echo $this->Form->end();
+?>
+
+
+== Regras de validação são definidas no Model, exemplo
+
+    public function validationDefault(Validator $validator)
+    {
+        $validator
+            ->notEmpty('title')
+            ->notEmpty('body');
+
+        return $validator;
+    }
+
+    if ($this->request->is(['post', 'put'])) {
+        $this->Articles->patchEntity($article, $this->request->getData());
+
+Em seguida, a action verifica se a requisição é POST ou PUT e caso seja, os dados são usados para atualizar a entidade de artigo em questão ao usar o método patchEntity().
+
+
+== Recebendo o nome de um action
+$this->request->getParam('action')
+
+
+== Recebendo nome de Controller
+$controllerName = $this->request->getParam('controller');
+
+
+== Camada Model
+use Cake\ORM\TableRegistry;
+
+$users = TableRegistry::get('Users');
+$query = $users->find();
+foreach ($query as $row) {
+    echo $row->username;
+}
+
+
+== Se nós quiséssemos criar um usuário e salvá-lo (com validação) fariamos algo assim:
+
+use Cake\ORM\TableRegistry;
+
+$users = TableRegistry::get('Users');
+$user = $users->newEntity(['email' => 'mark@example.com']);
+$users->save($user);
+
+
+== A camada view
+// No arquivo view, nós renderizaremos um 'elemento' para cada usuário.
+<?php foreach ($users as $user): ?>
+    <div class="user">
+        <?= $this->element('user', ['user' => $user]) ?>
+    </div>
+<?php endforeach; ?>
+
+
+== Controller
+Um controller pode ser visto como um gerente que certifica-se que todos os recursos necessários para completar uma tarefa sejam delegados aos trabalhadores corretos.
+
+Ele aguarda por petições dos clientes, checa suas validades de acordo com autenticação ou regras de autorização, delega requisições ou processamento de dados da camada Model, selecciona o tipo de dados de apresentação que os clientes estão aceitando, e finalmente delega o processo de renderização para a camada View.
+
+Enviar informações do controller para uma view:
+
+$this->set('valores', $valores);
+
+
+== Somente acaitar DELETE ou POST
+    $this->request->allowMethod(['post', 'delete']);
+
+
+== Enviar informações da view para o controller
+
+in your view you can use get method to send the form data. and in your controller's action you can access the passed arguments with $this->params['url'];
+
+in your view
+
+   $this->Form->create('Model', array('type' => 'get', 'action' => 'search'));
+   $this->Form->input('select_tfield_id', array('type' => 'select'));
+   $this->Form->input('value'));
+   $this->Form->end('submit');
+
+In your controller
+
+   function search() {
+       $url = $this->params['url'];
+       $id = $url['select_tfield_id'];
+       $value = $url['value'];
+   }
+
+
+Pelo form
+<?= $this->Form->hidden('name', ['value' => $this->Form->select('name')]) ?>
+Não passa nada, apenas null
+
+
+== Carregar componentes
+$this->loadComponent('Flash');
+$this->loadComponent('Auth');
+
+
+== Alguns actions típicos:
+
+	public function login()
+	{
+		if ($this->request->is('post')) {
+		    $user = $this->Auth->identify();
+		    if ($user) {
+		        $this->Auth->setUser($user);
+		        return $this->redirect($this->Auth->redirectUrl());
+		    }
+		    $this->Flash->error('Your username or password is incorrect.');
+		}
+	}
+
+	public function logout()
+	{
+		$this->Flash->success('You are now logged out.');
+		return $this->redirect($this->Auth->logout());
+	}
+
+	public function index()
+    {
+        $this->set('articles', $this->Articles->find('all'));
+    }
+
+    public function view($id)
+    {
+        $article = $this->Articles->get($id);
+        $this->set(compact('article'));
+    }
+
+    public function add()
+    {
+        $article = $this->Articles->newEntity();
+        if ($this->request->is('post')) {
+            $article = $this->Articles->patchEntity($article, $this->request->getData());
+            if ($this->Articles->save($article)) {
+                $this->Flash->success(__('Your article has been saved.'));
+                return $this->redirect(['action' => 'index']);
+            }
+            $this->Flash->error(__('Unable to add your article.'));
+        }
+        $this->set('article', $article);
+    }
+
+	// src/Controller/ArticlesController.php
+
+	public function edit($id = null)
+	{
+		$article = $this->Articles->get($id);
+		if ($this->request->is(['post', 'put'])) {
+		    $this->Articles->patchEntity($article, $this->request->getData());
+		    if ($this->Articles->save($article)) {
+		        $this->Flash->success(__('Your article has been updated.'));
+		        return $this->redirect(['action' => 'index']);
+		    }
+		    $this->Flash->error(__('Unable to update your article.'));
+		}
+
+		$this->set('article', $article);
+	}
+
+	// src/Controller/ArticlesController.php
+
+	public function delete($id)
+	{
+		$this->request->allowMethod(['post', 'delete']);
+
+		$article = $this->Articles->get($id);
+		if ($this->Articles->delete($article)) {
+		    $this->Flash->success(__('The article with id: {0} has been deleted.', h($id)));
+		    return $this->redirect(['action' => 'index']);
+		}
+	}
+
+
+== Algumas views típicas:
+
+<!-- File: src/Template/Articles/add.ctp -->
+
+<h1>Add Article</h1>
+<?php
+    echo $this->Form->create($article);
+    echo $this->Form->control('title');
+    echo $this->Form->control('body', ['rows' => '3']);
+    echo $this->Form->button(__('Save Article'));
+    echo $this->Form->end();
+?>
+
+<!-- File: src/Template/Articles/edit.ctp -->
+
+<h1>Edit Article</h1>
+<?php
+    echo $this->Form->create($article);
+    echo $this->Form->control('title');
+    echo $this->Form->control('body', ['rows' => '3']);
+    echo $this->Form->button(__('Save Article'));
+    echo $this->Form->end();
+?>
+
+<!-- File: src/Template/Articles/view.ctp -->
+
+<h1><?= h($article->title) ?></h1>
+<p><?= h($article->body) ?></p>
+<p><small>Created: <?= $article->created->format(DATE_RFC850) ?></small></p>
+
+
+<!-- File: src/Template/Articles/index.ctp  (edit links added) -->
+
+<!-- File: src/Template/Articles/index.ctp (delete links added) -->
+
+<h1>Blog articles</h1>
+<p><?= $this->Html->link('Add Article', ['action' => 'add']) ?></p>
+<table>
+    <tr>
+        <th>Id</th>
+        <th>Title</th>
+        <th>Created</th>
+        <th>Actions</th>
+    </tr>
+
+<!-- Here's where we loop through our $articles query object, printing out article info -->
+
+    <?php foreach ($articles as $article): ?>
+    <tr>
+        <td><?= $article->id ?></td>
+        <td>
+            <?= $this->Html->link($article->title, ['action' => 'view', $article->id]) ?>
+        </td>
+        <td>
+            <?= $article->created->format(DATE_RFC850) ?>
+        </td>
+        <td>
+            <?= $this->Form->postLink(
+                'Delete',
+                ['action' => 'delete', $article->id],
+                ['confirm' => 'Are you sure?'])
+            ?>
+            <?= $this->Html->link('Edit', ['action' => 'edit', $article->id]) ?>
+        </td>
+    </tr>
+    <?php endforeach; ?>
+
+</table>
+
+<!-- File: src/Template/Users/login.ctp -->
+
+<div class="users form">
+<?= $this->Flash->render() ?>
+<?= $this->Form->create() ?>
+    <fieldset>
+        <legend><?= __('Please enter your username and password') ?></legend>
+        <?= $this->Form->control('username') ?>
+        <?= $this->Form->control('password') ?>
+    </fieldset>
+<?= $this->Form->button(__('Login')); ?>
+<?= $this->Form->end() ?>
+</div>
+
+
+== Mudando a route:
+
+$routes->connect('/', ['controller' => 'Pages', 'action' => 'display', 'home']);
+
+para
+$routes->connect('/', ['controller' => 'Articles', 'action' => 'index']);
+
+
+== Select num Controller
+use Cake\ORM\TableRegistry;
+
+		$query = TableRegistry::get('Articles')->find();
+
+		foreach ($query as $article) {
+			debug($article->title);
+		}
+
+
+== Por default uma consulta traz todos os campos de uma tabela
+$query = $articles->find();
+$articles->find()->select();
+
+Para trazer apenas id e title:
+$articles->find()->select(['id', 'title']);
+
+
+== Retornar todos os title
+use Cake\ORM\TableRegistry;
+		$articles = TableRegistry::get('Articles');
+		$allTitles = $articles->find()->extract('title');
+		foreach ($allTitles as $title) {
+		    echo $title.'<br>';
+		}
+
+Par chave-valor:
+$list = $articles->find('list');
+
+foreach ($list as $id => $title) {
+    echo "$id : $title"
+}
+
+
+== Retornando os title
+$query = TableRegistry::get('Articles')->find();
+
+foreach ($query as $article) {
+    debug($article->title);
+}
+
+
+== Retornando um único registro de uma tabela
+
+$articles = TableRegistry::get('Articles');
+$article = $articles
+    ->find()
+    ->where(['id' => 1])
+    ->first();
+
+debug($article->title);
+
+
+== Mostrar apenas um campo (title)
+$articles = TableRegistry::get('Articles');
+$query = $articles->find();
+$query->select(['id', 'title', 'body']); // ou apenas $query->select();
+foreach ($query as $row) {
+    debug($row->title);
+}
+
+
+== Limitar registros e páginas:
+// Fetch rows 50 to 100
+$query = $articles->find()
+    ->limit(50)
+    ->page(2);
+
+
+== WHERE CASE
+$query = $cities->find()
+    ->where(function ($exp, $q) {
+        return $exp->addCase(
+            [
+                $q->newExpr()->lt('population', 100000),
+                $q->newExpr()->between('population', 100000, 999000),
+                $q->newExpr()->gte('population', 999001),
+            ],
+            ['SMALL',  'MEDIUM', 'LARGE'], # values matching conditions
+            ['string', 'string', 'string'] # type of each value
+        );
+    });
+# WHERE CASE
+#   WHEN population < 100000 THEN 'SMALL'
+#   WHEN population BETWEEN 100000 AND 999000 THEN 'MEDIUM'
+#   WHEN population >= 999001 THEN 'LARGE'
+#   END
+
+$query = $cities->find()
+    ->where(function ($exp, $q) {
+        return $exp->like('name', '%A%');
+    });
+# WHERE name LIKE "%A%"
+
+
+== Retornar todo o primeiro registro:
+$articles = TableRegistry::get('Articles');
+$query = $articles->find('all', [
+    'order' => ['Articles.created' => 'DESC']
+]);
+$row = $query->first();
+debug($row);
+
+
+== Dinâmico encontrar
+
+$query = $this->Users->findByUsername('usuario');
+$query = $this->Users->findAllByUsername('usuario');
+
+
+== Encontrar relacionados
+
+$query = $articles->find()->contain([
+    'Authors' => ['Addresses'], 'Comments' => ['Authors']
+]);
+
+$query = $products->find()->contain([
+    'Shops.Cities.Countries',
+    'Shops.Managers'
+]);
+
+
+== Inserir um novo registro
+
+$articlesTable = TableRegistry::get('Articles');
+$article = $articlesTable->newEntity();
+
+$article->title = 'A New Article';
+$article->body = 'This is the body of the article';
+
+Atualizar
+$articlesTable = TableRegistry::get('Articles');
+$article = $articlesTable->get(12); // Return article with id 12
+
+$article->title = 'CakePHP is THE best PHP framework!';
+$articlesTable->save($article);
+
+
+== Comunicação entre Model e Controller
+
+Criar function no model:
+	public function teste()
+	{
+		return 'Funciona';
+	}
+
+Chamar no Controller:
+use Cake\ORM\TableRegistry;
+
+		$articles = TableRegistry::get('Articles');
+		$func=$articles->teste();// Redebe do Model
+		$this->set('func',$func); // Envia para a view
+
+
+== Comunicação entre Controller e View/Template
+
+No controller/action:
+
+$this->set('func',$func);
+
+Na view
+
+print $func
+ou
+debug($func)
+
+View outras recebem objetos
+
+foreach($clientes as $cliente){
+	print $cliente->id;
+	print $cliente->name;
+}
+
+
+== Contagem e outros
+
+$query = $this->Model->find()
+    ->where([
+        'category_id'=>1,
+        'ativo'=>1
+    ])->order('created DESC');
+
+debug($query->all());
+debug($query->first());
+debug($query->count());
+
+
+==
+$query = $this->Model->find()
+    ->where([
+        'category_id'=>1,
+        'ativo'=>1
+    ])
+    ->order('created DESC')
+    ->contain([
+        'Category'
+    ]);
+
+//ou com get()
+
+$data = $this->Model->get(1, [
+    'contain'=>['Category']
+]);
+
+
+=============
+Resumo 0 do CakePHP
+
+Geralmente controller são usados para gerenciar a lólica de um único model.
+
+Controllers são classes que estendem a classe AppController. AppController deve conter métodos que são compartilhados entre todos os controllers de sua aplicação.
+
+Os controllers fornecem uma série de métodos que lidam com requisições. Estes são chamados de actions.
+
+Components - são a melhor alternativa sobre código usado por muitos controllers.
+
+Os controllers e componentes contam com um método initilize() que é invocado ao final do cconstrutor do controller.
+
+Qualquer trecho de código ou componente:
+- No AppController fica acessível por todos os controllers.
+- Num certo controller fica acessível somente para este
+
+Redirecionamento para outras páginas
+
+controller/action
+$this->redirect(['controller' => 'Clientes', 'action' => 'index'])
+
+URL
+$this->redirect('http://ribafs.org')
+
+Action do controller atual
+$this->redirect(['action' => 'edit', $id]);
+ou
+$this->setAction('index')
+
+Para o próprio link de onde veio
+$this->redirect($this->referer());
+
+== Carregar model que não é o default
+
+$this->LoadModel('Clientes');
+
+== Componente Flash
+Uma forma eficiente de enviar mensagens do controller para as views
+$this->Flash->msg
+
+msg =
+success
+greatSuccess
+set
+error
+warning
+
+== Layout - contém código de apresentação da view. Tudo que vemos nas views está num layout.
+Estão em src/Template/Layout
+
+O cake já vem com um layout padrão, que é o default.ctp.
+
+Como setar outro layout no controller:
+
+	public function initialize()
+	{
+		$this-viewBuilder()-setLayout('admin');
+	}
+
+== Element - são pedaços de código de apresentação reutilizáveis para as views
+
+Como chamar um element (declarar onde deseja que apareça):
+echo $this->element('nome_element');
+
+== Acesso a Banco de Dados
+
+O trabalho com bancos de dados no Cake é feito com dois objetos Tables (lida com coleções da dados, tabela, por exemplo) e Entities (lida com apenas um registro).
+
+Para trabalhar com Tabelas num controller
+
+Carregar o objeto Table
+use Cake\ORM\TableRegistry;
+
+Carregar o respectivo objeto
+$clientes = TableRegistry::get('Clientes');
+
+Agora pode trabalhar com seu conteúdo.
+
+== Acesso a Bancos de Dados
+
+use Cake\Datasource\ConnectionManager;
+
+$dsn = 'mysql://root:password@localhost/my_database';
+ConnectionManager::config('default', ['url' => $dsn]);
+$conn = ConnectionManager::get('default');
+
+$results = $conn->execute('SELECT * FROM articles')->fetchall('assoc');
+
+Também podemos usar query builder.
+
+== Usando transações
+
+$conn->begin();
+$conn->execute('UPDATE articles SET published = ? WHERE id = ?', [true, 2]);
+$conn->execute('UPDATE articles SET published = ? WHERE id = ?', [false, 2]);
+$conn->commit();
+
+=======================
+Dicas de CakePHP
+
+action index resumido
+
+public function index()
+{
+	$this->set('posts', $this->paginate($this->Posts));
+}
+
+ou
+$this->set('categories', $this->Despesas->find('all'));
+
+action view
+
+public function view($id = null){
+	$post = $this->Posts->get($id);
+	$this->set('posts', $posts);
+}
+
+action add
+    function add() {
+        if (!empty($this->data)) {
+            if ($this->Category->save($this->data)) {
+                $this->Session->setFlash('Your category has been saved.');
+                $this->redirect(array('action' => 'index'));
+            }
+        }
+    }
+
+Alterar combo
+Que mostra id para mostrar o campo descrição
+No Caso o campo role do Users/add, relacionado com Roles
+
+Apenas acessar o RolesTable.php
+e mudar o DisplayField() de id para 'role'.
+
+
+== Criar uma área administrativa
+https://www.youtube.com/watch?v=eWu6r5aO1Jc&index=6&list=PL83b6tjXNFHe-OVRROawG3YdIN_-Kbc6j
+
+Difinir prefixo
+
+config/routes.php
+
+Pouter::prefix('admin', function ($routes) {
+	$routes->fallbacks(DashedRoute::class);
+});
+
+Em controller criar a pasta:
+Admin
+
+Template nova pasta
+Admin
+
+Mover os controllers Roles e Users para a apsta Controller/Admin
+
+Mover também  as respecitivas views/templates (Roles e Users)
+
+Editar os dois controllers de Admin e mudar o namespace adicionando Admin, assim:
+use App\Controller\AppController\Admin;
+
+Para chamar os dois controllers pela url preceda com admin:
+
+http://localhost/logins/admin/users
+
+Para que um controller permita o acesso completo:
+
+use Cake\Event\Event;
+
+public function beforeFilter(Event $event)
+{
+	$this->Auth->allow();
+}
+
+
+Autenticação de e-mail
+https://www.youtube.com/watch?v=cEwf9PpbMcQ
+
+config/app.php
+
+...
+    'EmailTransport' => [
+        'default' => [
+            'className' => 'Mail',
+            // The following keys are used in SMTP transports
+            'host' => 'localhost',
+            'port' => 25,
+            'timeout' => 30,
+            'username' => 'user',
+            'password' => 'secret',
+            'client' => null,
+            'tls' => null,
+            'url' => env('EMAIL_TRANSPORT_DEFAULT_URL', null),
+        ],
+		'gmail' => [
+			'className' => 'Smtp',
+			'host' => 'ssl://smtp.gmail.com',
+			'port' => 465,
+			'timeout' => 30,
+			'username' => 'ribafs@gmail.com',
+			'password' => 'zmxn1029g',
+			'client' => null,
+			'tls' => null,
+			'url' => env('EMAIL_TRANSPORT_DEFAULT_URL', null)
+    ],
+
+Profile
+
+'Email' => [
+        'default' => [
+            'transport' => 'default',
+            'from' => 'you@localhost',
+            //'charset' => 'utf-8',
+            //'headerCharset' => 'utf-8',
+        ],
+		'ribaportal' => [
+			'transport' => 'gmail',
+			'from' => ['ribafs@gmail.com'=>'Portal do RibaFS'],
+		],
+    ],
+
+Criar classe mailler usando o bake
+
+bin/cake bake mailer user
+
+Criar classes no controller e no model
+
+Abrir src/Controller/Mailer/UserMailer.php
+
+Adicionar após a linha 
+static ...
+
+	public function welcome($user)
+	{
+		$this->to($user->email)
+		->profile('ribaportal')
+		->emailFormat('html')
+		->template('welcome_email_template')
+		->layout('default')
+		->viewVars(['nome' => $user->name])
+		->subject(sprintf('Bem vindo, %s', $user->name));
+	}
+
+Criar o template para o e-mail
+
+src/Template/Email/html/welcome_email_template.ctp
+
+<h1>Seja bem-vindo(a), <?php echo $nome;?></h1>
+<p>
+	Apenas um teste de envio de e-mail pelo CakePHP.
+</p>
+
+Para testar criei um novo usuário e veja se ele enviou o e-mail.
+
+
+Recuperação de senha
+
+https://www.youtube.com/watch?v=cEwf9PpbMcQ
+
+

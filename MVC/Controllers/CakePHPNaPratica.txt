@@ -1,0 +1,56 @@
+Cake na Prática
+
+Controller e Views
+
+No controller src/Controller/ClientesController.php
+    public function index()
+    {
+        $this->paginate = [
+            'contain' => ['Users']
+        ];
+        $this->set('clientes', $this->paginate($this->Clientes));
+        $this->set('_serialize', ['clientes']);
+
+	// Testes
+	$this->set('cor', 'Verde');
+		$data = [
+			'color' => 'pink',
+			'type' => 'sugar',
+			'base_price' => 23.95
+		];
+
+		// Make $color, $type, and $base_price available to the view:
+		$this->set($data);
+
+		$this->set($data);
+		$cor1='verde';
+		$cor2='azul';
+		$this->set(compact('cor1','cor2'));
+    }
+
+Na view src/Template/Clientes/index.ctp
+
+<?php 
+echo 'Cor: '.$cor.'<br>';
+echo $color.'<br>';
+echo $type.'<br>';
+echo $base_price.'<br><br>';
+
+echo $cor1.'<br>';
+echo $cor2.'<br><br>';
+
+?>
+
+
+Redirect
+
+Em um action:
+
+	return $this->redirect(['conttroller'=>'Clientes', 'action'=>'add']);
+
+
+Na versão 3 do Cake, os Table Objects contém:
+queries
+callbacks
+validations
+events

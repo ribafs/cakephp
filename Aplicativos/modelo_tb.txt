@@ -1,0 +1,43 @@
+Instalar e configurar Twitter Bootstrap
+
+https://github.com/CakePHPBrasil/TwitterBootstrap
+
+composer require cakephp-brasil/twitter-bootstrap
+
+bin/cake plugin load TwitterBootstrap
+
+bin/cake bake all Clientes --theme TwitterBootstrap
+
+Adicionar ao src/View/AppView.php
+
+public function initialize()
+{
+    $this->loadHelper('Form', ['className' => 'TwitterBootstrap.Form']);
+}
+
+Add ao initialize() do AppController:
+
+// Para adicionar um Título
+$this->set('project_name', 'Título do Aplicativo');
+$this->viewBuilder()->theme('TwitterBootstrap');
+//$this->viewBuilder()->layout('adminlte');
+
+Para alterar o menu superior direito, esquerdo, topo, etc.
+Copie um dos arquivos em
+/vendor/cakephp-brasil/twitter-bootstrap/src/Template/Element
+
+para
+/src/Template/Element/
+
+Para usar o AdminLTE
+Copie de
+/vendor/cakephp-brasil/twitter-bootstrap/src/Template/Element/adminlte/
+
+para
+src/Template/Element/adminlte/header.ctp
+
+Publicando todas as views automaticamente:
+
+bin/cake TwitterBootstrap.publish
+
+

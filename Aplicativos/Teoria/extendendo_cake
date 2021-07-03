@@ -1,0 +1,15 @@
+Vamos agora aprender a extender os recursos do CakePHP
+
+Criarmeos:
+
+- Component - são extensões dos controllers
+
+- Behavior - são extensões dos models
+
+- Helpers - extensões das views
+- Element - extensões das views/templates
+- Layout - organizam o layout das páginas
+
+- Plugin - verdadeiros mini aplicativos que rodam dentro do aplicativo do CakePHP
+
+

@@ -1,0 +1,225 @@
+Tutorial para a criação de um plugin simples para o CakePHP 3
+
+Aqui descrverei como criar um plugin efetuando um clone/download de outro plugin existente no GitHub.
+Só consegui fazer dessa forma, economizando muito esforço, graças às licenças generosas do software livre.
+
+Nosso plugin terá o objetivo de implementar o Bootstrap em aplicativos do CakePHP 3.
+
+Para isso efetuarei um clone do ótimo Plugin twbs-cake-plugin:
+https://github.com/elboletaire/twbs-cake-plugin
+
+Este plugin implementa o Bootstrap mas usa o less ao invés de somente o CSS e também usa outro plugin, o BootstrapUI e acho que fica meio pesado e mais complexo, pelo menos do que eu preciso.
+
+Vou aproveitar a maior parte e usar apenas CSS e ficará mais rápido e mais simples.
+
+Para isso criareei dois projetos, um no GitHub e outro no Packagist para facilitar a instalação e atualização através do Composer usado pelo Packagist.
+
+Eu uso o Linux e mostrarei os passos com este sistema, mas facilmente você pode fazer o mesmo usando outro SO, basta que instale o Git (https://git-scm.com/downloads), pois pouca coisa é exclusiva do sistema, a maior parte é na web nos sites.
+
+Comecemos efetuando o download e descompactação do twbs-cake-plugin
+
+Vamos reomear a pasta existente twbs-cake-plugin-master para twbs-cake-css. Este será o nome do nosso plugin.
+
+Esta é a estrutura de pastas existente no plugin twbs-cake-css:
+
+/config/
+/src/
+/webroot/
+/composer.json
+/LICENSE
+/readme.md
+
+Removerei a pasta config, pois tem apenas o arquivo bootstrap.php, que inicia dois plugins que não usarei.
+
+Da pasta webroot removerei a subpasta less e removerei todo o conteúdo das subpastas fonts e js.
+Vamos deixar esta pasta como ela precisa ficar para que que o plugin adicione suporte ao bootstrap.
+
+Download do Bootstrap
+http://getbootstrap.com/getting-started/#download
+
+Baixar do link Download Bootstrap, que é a opção dist com os mins.
+
+Descompacte
+Criar a pasta twbs-cake-plugin/webroot/css
+Da pasta bootstrap-3.3.7-dist/css copiar o arquivo bootstrap.min.css para a pasta twbs-cake-css/webroot/css
+
+Da pasta bootstrap-3.3.7-dist/fonts copiar o arquivo glyphicons-halflings-regular.ttf para a pasta twbs-cake-css/webroot/fonts
+
+Da pasta bootstrap-3.3.7-dist/js copiar o arquivo bootstrap.min.js para a pasta twbs-cake-css/webroot/js
+
+A pasta webroot do nosso novo plugin está pronta.
+
+Vamos agora customizar o arquivo composer.json. Ele é quem dá as insformações para que o composer instale, atualize ou remova o plugin.
+
+Irei editar seu conteúdo e mudar para que fique assim. Adeque para seu caso:
+
+{
+    "name": "ribafs/twbs-cake-css",
+    "authors": [
+        {
+            "name": "Ribamar FS",
+            "email": "ribafs@gmail.com",
+            "homepage": "http://racotecnic.com",
+            "role": "Developer"
+        }
+    ],
+    "description": "Twitter Bootstrap Plugin for CakePHP 3",
+    "type": "cakephp-plugin",
+    "keywords": ["cakephp", "bootstrap", "plugin", "template"],
+    "license": "MIT",
+    "support": {
+        "issues": "https://github.com/ribafs/twbs-cake-css/issues",
+        "source": "https://github.com/ribafs/twbs-cake-css.git"
+    },
+    "homepage": "https://github.com/ribafs/twbs-cake-css",
+    "require": {
+        "cakephp/cakephp": "^3.3"
+    },
+    "autoload": {
+        "psr-4": {
+            "Bootstrap\\": "src"
+        }
+    }
+}
+
+Tive dúvidas se mantinha ou não os dados do desenvolvedor original, mas resolvi usar os meus, pois estou mantendo o crédito devido.
+
+Quanto ao arquivo LICENSE manterei intacto, pois vou maner a MIT como licença.
+
+Já o readme.md, que é tipo a index do projeto e geralmente contém o tutorial de instalação e uso, apenas renomearei para README.md e alterarei seu conteúdo de forma adaquada:
+
+Simple plugin to implement Bootstrap in CakePHP 3
+===================================================
+
+This plugin is a fork of the Twitter Bootstrap Plugin
+https://github.com/elboletaire/twbs-cake-plugin
+
+This plugin only use CSS, dont use Less.
+
+It also contains bake templates that will help you starting *twitter-bootstraped*
+CakePHP webapps.
+
+General Features
+----------------
+
+- Bake templates.
+- Generic Bootstrap layout.
+
+Installation
+------------
+
+### Adding the plugin
+
+You can easily install this plugin using composer as follows:
+
+```bash
+composer require ribafs/twbs-cake-css
+```
+
+### Enabling the plugin
+
+After adding the plugin remember to load it in your `config/bootstrap.php` file:
+
+```php
+bin/cake plugin load Bootstrap
+```
+
+This will load the CSS for you.
+
+### Add Template to src/Controller/AppController.php
+```php
+    public function beforeRender(Event $event)
+    {
+        $this->viewBuilder()->theme('Bootstrap');
+    ...
+```     
+
+### Baking views
+
+You can bake your views using the twitter bootstrap templates bundled with this
+plugin. To do so, simply specify the `bootstrap` template when baking your files:
+
+```bash
+bin/cake bake all amigos --theme Bootstrap
+```
+
+License
+-------
+
+The MIT License (MIT)
+
+(Aqui o autor pede que se mantenha o texto. Eu o fiz no plugin publicado, apenas não deixei neste tutorial).
+
+
+Nos resta agora a pasta /src/, que de fato contém o código do plugin que será usado pelo Cake.
+
+Ele contém os seguintes arquivos e pastas:
+
+src/Template/Bake/Element/form.ctp
+
+src/Template/Bake/Template/add.ctp
+src/Template/Bake/Template/edit.ctp
+src/Template/Bake/Template/index.ctp
+src/Template/Bake/Template/view.ctp
+
+src/Template/Layout/default.ctp
+
+Os cinco primeiro mantive intocados. Apenas o layout default eu substitui por um que adaptei do original do Cake, que mostro abaixo:
+
+<?php
+// Removi o cabeçalho original apenas aqui
+$cakeDescription = 'CakePHP: the rapid development php framework';
+?>
+<!DOCTYPE html>
+<html>
+<head>
+    <?= $this->Html->charset() ?>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        <?= $cakeDescription ?>:
+        <?= $this->fetch('title') ?>
+    </title>
+    <?= $this->Html->meta('icon') ?>
+
+    <?= $this->Html->css('base.css') ?>
+    <!-- Abaixo estão as duas linhas do css e js que introduzimos -->
+    <?= $this->Html->css('bootstrap.min.css') ?>
+    <?= $this->Html->script('bootstrap.min') ?>
+
+    <?= $this->fetch('meta') ?>
+    <?= $this->fetch('css') ?>
+    <?= $this->fetch('script') ?>
+</head>
+<body>
+<style>
+/* Remover estas linhas de style, caso o texto do site fique com letras muito grandes */
+html { font-size: 14px; }
+body { font-size: 14px; }
+</style>
+
+    <nav class="top-bar expanded" data-topbar role="navigation">
+        <ul class="title-area large-3 medium-4 columns">
+            <li class="name">
+                <h1><a href=""><?= $this->fetch('title') ?></a></h1>
+            </li>
+        </ul>
+        <div class="top-bar-section">
+            <ul class="right">
+                <li><a target="_blank" href="http://book.cakephp.org/3.0/">Documentation</a></li>
+                <li><a target="_blank" href="http://api.cakephp.org/3.0/">API</a></li>
+            </ul>
+        </div>
+    </nav>
+    <?= $this->Flash->render() ?>
+    <div class="clearfix"> <!-- Alterei esta linha. Caso queira volte ao original, que era assim: <div class="container clearfix">-->
+        <?= $this->fetch('content') ?>
+    </div>
+    <footer>
+    </footer>
+</body>
+</html>
+
+Assim concluímos nosso plugin. Como me pareceu que pode ser útil, abriguei no GitHub e Packagist e está em:
+https://github.com/ribafs/twbs-cake-css
+
+

@@ -1,0 +1,77 @@
+Criação de plugins para o CakePHP3
+
+comp app_control
+
+Criar um plugin:
+cd app_control
+bin/cake bake plugin AdminApp
+
+Carregar o plugin no bootstrap.php:
+bin/cake plugin load AdminApp
+
+Estrutura de um plugin:
+
+/src
+/plugins
+    /ContactManager
+        /config
+        /src
+            /Controller
+                /Component
+            /Model
+                /Table
+                /Entity
+                /Behavior
+            /View
+                /Helper
+            /Template
+                /Layout
+        /tests
+            /TestCase
+            /Fixture
+        /webroot
+        
+Criando um controller para o plugin:
+
+bin/cake bake controller --plugin AdminApp Groups
+bin/cake bake controller --plugin AdminApp Users
+bin/cake bake controller --plugin AdminApp Permissions
+
+Criando um componente:
+bin/cake bake component --plugin AdminApp Control
+
+Criar o banco e configurar no app.php e o routes para Groups/index
+
+Criando um model para o plugin:
+bin/cake bake model --plugin AdminApp Groups
+bin/cake bake model --plugin AdminApp Users
+bin/cake bake model --plugin AdminApp Permissions
+
+Criando templates para o plugin:
+bin/cake bake template --plugin AdminApp Groups
+bin/cake bake template --plugin AdminApp Users
+bin/cake bake template --plugin AdminApp Permissions
+
+Criando a view login.ctp para o plugin:
+bin/cake bake template --plugin AdminApp Users login
+
+Chamando o plugin pelo navegador:
+http://localhost/app_control/admin-app/groups
+
+Dica: Sempre que criar um plugin regere o autoloader:
+php composer.phar dumpautoload
+
+O routes é criado automaticamente.
+
+Criar um helper para o plugin:
+bin/cake bake helper --plugin MeuHelper
+
+Criando um Behaviour para o plugin:
+bin/cake bake behavior --plugin MeuBehavior
+
+Routes
+Router::scope('/adminapp', ['plugin' => 'AdminApp'], function ($routes) {
+    $routes->fallbacks();
+});
+
+

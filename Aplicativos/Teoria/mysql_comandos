@@ -1,0 +1,32 @@
+Usando o mysql pela linha de comando
+
+Acessar
+
+mysql -uroot -p
+
+Acessar banco
+
+use banco;
+
+Mostrar tabelas
+
+show tables;
+
+Mostrar estrutura de tabela
+
+desc nome;
+
+Consultas
+
+select * from clientes;
+
+Importar script para um banco. Cria-se o banco antes
+Indicado para quando o phpmyadmin ou o adminer não suportam por ser maior que o php.ini permite
+
+mysql -uroot -p banco <banco sql
+
+Exportar banco para script sql
+
+mysqldump -uroot -p banco > banco .sql
+
+

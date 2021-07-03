@@ -1,0 +1,106 @@
+Criar um aplicativo para exemplo de interação do codigo do CakePHP entre controllers, models e templates.
+
+cake3_app_code
+
+Criar um banco no postgresql com duas tabelas relacionadas
+
+groups e users
+
+Configurar o banco no app.php e a rota para apontar para Users e index
+
+Testar
+
+http://localhost/cake3_app_code
+
+
+== Criar um novo método com apenas uma mensagem/string
+
+Criar um método novo no UsersTable.php
+
+    public function olaModel(){
+        return "Olá model do CakePHP3";
+    }
+
+No UsersController adicione ao início
+
+use Cake\ORM\TableRegistry;
+
+E crie o método ola
+
+	public function ola()
+	{
+		$msg = TableRegistry::get('Users');
+		$ola = $msg->olaModel();
+		$this->set('ola',$ola); 
+	}
+
+No Template Users cria o arquivo ola.ctp contendo
+
+<h3>Mensagem criada no método olaModel Model UsersTable.php e enviada para a view ola.ctp pelo action ola() do Controller UsersController.php</h3>
+<?= $ola ?>
+
+Chamar pelo navegador assim:
+
+http://localhost/cake3_app_code/users/ola
+
+Alternativamente criar um link para a view ola na view index.ctp assim:
+
+Abaixo de New Group
+        <li><?= $this->Html->link(__('Olá'), ['controller' => 'Users', 'action' => 'ola']) ?></li>
+
+
+== Criar um método que pega um registro da tabela users
+
+No UsersTable.php:
+
+Adicione ao início
+    use Cake\ORM\TableRegistry;
+
+	public function umUser()
+	{
+        $users = TableRegistry::get('Users');
+        $query = $users->find();
+        $user=$query->where(['username' => 'super']);
+        return $user;
+	}
+
+No UsersController.php
+
+	public function umUser()
+	{
+		$user = TableRegistry::get('Users');
+		$super = $user->umUser();
+		$this->set('super',$super); 
+	}
+
+No Template/Users criar um_user.ctp contendo
+
+<?php
+//
+?>
+<h3>Usuário recebido do model através do controller</h3>
+
+<?php
+foreach($super as $campos){
+    print ' ID - '.$campos->id.'<br>';
+    print ' Grupo - '.$campos->group_id.'<br>';
+    print ' Username - '.$campos->username.'<br>';
+}
+
+Testar
+
+http://localhost/cake3_app_code/users/um_user
+
+Adicionar o link abaixo para o action Users/index.ctp
+        <li><?= $this->Html->link(__('Um usuário'), ['controller' => 'Users', 'action' => 'um_user']) ?></li>
+
+
+== No exemplo acima trazer o nome do grupo ao invés do id
+
+== Criar um método que pega somente um campo de um registro da tabela users
+
+== Criar um método que pega todos os registros da tabela users
+
+== No model UsersTable criar um método que requisite um registro da tabela groups
+
+

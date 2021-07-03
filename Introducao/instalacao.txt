@@ -1,0 +1,72 @@
+A instalação recomendada e suportada pela equipe do Cake é com o composer
+
+No Windows
+Após ter instalado o servidor (Xampp ou outro) e tudo pronto vamos instalar e usar o Composer.
+
+Download
+https://getcomposer.org/Composer-Setup.exe
+https://git-scm.com/download/win
+
+Instale o composer e o git
+
+Habilitar a extensão intl no php.ini
+
+editar c:\xampp\php\php.ini
+Descomentar a linha abaixo:
+extension=php_intl.dll
+
+Removendo o ; do início
+Restartar o Apache
+
+Adicionar o php ao path
+Painel de Controle - Sistema e Segurança - Sistema
+Configurações Avançadas do Sistema - Variáveis de Ambiente
+
+Clicar em Path e depois em Editar
+Clique na caixa de texto e vá para o final da linha
+Adicione a linha abaixo:
+;C:\xampp\php
+
+Clique em OK - Ok - OK
+
+Criar um arquivo 
+c:\xampp\htdocs\comp.bat
+
+contendo apenas a linha:
+composer create-project --prefer-dist cakephp/app %1
+
+Executar:
+
+cd c:\xampp\htdocs
+
+comp intranet
+
+
+No linux
+curl -sS https://getcomposer.org/installer | php
+
+Colocar no path do Linux
+sudo mv composer.phar /usr/local/bin/composer
+
+Criar App
+composer create-project --prefer-dist cakephp/app nome_ap
+
+Criar script no Linux para automatizar a criação de aplicativos:
+sudo nano /usr/local/bin/comp
+
+Cole a linha:
+composer create-project --prefer-dist cakephp/app $1
+
+Execute
+sudo chmod +x /usr/local/bin/comp
+
+Desabilitando o xdebug (como recomendado) no Linux:
+sudo php5dismod -s cli xdebug
+
+Executar:
+
+cd /var/www/html
+
+comp intranet
+
+

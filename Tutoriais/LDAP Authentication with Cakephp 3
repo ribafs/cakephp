@@ -1,0 +1,263 @@
+LDAP Authentication with Cakephp 3.x
+
+I'm new to Cakephp and working on implementation of LDAP-authentication in my application now. Many things in the "bookmarker" tutorial on the official website works automatically, so it didn't give me enough information about how to implement some specific authentication. I've already checked this post CakePHP 3 Ldap authentication issue and clarification and tried to implement my authentication this way, but still have some understanding problems.
+
+In my database I have a table "Students" which has an attribute "id" as a primary key. My AppController looks as follows:
+
+ public function initialize()
+{
+    parent::initialize();
+
+    $this->loadComponent('Flash');
+    $this->loadComponent('Auth', ['authenticate' =>
+        ['Form' =>
+            ['fields' =>
+                ['username' => 'email',
+                    'password' => 'password']
+            ]
+        ], 'loginAction' => [
+        'controller' => 'Students',
+        'action' => 'login'
+    ]
+    ]);
+
+    $this->Auth->config('authenticate', ['Ldap']);
+}
+
+public function isAuthorized()
+{
+    if($this->Auth->user('departmentnumber') == "***") { return true; }
+}
+
+The LdapAuthenticate class is like in the post I mentioned above:
+
+namespace App\Auth;
+
+use Cake\Auth\BaseAuthenticate;
+use Cake\Network\Request;
+use Cake\Network\Response;
+
+class LdapAuthenticate extends BaseAuthenticate {
+
+protected $_host = '***' ;
+
+public function authenticate(Request $request, Response $response) {
+    $username = $request->data['username'] ;
+    $password = $request->data['password'] ;
+    $ds = @ldap_connect($this->_host) ;
+    if (!$ds) {
+        throw \Cake\Error\FatalErrorException ('Unable to connect to LDAP host.') ;
+    }
+    $basedn = "cn=Users,dc=***";
+    $dn = "cn=$username, " . $basedn;
+    $ldapbind = @ldap_bind($ds, $dn, $password);
+    if (!$ldapbind) {
+        return false ;
+    }
+
+    $entry = ldap_first_entry ($ldapbind) ;
+    $attrs = ldap_get_attributes ($ldapbind, $entry) ;
+    $user  = [] ;
+    // Loop
+    for ($i = 0 ; $i < $attrs["count"] ; $i++) {
+        $user[$attrs[$i]] = ldap_values ($ldapbind, $entry, $attrs[$i])[0] ;
+    }
+    // Then close it and return the authenticated user
+    ldap_unbind ($ldapbind) ;
+    return $user ;
+}
+}
+
+In the StudentsController I've implemented functions login and logout like in the "bookmarker" tutorial:
+
+public function login(){
+    if ($this->request->is('post')){
+        $user = $this->Auth->identify();
+        if ($user) {
+            $this->Auth->setUser($user);
+            return $this->redirect($this->Auth->redirectUrl());
+        }
+
+        // user is not identified
+        $this->Flash->error('Your username or password is not correct');
+    }
+}
+
+public function logout(){
+    $this->Flash->success('You are now logged out');
+    return $this->redirect($this->Auth->logout());
+}
+
+When I open any page, I'm successfully landing in my login.ctp page. After I enter my credentials and click "login", I'm getting an error "SQLSTATE[42S02]: Base table or view not found: 1146 Table '***_db.users' doesn't exist". So I think I made something wrong, but don't have enough understanding to find where - have no idea why it tries to find a "users" table in my database which doesn't exist.
+
+Thank to everyone who helps me with ideas in advance!
+
+========
+Because of incorrect configuration. Instead of using Form in your Auth config, use Ldap:
+
+ $this->loadComponent('Auth', ['authenticate' =>
+        ['Ldap' =>
+            ['fields' =>
+                ['username' => 'email',
+                    'password' => 'password']
+            ]
+        ], 'loginAction' => [
+        'controller' => 'Students',
+        'action' => 'login'
+    ]
+    ]);
+
+Jozé Lorenzo
+
+
+================= Outro ================
+
+CakePHP 3 Ldap authentication issue and clarification
+
+I am working on integrating LDAP authentication in my project. and I followed the tutorial from official CakePHP site that guides through how to create a custom object in application src path and using those custom objects in AuthController.
+
+So I created a folder called Auth in src with the file name called LdapAuthorize.php. The path looks like this src/Auth/LdapAuthorize.php
+
+Here is my LdapAuthorize.php code:
+
+namespace App\Auth;
+
+use Cake\Auth\BaseAuthorize;
+use Cake\Network\Request;
+
+class LdapAuthorize extends BaseAuthorize {
+    public function authorize($user, Request $request) {
+        if ($user == 'username') { // where username is logged on ldap user on a computer.
+            return true;
+        }
+    }
+}
+
+
+	
+
+I am working on integrating LDAP authentication in my project. and I followed the tutorial from official CakePHP site that guides through how to create a custom object in application src path and using those custom objects in AuthController.
+
+So I created a folder called Auth in src with the file name called LdapAuthorize.php. The path looks like this src/Auth/LdapAuthorize.php
+
+Here is my LdapAuthorize.php code:
+
+namespace App\Auth;
+
+use Cake\Auth\BaseAuthorize;
+use Cake\Network\Request;
+
+class LdapAuthorize extends BaseAuthorize {
+    public function authorize($user, Request $request) {
+        if ($user == 'username') { // where username is logged on ldap user on a computer.
+            return true;
+        }
+    }
+}
+
+I also called the object in AppController.php file. Here is my code:
+
+public function initialize()
+{
+    parent::initialize();
+    $this->loadComponent('Flash');
+    $this->loadComponent('Auth', [
+        'loginRedirect' => [
+            'controller' => 'Customers',
+            'action' => 'index'
+        ],
+        'logoutRedirect' => [
+            'controller' => 'Pages',
+            'action' => 'display',
+            'home'
+        ]
+    ]);      
+    $this->Auth->config('authenticate', [
+        'Ldap'
+    ]);
+}
+
+So when I access the url http://localhost/AppPath/Dashboard/index I get Authentication adapter "Ldap" was not found.
+
+Since this is my first experience with CakePHP, I couldn't find that many solution online that help troubleshoot any issues.
+
+Adding additional code for LdapAuthenticate.php:
+
+namespace App\Auth;
+
+use Cake\Auth\BaseAuthenticate;
+use Cake\Network\Request;
+use Cake\Network\Response;
+
+class OpenidAuthenticate extends BaseAuthenticate
+{
+    public function authenticate(Request $request, Response $response)
+    {
+        $users = ["john", "ray"];
+        return $users;
+    }
+}
+
+--------------
+
+
+What you need is a custom authentication adapter, your LdapAuthorize is a custom authorize adapter:
+
+// in src/Auth/LdapAuthenticate.php
+
+namespace App\Auth;
+
+use Cake\Auth\BaseAuthenticate;
+use Cake\Network\Request;
+use Cake\Network\Response;
+
+class LdapAuthenticate extends BaseAuthenticate {
+
+    protected $_host = 'your_ldap_server' ;
+
+    public function authenticate(Request $request, Response $response) {
+        $username = $request->data['username'] ;
+        $password = $request->data['password'] ;
+        $ds = @ldap_connect($this->_host) ;
+        if (!$ds) {
+            throw \Cake\Error\FatalErrorException ('Unable to connect to LDAP host.') ;
+        }
+        $basedn = "your ldap query... "
+        $dn = "uid=$username, ".$basedn;
+        $ldapbind = @ldap_bind($ds, $dn, $password);
+        if (!$ldapbind) {
+            return false ;
+        }
+        // Do whatever you want with your LDAP connection... 
+        $entry = ldap_first_entry ($ldapbind) ;
+        $attrs = ldap_get_attributes ($ldapbind, $entry) ;
+        $user  = [] ;
+        // Loop
+        for ($i = 0 ; $i < $attrs["count"] ; $i++) {
+            $user[$attrs[$i]] = ldap_values ($ldapbind, $entry, $attrs[$i])[0] ;
+        }
+        // Then close it and return the authenticated user
+        ldap_unbind ($ldapbind) ;
+        ldap_close ($ldapbind);
+        return $user ;
+    }
+
+}
+
+--
+ 2
+down vote
+	
+
+I was still having the same error after creating the custom authentication adapter suggested above.
+
+I solved it changing
+namespace App\Auth;
+
+for
+
+namespace Cake\Auth;
+
+In LdapAuthenticate.php
+
+

@@ -1,0 +1,48 @@
+3.6 Roadmap
+Mark Story edited this page on 17 Feb · 29 revisions
+
+Clone this wiki locally
+
+CakePHP 3.6 will be an API compatible release with the previous version of 3.x.
+Deprecations converted into run-time errors ✅
+
+In order to ease the migration into 4.x, all current deprecations that exist only as documentation warnings will be upgraded to run-time E_USER_DEPRECATED errors. By having run-time errors we make deprecations easier to locate and fix. Once an application is run-time error free, upgrading to 4.0.0 should be a one line change in an application's composer.json, and updating any implementations of core interfaces that have changed. See 11385
+Route Builder DSL
+
+Complete more of the backwards compatible changes described in #10643:
+
+    ✅ Add compact Controller::action syntax for controller & action routing defaults.
+    ✅ Entity based Routing 11300
+    ✅ Add new {var} placeholder syntax and deprecate :var. To be removed in 5.0
+    Add default route parameters.
+    Add scheme conditions to routes.
+    Improve how subdomain routes can be created 11689.
+
+Http Middleware improvements
+
+    Add middleware version of SecurityComponent
+    Deprecate AuthComponent in favor of the new Authentication plugin. ✅
+
+Build new Authorization Middleware plugin ✅
+
+The new Authentication plugin does not handle authorization at all. We should build out a new plugin to handle authorization in a pluggable way that integrates well with cakephp/authentication and the PSR7 stack. The authorization plugin will replace the authorization aspects of AuthComponent.
+Command classes ✅
+
+Shells have a complex and sometimes confusing set of features, specifically around sub-commands. Both shell methods and tasks can be sub-commands, and when to use each one is not clear and confusing. We could simplify the console command creation experience by replacing shells with a simpler Command class that provides a set of event life-cycle hooks and easy to use ways to share option parsers, and re-use code. See 11137 and this thread for more information.
+Plugin Application Classes ✅
+
+To make plugin bootstrap more self-contained, and better match the paradigms set in App\Application we will introduce a plugin 'app' class. This class will define the configuration, routing, console commands for a plugin in a self-contained manner. This should make loading plugins easier and allow the addition of a dependency injection container more easily in the future. See 11564
+Create a console sub-split
+
+Like other packages in CakePHP, the Console libraries should be available as a separate package. See 10965.
+Other improvements
+
+    Improve PaginatorComponent::sortWhitelist to provide a mapping so complex sort conditions can be whitelisted. (https://github.com/cakephp/cakephp/issues/10028)
+    Make MissingTemplateExceptions easier to understand by listing the actual paths searched 11476
+    Improve timezone handling so that editing datetimes in a user timezone is easier. 10877
+    Add timezone support to datepickers making it easier to display and accept datetime information in a user's timezone, but automatically convert to the server/database timezone when marshalling. 11517.
+    Improve Validator API by giving more control on how empty fields are handled. 8925.
+    Refactor Database\QueryLogger. Allow the logger to be injected through the constructor. Default to using Log::write() for backwards compatibility.
+
+The remainder of the 3.6 roadmap is unplanned at this point in time.
+

@@ -1,0 +1,19 @@
+Perigo do Valor Default
+
+Na criação das tabelas não deixe valor defaul em campos.
+Caso deixe ele não será criticado, não será exigida uma entrada do usuário.
+Ao teclar enter sem ter digitado nada o valor default será armazenado.
+
+Um bom exemplo é o campo user_id no Clientes/add.ctp que por padrão é criado assim pelo Bake
+
+            echo $this->Form->input('user_id', ['options' => $users]);
+            
+Desta forma o primeiro valor é assumido sempre que o usuário não seleciona algo no select.
+
+Idealmente mude para algo assim:
+            echo $this->Form->input('user_id', ['empty' => true,'options' => $users]);
+            
+Assim, ao teclar enter, sem ter selecionado nada será exigido que selecione algo.
+
+                        
+

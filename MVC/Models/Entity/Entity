@@ -1,0 +1,71 @@
+Entidades\Entity
+
+https://book.cakephp.org/3.0/pt/orm/entities.html
+
+class Cake\ORM\Entity
+
+Enquanto Objetos de tabela representam e fornecem acesso a uma coleção de objetos, entidades representam linhas individuais ou objetos de domínio na sua aplicação. Entidades contêm propriedades persistentes e métodos para manipular e acessar os dados que elas contêm.
+
+Entidades são criadas para você pelo CakePHP cada vez que utilizar o find() em um objeto de Table.
+
+// src/Model/Entity/Article.php
+namespace App\Model\Entity;
+
+use Cake\ORM\Entity;
+
+class Article extends Entity
+{
+}
+
+Acessando dados de uma entity
+
+use App\Model\Entity\Article;
+
+$article = new Article;
+$article->title = 'This is my first post';
+echo $article->title;
+
+Podemos usar get e set
+
+$article->set('title', 'This is my first post');
+echo $article->get('title');
+
+Ao usar set(), você pode atualizar várias propriedades ao mesmo tempo usando um array:
+
+$article->set([
+    'title' => 'My first post',
+    'body' => 'It is the best ever!'
+]);
+
+Accessors & Mutators
+
+Além da simples interface get/set, as entidades permitem que você forneça métodos acessadores e mutadores. Esses métodos deixam você personalizar como as propriedades são lidas ou definidas.
+
+Acessadores usam a convenção de _get seguido da versão CamelCased do nome do campo.
+
+Cake\ORM\Entity::get($field)
+
+Eles recebem o valor básico armazenado no array _properties como seu único argumento. Acessadores serão usadas ao salvar entidades, então seja cuidadoso ao definir métodos que formatam dados, já que os dados formatados serão persistido. Por exemplo:
+
+namespace App\Model\Entity;
+
+use Cake\ORM\Entity;
+
+class Article extends Entity
+{
+    protected function _getTitle($title)
+    {
+        return ucwords($title);
+    }
+}
+
+O acessador seria executado ao obter a propriedade através de qualquer uma dessas duas formas:
+
+echo $user->title;
+echo $user->get('title');
+
+Você pode personalizar como as propriedades são atribuidas definindo um mutador:
+
+Cake\ORM\Entity::set($field = null, $value = null)
+
+

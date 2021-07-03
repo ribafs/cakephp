@@ -1,0 +1,75 @@
+Implementar Bootstrap no CakePHP 3
+
+Para isso usarei o template criado pelo plugin elboletaire/twbs-cake-plugin, para facilitar nossas vidas.
+
+Baixar o Bootstrap
+http://getbootstrap.com/getting-started/#download
+No link Download Bootstrap
+
+Descompacte e separe apenas os:
+css/bootstrap.min.css
+js/bootstrap.min.js
+fonts/glyphicons-halflings-regular.ttf
+
+
+Crie um projeto chamado cake-bs com o cake ou use um existente
+composer create-project --prefer-dist cakephp/app cake-br
+
+Baixar o plugin twbs-cake-plugin:
+https://github.com/elboletaire/twbs-cake-plugin
+
+Descompactar e separar apenas os arquivos:
+
+src/Template/Bake/Element/form.ctp
+src/Template/Bake/Template/(todos os 4 arquivos)
+
+
+Agora vamos trabsferir os arquivos do Bootstrap e do Plugin para nosso projeto:
+
+Estes..
+css/bootstrap.min.css
+js/bootstrap.min.js
+fonts/glyphicons-halflings-regular.ttf
+
+Devem ser copaidos para a pasta cake-bs/webroot
+
+Copie sobrescrevendo existente
+src/Template/Bake/Element/form.ctp
+
+Para
+cake-bs/vendor/cakephp/bake/src/Template/Bake/Element
+
+Copiar os 4 arquivos sobrescrevendo existente de:
+src/Template/Bake/Template/
+
+Para:
+cake-bs/vendor/cakephp/bake/src/Template/Bake/Template
+
+Editar o arquivo do nosso projeto:
+cake-bs/src/Template/Layout/default.ctp
+
+Remova a linha que contem cake.css e adicione estas duas abaixo de bake.css, para que fique assim
+    <?= $this->Html->css('base.css') ?>
+    <?= $this->Html->css('bootstrap.min.css') ?>
+    <?= $this->Html->script('bootstrap.min') ?>
+
+Criar o banco.
+Configurar o banco (config/app.php) e também o config/routes.php
+
+Gerar o(s) CRUD(s):
+
+bin/cake bake all amigos
+
+Se precisar adicione logo abaixo de <body>
+<body>
+<style>
+html { font-size: 14px; }
+body { font-size: 14px; }
+</style>
+
+Prontinho. Pode acessar seu aplicativo já com o Bootstrap aplicado:
+
+http://localhost/cake-bs
+
+Caso queira usar o Cake com o Less uma boa alternativa é o Plugin twbs-cake-plugin, citado acima.
+

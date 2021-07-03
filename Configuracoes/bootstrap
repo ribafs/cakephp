@@ -1,0 +1,17 @@
+bootstrap.php
+
+Veja as mensagens iniciais que ele pode disparar, acusando que este é um dos arquivos iniciais no boot do CakePHP 3.
+
+Observe que ele já vem com várias configurações prontas. Já vem com alguns plugins carregados, como o Migrations e o DebugKit.
+
+Carregando Plugins
+
+Caso queira carregar um plugin de terceiro precisa adicionar uma linha logo abaixo desta:
+Plugin::load('Migrations');
+
+Supondo que precise carregar um plugin chamado Acl:
+
+Plugin::load('Acl');
+
+Evite usar loadAll()
+

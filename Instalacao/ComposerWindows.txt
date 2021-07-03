@@ -1,0 +1,49 @@
+Instalando o CakePHP no Windows via Composer
+
+Após ter instalado o servidor (Xampp ou outro) e tudo pronto vamos instalar e usar o Composer.
+
+Download
+https://getcomposer.org/Composer-Setup.exe
+https://git-scm.com/download/win
+
+Instale o composer e o git
+
+Criar um arquivo c:\xampp\htdocs\comp.bat, contendo a linha:
+
+
+Habilitar a extensão intl no php.ini
+
+editar c:\xampp\php\php.ini
+Descomentar a linha abaixo:
+extension=php_intl.dll
+
+Removendo o ; do início
+Restartar o Apache
+
+
+Adicionar o php ao path
+Painel de Controle - Sistema e Segurança - Sistema
+Configurações Avançadas do Sistema - Variáveis de Ambiente
+
+Clicar em Path e depois em Editar
+Clique na caixa de texto e vá para o final da linha
+Adicione a linha abaixo:
+;C:\xampp\php
+
+Clique em OK - Ok - OK
+
+
+Usando o Composer:
+
+composer install
+Este comando fará o composer ler as configurações setadas no arquivo json e instalar todas as bibliotecas/pacotes necessários para a sua aplicação e também estas mesmas bibliotecas que possuírem dependências terão as mesmas resolvidas. 
+
+composer update
+composer init
+composer validate
+composer self-update
+
+Detalhes
+https://getcomposer.org/doc/03-cli.md
+http://tableless.com.br/composer-para-iniciantes/
+

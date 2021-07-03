@@ -1,0 +1,75 @@
+https://book.cakephp.org/3.0/pt/orm/saving-data.html
+
+Salvando Dados
+
+Depois que carregamos os dados é hora de atualizar e salvar as alterações.
+
+Inserindo dados
+
+A maneira mais fácil de inserir dados no banco de dados é criando uma nova entidade e passando ela pro método save() na classe Table:
+
+use Cake\ORM\TableRegistry;
+
+$clientesTable = TableRegistry::get('clientes');
+$cliente = $clientesTable->newEntity();
+
+$cliente->nome = 'Fátima EF';
+$cliente->email = 'fatima@gmail.com';
+
+if ($clientesTable->save($cliente)) {
+    // The $cliente entity contains the id now
+    $id = $cliente->id;
+}
+
+
+Update
+
+use Cake\ORM\TableRegistry;
+
+$clientesTable = TableRegistry::get('Clientes');
+$cliente = $clientesTable->get(2); // Return cliente with id 12
+
+$cliente->nome = 'Este era o Tiago';
+$clientesTable->save($cliente);
+
+
+
+Salvando com Associações
+
+Por padrão o método save() também salvará associações de um nível:
+
+$clientes = TableRegistry::get('Clientes');
+
+$clientesTable = TableRegistry::get('clientes');
+$user = $clientesTable->Users->findByUsername('super')->first();
+
+$cliente = $clientesTable->newEntity();
+$cliente->nome = 'Um cliente';
+$cliente->email = 'novo@novo.com';
+$cliente->user_id = $user;
+
+if ($clientesTable->save($cliente)) {
+    // A chave estrangeira foi atribuída automaticamente
+    echo $cliente->user_id;
+}
+
+
+O método save() também é capaz de criar novos registros para associações:
+
+$firstComment = $clientesTable->Comments->newEntity();
+$firstComment->body = 'The CakePHP features are outstanding';
+
+$secondComment = $clientesTable->Comments->newEntity();
+$secondComment->body = 'CakePHP performance is terrific!';
+
+$tag1 = $clientesTable->Tags->findByName('cakephp')->first();
+$tag2 = $clientesTable->Tags->newEntity();
+$tag2->name = 'awesome';
+
+$cliente = $clientesTable->get(12);
+$cliente->comments = [$firstComment, $secondComment];
+$cliente->tags = [$tag1, $tag2];
+
+$clientesTable->save($cliente);
+
+

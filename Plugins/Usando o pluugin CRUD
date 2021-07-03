@@ -1,0 +1,57 @@
+Usando o pluugin CRUD
+
+Criar o aplicativo
+composer create-project --prefer-dist cakephp/app crud
+
+Criar o banco crud
+
+Configurar o cake para o banco
+
+Instalar o plugin
+composer require friendsofcake/crud:5.3.3
+
+Carregar o plugin
+bin/cake plugin load Crud
+
+Configurar os controllers
+
+nano src/Controller/AppController.php
+
+Adicionar o trait
+
+class AppController extends  Controller
+{
+    use \Crud\Controller\ControllerTrait;
+
+}
+
+Carregar o componente Crud no AppController Initialize()
+
+        $this->loadComponent('Crud.Crud', [
+            'actions' => [
+                'Crud.Index',
+                'Crud.Add',
+                'Crud.Edit',
+                'Crud.View',
+                'Crud.Delete'
+            ]
+        ]);
+
+Criar o src/Controller/PostsController.php
+
+namespace App\Controller;
+
+class PostsController extends AppController
+{
+}
+
+Criar os templates
+
+bin/cake bake template posts
+
+Testar
+
+http://localhost/crud/posts
+
+
+

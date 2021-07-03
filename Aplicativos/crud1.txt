@@ -1,0 +1,251 @@
+Criação de um aplicativo tipo CRUD com o CakePHP3
+
+O objetivo maior deste tutorial é criar um aplicativo tipo CRUD com o Cake, mas agora apenas codificando, sem a ajuda do bake.
+Vamos seguir de onde paramos no tutorial anterior sobre o crud0.
+
+- Criar o aplicativo base usando o composer na pasta crud1
+cd /var/www/html
+composer create-project --prefer-dist cakephp/app crud1
+
+- Vamos usar o mesmo banco 'crud' criado no tutorial anterior com a tabela clientes
+
+- Configurar o banco no aplicativo
+    cd /var/www/html/crud1
+    nano config/app.php
+Como usaremos o mysql basta alterar estar linhas em Datasource
+            'username' => 'root',
+            'password' => '',
+            'database' => 'crud',
+
+Aproveite e altere a linha com
+        'errorLevel' => E_ALL,
+Para
+        'errorLevel' => E_ALL & ~E_USER_DEPRECATED,
+
+- Configurar o routes.php para que nosso aplicativo acesse automaticamente o action index() do controller Clientes
+    cd /var/www/html/crud1
+    nano config/routes.php
+
+Mudar apenas esta linha
+    $routes->connect('/', ['controller' => 'Pages', 'action' => 'display', 'home']);
+Para
+    $routes->connect('/', ['controller' => 'Clientes', 'action' => 'index']);
+
+Fazendo isso podemos chamar nosso aplicativo assim:
+
+    http://localhost/crud1
+
+E ele chamará 
+http://localhost/crud1/clientes/index
+
+Nos mostrará erros dizendo que não temos o controller clientes.
+
+== Criação do controller ClientesController.php com o action index()
+
+O CakePHP é um framework que segue o padrão MVC. Quando criamos um aplicativo sem criar explicitamente o model ele cria um model para nós.
+Vejamos. Vamos criar o controller
+
+src/Controller/ClientesController.php
+
+Contendo:
+
+<?php
+namespace App\Controller;
+use App\Controller\AppController;
+
+class ClientesController extends AppController
+{
+    public function index()
+    {
+        $clientes = $this->paginate($this->Clientes);
+        $this->set(compact('clientes'));
+    }
+
+}
+
+Veja que é basicamente o mesmo método index() criado pelo bake, mas sem os comentários para simplificar.
+
+Este método usa a função set() para enviar a variável clientes, que contém todos os registros da tabela clientes para a view chamada pelo método index, que no caso é src/Template/Clientes/index.ctp
+
+
+== Criação da View/Template Clientes/index.ctp
+
+Então criemos o diretório
+
+src/Template/Clientes
+
+E dentro dele o template
+
+index.ctp
+
+Contendo
+
+<?php 
+foreach ($clientes as $cliente){ 
+     echo $cliente->id.'-'.$cliente->nome.'-'.$cliente->email.'<br>';
+}
+
+Melhorando um pouco a aparência do nosso template index.ctp:
+
+<table>
+<?php 
+print '<tr><td>ID</td><td>Nome</td><td>E-mail</td></tr>';
+foreach ($clientes as $cliente){ 
+     print '<tr><td>'.$cliente->id.'</td><td>'.$cliente->nome.'</td><td>'.$cliente->email.'</td></tr>';
+}
+print '</table>';
+
+Aqui recebemos a variável $clientes e varremos a mesma com o laço foreach().
+
+Ele mostrará todos os campos de todos os registros.
+
+Veja que fizemos tudo isso apenas com o controller e o template/view, não tocamos em model. O cake cuidou disso para nós.
+
+
+== Criação do action add() e do tempalte add.ctp
+
+Adicionar o método/action add() ao nosso controller clientes
+
+    public function add()
+    {
+        $cliente = $this->Clientes->newEntity();
+        if ($this->request->is('post')) {
+
+            // o método patchEntity(), como o newEntity() validará os dados antes de ser salvo na entidade
+            $cliente = $this->Clientes->patchEntity($cliente, $this->request->getData());
+
+            // Salvar o registro cliente
+            if ($this->Clientes->save($cliente)) {
+                return $this->redirect(['action' => 'index']);
+            }
+        }
+        // Armazena os dados do registro clientes na variável cliente e envia para o add.ctp
+        $this->set(compact('cliente'));
+    }
+
+
+É também o método criado pelo bake mas simplificado.
+
+Se chamar pelo navegador agora com:
+
+http://localhost/crud1/clientes/add
+
+Ele reclamará do tempalte add.ctp correspondente
+
+
+== Criar o template src/Template/Clientes/add.ctp
+
+Contendo este código abaixo, que é uma simplificação do criado pelo bake
+
+<?= $this->Form->create($cliente) ?>
+<legend><?= __('Add Cliente') ?></legend>
+    <?php
+        echo $this->Form->control('nome');
+        echo $this->Form->control('email');
+    ?>
+<?= $this->Form->button(__('Submit')) ?>
+<?= $this->Form->end() ?>
+
+Como não temos nenhum link para esta view podemos chamá-la pelo navegador assim:
+
+http://localhost/crud1/clientes/add
+
+
+== Criando o action a o template view
+
+    Adicionar ao controller o método abaixo
+
+    public function view($id = null)
+    {
+        $cliente = $this->Clientes->get($id);
+        $this->set(compact('cliente'));
+    }
+
+Agora chame pelo navegador com 
+
+http://localhost/crud1/clientes/view/3
+
+Ele informará que o view.ctp não existe
+
+Então crie o arquivo src/Template/Clientes/view.ctp
+
+Contendo
+
+<table class="vertical-table">
+    <tr>
+        <th>Nome</th>
+        <td><?= $cliente->nome ?></td>
+    </tr>
+    <tr>
+        <th>E-mail</th>
+        <td><?= $cliente->email ?></td>
+    </tr>
+    <tr>
+        <th>Id</th>
+        <td><?= $cliente->id ?></td>
+    </tr>
+</table>
+
+Agora chame pelo navegador com 
+
+http://localhost/crud1/clientes/view/3
+
+== Criar o action e o template edit
+
+    public function edit($id = null)
+    {
+        $cliente = $this->Clientes->get($id);
+        if ($this->request->is(['patch', 'post', 'put'])) {
+            $cliente = $this->Clientes->patchEntity($cliente, $this->request->getData());
+            if ($this->Clientes->save($cliente)) {
+                return $this->redirect(['action' => 'index']);
+            }
+        }
+        $this->set(compact('cliente'));
+    }
+
+<?= $this->Form->create($cliente) ?>
+    <h3>Editar Cliente<>
+    <?php
+        echo $this->Form->control('nome');
+        echo $this->Form->control('email');
+    ?>
+<?= $this->Form->button(__('Submit')) ?>
+<?= $this->Form->end() ?>
+
+Agora chame pelo navegador com:
+
+http://localhost/crud1/clientes/edit/3
+
+Ele mostrará um formulário com o registro 3 para ser editado.
+
+Agora o interessante é a criação de uma grid contendo a listagem de todos os registros (index), um botão para adicioanr novos registros e cada registro contendo um link para editar, visualizar e excluir, como fez o Bake.
+
+Mas ainda falta muito para ficar parecido com o código gerado pelo bake:
+- Paginação
+- Ordenação dos campos
+- Estilo com CSS
+- ...
+
+O que vem a seguir?
+
+Veja que nosso aplicativo crud1 não está completo.
+Criaremos o aplicativo crud2 que mostrará links para editar, visualizar e excluir os registros no index.ctp.
+
+Leituras recomendadas:
+
+https://github.com/ribafs/cake-control-br
+
+O site oficial do CakePHP é uma das grandes forças do framework, com tutoriais de exemplo de aplicativos:
+https://book.cakephp.org/3.0/en/tutorials-and-examples.html
+https://book.cakephp.org/3.0/en/tutorials-and-examples/blog/blog.html
+https://book.cakephp.org/3.0/en/tutorials-and-examples/blog-auth-example/auth.html
+https://book.cakephp.org/3.0/en/tutorials-and-examples/bookmarks/intro.html
+
+E uma ótima documentação, que pode ser vista online
+https://book.cakephp.org/3.0/en/index.html
+
+Ou offline em PDF ou Epub
+https://book.cakephp.org/3.0/_downloads/en/CakePHPCookbook.pdf
+https://book.cakephp.org/3.0/_downloads/en/CakePHPCookbook.epub
+

@@ -1,0 +1,33 @@
+Plugin Assets
+
+Os recursos da web de um plugin (mas não arquivos PHP) podem ser atendidos através do plugin no diretório webroot, assim como os assets da aplicação principal:
+
+/vendor/meuVendor/NomePlugin/webroot/
+                               css/
+                               js/
+                               img/
+                               flash/
+                               pdf/
+
+
+Linking to Assets in Plugins
+
+Você pode usar o sintaxe plugin ao vincular aos recursos do plugin usando o View\Helper\HtmlHelper script, image ou css methods:
+
+// Gera a URL /contact_manager/css/styles.css
+echo $this->Html->css('ContactManager.styles');
+
+// Gera a URL  /contact_manager/js/widget.js
+echo $this->Html->script('ContactManager.widget');
+
+// Gera a URL /contact_manager/img/logo.jpg
+echo $this->Html->image('ContactManager.logo');
+
+
+Chamar Element no layout do plugin
+
+/vendor/ribafs/cake-control-br/src/Template/Layout/default.ctp
+
+$this->element('CakeControlBr.topmenu');
+
+

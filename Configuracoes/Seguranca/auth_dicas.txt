@@ -1,0 +1,128 @@
+
+
+public function isAuthorized($user)
+{
+    $requestedUserId=$this->request->pass[0];
+
+    if ($user['rol']=='Admin') 
+    {
+        return true;
+    }
+
+    else if ($user['rol']!='Admin') 
+    {
+
+    if (!($this->request->action == 'index')) 
+    {
+
+    if($userid==$user['id']) 
+    {
+        return true;
+    }
+
+    }
+        return false;
+    }
+    return parent::isAuthorized($user);
+}
+
+---------
+
+if ($this->request->prefix == 'admin') {
+
+        $this->loadComponent('Auth', [
+            'authenticate' => [
+                'Form' => [
+                    'userModel' => 'Admins',
+                    'fields' => ['username' => 'email', 'password' => 'password']
+                ],
+            ],
+            'loginAction' => [
+                'controller' => 'Admins',
+                'action' => 'login'
+            ],
+            'loginRedirect' => [
+                'controller' => 'Admins',
+                'action' => 'index'
+            ],
+            'logoutRedirect' => [
+                'controller' => 'Admins',
+                'action' => 'login',
+            ],
+            'storage' => [
+                'className' => 'Session',
+                'key' => 'Auth.Admin',              
+            ],
+        ]);
+
+    } else {
+
+        $this->loadComponent('Auth', [
+            'authenticate' => [
+                'Form' => [
+                    'userModel' => 'Users',
+                    'fields' => ['username' => 'email', 'password' => 'password']
+                ],
+            ],
+            'loginAction' => [
+                'controller' => 'Users',
+                'action' => 'login'
+            ],
+            'loginRedirect' => [
+                'controller' => 'pages',
+                'action' => 'home'
+            ],
+            'logoutRedirect' => [
+                'controller' => 'Users',
+                'action' => 'login',
+            ],
+            'storage' => [
+                'className' => 'Session',
+                'key' => 'Auth.User',               
+            ],
+        ]);
+
+    }
+    
+Solução
+
+public function loginas($id = null)
+{
+
+    $user = $this->Users->get($id, [
+        'contain' => []
+    ]);
+
+    $this->Auth->__set('sessionKey', 'Auth.User');
+
+    $this->Auth->config([
+        'authenticate' => [
+            'Form' => [
+                'userModel' => 'Users',
+                'fields' => ['username' => 'email', 'password' => 'password']
+            ],
+        ],
+        'loginAction' => [
+            'controller' => 'Users',
+            'action' => 'login'
+        ],
+        'loginRedirect' => [
+            'controller' => 'Pages',
+            'action' => 'home'
+        ],
+        'logoutRedirect' => [
+            'controller' => 'Users',
+            'action' => 'login',
+        ],
+        'storage' => [
+            'className' => 'Session',
+            'key' => 'Auth.User',               
+        ],
+    ]);
+
+    $this->Auth->setUser($user->toArray());
+    return $this->redirect([
+        'prefix' => false,
+        'controller' => 'Pages',
+        'action' => 'home',
+    ]);         

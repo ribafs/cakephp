@@ -1,0 +1,5 @@
+If you want to ensure your autoloader is fresh, you can do
+
+php composer.phar dumpautoload
+
+

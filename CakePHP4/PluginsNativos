@@ -1,0 +1,103 @@
+Acompanham o core
+
+Pacotes nativos mas que podem ser usados separadamente
+        ORM
+        Database
+        Datasource
+        HTTP
+        Console
+        Collection
+        I18n
+        Cache
+        Log
+        Event
+        Utility
+        Validation
+        Form
+
+Acompanham mas podem ser instalados com o composer
+
+Authentication
+
+The authentication plugin integrates with your application as a middleware. It can also be used as a component to make unauthenticated access simpler.
+composer require "cakephp/authentication:^2.0"
+
+Load no src/Application.php
+public function bootstrap(): void
+{
+    parent::bootstrap();
+
+    $this->addPlugin('Authentication');
+}
+
+Authorization
+
+composer require "cakephp/authorization:^2.0"
+
+src/Application.php:
+
+$this->addPlugin('Authorization');
+
+The Authorization plugin integrates into your application as a middleware layer and optionally a component to make checking authorization easier.
+
+Bake
+composer require --dev cakephp/bake:"^2.0"
+
+DebugKit
+composer require --dev cakephp/debug_kit "~4.0"
+bin/cake plugin load DebugKit
+Set 'debug' => true, in config/app.php.
+DebugKit.panels - Enable or disable panels for DebugKit. You can disable any of the standard panels by:
+
+// Before loading DebugKit
+Configure::write('DebugKit.panels', ['DebugKit.Packages' => false]);
+https://book.cakephp.org/4/pt/upgrade-tool.html
+
+Migrations
+Migrations is a plugin supported by the core team that helps you do schema changes in your database by writing PHP files that can be tracked using your version control system.
+composer require cakephp/migrations "@stable"
+bin/cake plugin load Migrations
+https://book.cakephp.org/migrations/3/en/index.html
+
+Phinx
+Phinx makes it ridiculously easy to manage the database migrations for your PHP app. In less than 5 minutes, you can install Phinx using Composer and create your first database migration. Phinx is just about migrations without all the bloat of a database ORM system or application framework.
+
+composer require robmorgan/phinx
+Create folders in your project following the structure db/migrations with adequate permissions. It is where your migration files will live and should be writable.
+
+Phinx can now be executed from within your project:
+vendor/bin/phinx init
+https://book.cakephp.org/phinx/0/en/index.html
+
+Chronos
+Chronos provides a zero-dependency collection of extensions to the DateTime object. In addition to convenience methods, Chronos provides:
+
+    Date objects for representing calendar dates.
+
+    Immutable date and datetime objects.
+
+    A pluggable translation system. Only English translations are included in the library. However, cakephp/i18n can be used for full language support.
+composer require "cakephp/chronos:^2.0"
+https://book.cakephp.org/chronos/2/en/index.html
+
+
+Da equipe mas que não acompanham o core
+
+== debig-kit
+
+https://book.cakephp.org/4/pt/upgrade-tool.html
+
+composer require --dev cakephp/debug_kit:"^4.0"
+
+bin/cake plugin load DebugKit
+
+Set 'debug' => true, in config/app.php.
+
+
+Migrations
+
+composer require robmorgan/phinx
+composer install
+php vendor/bin/phinx
+
+

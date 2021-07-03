@@ -1,0 +1,14 @@
+Selecione como primeiro na combo
+
+echo $this->Form->control('group_id', ['options' => $groups, 'empty'=>'Selecione']);
+
+echo $this->Form->input('grupo', ['label'=>'','id'=>'grupo','readonly' => true,'options' => $grupos, 'empty'=>'Selecione o grupo', 'onchange'=>'grupoFocus()']);
+
+        $this->setDisplayField('username');
+
+<?php echo $this->Html->link('click here', '//www.notw.com', array('target' => '_blank')); ?> 
+
+$this->redirect('http://www.google.com');
+
+echo $this->Html->link( 'Google link!', 'http://www.google.com/' );
+

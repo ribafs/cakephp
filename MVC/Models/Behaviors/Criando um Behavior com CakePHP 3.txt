@@ -1,0 +1,320 @@
+Criando um Behavior com CakePHP 3
+http://josediazgonzalez.com/2013/12/21/building-a-behavior-with-cakephp/
+
+Criando um Plugin Scaffolding
+Eu normalmente coloco código que não é do aplicativo em um plugin. Várias extensões do core como component, behavior, helper pertencem a esta categoria. Você pode normalmente dizer se um código é plugável se você puder se imaginar reusando o código com o contexto de um CMS e um restreador de erros.
+
+Vamos criar a seguinte estrutura de diretórios:
+
+cd aplicativo
+mkdir -p src/plugins/DeletedAt/Model/Behavior
+
+Depois inicializar o plugin com um repositório git. 
+
+cd src/plugins/DeletedAt
+touch Model/Behavior/empty
+git init
+git add Model/Behavior/empty
+git commit -m "Commit inicial"
+git push origin master
+
+As linhas acima subentendem que você criou um repositório no GitHub para o projeto.
+
+Agora iremos criar um plugin:
+
+cd path/to/app
+git clone git@github.com:FriendsOfCake/travis.git vendor/travis
+export COPYRIGHT_YEAR=2013
+export GITHUB_USERNAME="josegonzalez"
+export PLUGIN_PATH="Plugin/DeletedAt"
+export PLUGIN_NAME="DeletedAt"
+export REPO_NAME="cakephp-deleted-at"
+export YOUR_NAME="Jose Diaz-Gonzalez"
+./vendor/travis/setup.sh
+rm -rf vendor/travis
+cd Plugin/DeletedAt
+git add .
+git commit -m "FriendsOfCake support"
+git push origin master
+
+Criando um Behavior simples:
+
+Precisamos criar os arquivos apropriados.
+Criar 
+
+DeletedAtBehavior.php
+DeletedAtBehaviorTest.php
+
+cd app/Plugin/DeletedAt
+mkdir -p Test/Case/Model/Behavior
+touch Model/Behavior/DeletedAtBehavior.php
+
+<?php
+App::uses('ModelBehavior', 'Model');
+class DeletedAtBehavior extends ModelBehavior {
+}
+?>
+
+touch Test/Case/Model/Behavior/DeletedAtBehaviorTest.php
+
+<?php
+App::uses('Model', 'Model');
+App::uses('AppModel', 'Model');
+require_once CAKE . 'Test' . DS . 'CASE' . DS . 'Model' . DS . 'models.php';
+class DeletedAtBehaviorTest extends CakeTestCase {
+}
+?>
+
+Habolitar o plugin:
+
+Adicionar para o final do config/bootstrap.php
+
+CakePlugin::load('DeletedAt');
+
+Executar testes:
+
+cd aplicativo
+cd bin/cake test DeletedAt AllDeletedAt --stderr
+
+Você verá exatamente 1 falha
+
+Excrevendo testes
+
+Para nosso behavior desejamos ser capazes de:
+- Marcar registros como deleted_at com um timestamp
+- Undeletar registros
+
+Nós iremos armazenar estes estado com um campo deleted_at no registro. Será do tipo tatetime e se for nulo, então or egistro nãos erá excluído, caso contrário nós conheceremos quando este foi excluído.
+
+Iremosprecisar de uma fixture/fixação para representar nosso model de teste. Nós devemos criar isto usando o seguinte:
+
+cd aplicativo/plugins/DeletedAt
+mkdir -p Text/Fixture
+touch Text/Fixture/DeletedUserFixture.php
+
+Fixtures são classes usadas para descartar schemas de teste no banco de dados. Elas são úteis para testar ambos os casos reais - usando o schema do banco da tabelas de produção - como também para testes de cenários, como devemos usar para nosso plugin.
+
+Classes fixtures requerem dois atributos de classe: $fields e $records. O atributo $fields é usado para definir o esquema a tabela a ser descartada.
+O atrituto $records é um array de registros a serem inseridos no banco de dados. O atributo $records deve ter valores especificados para cada campo em $fields, de outra forma o behavior deve ser unknown. Usaremos o seguinte para a fixture:
+
+<?php
+App::uses('CakeTestFixture', 'TestSuite/Fixture');
+class DeletedUserFixture extends CakeTestFixture {
+  public $fields = array(
+    'id' => array('type' => 'integer', 'key' => 'primary'),
+    'user' => array('type' => 'string', 'null' => true),
+    'password' => array('type' => 'string', 'null' => true),
+    'created' => 'datetime',
+    'updated' => 'datetime',
+    'deleted' => array('type' => 'datetime', 'null' => true),
+  );
+  public $records = array(
+    array('user' => 'mariano', 'password' => '5f4dcc3b5aa765d61d8327deb882cf99', 'created' => '2007-03-17 01:16:23', 'updated' => '2007-03-17 01:18:31', 'deleted' => '2007-03-18 10:45:31'),
+    array('user' => 'nate', 'password' => '5f4dcc3b5aa765d61d8327deb882cf99', 'created' => '2007-03-17 01:18:23', 'updated' => '2007-03-17 01:20:31', 'deleted' => null),
+    array('user' => 'larry', 'password' => '5f4dcc3b5aa765d61d8327deb882cf99', 'created' => '2007-03-17 01:20:23', 'updated' => '2007-03-17 01:22:31', 'deleted' => null),
+  );
+}
+?>
+
+Agora deixe eu escrever um teste apenas para nossa sanidade. Precisamos preparar nossa classe de teste com o seguinte:
+
+- Uma propriedade $fixture para notificar o PHPUnit como também para que as fixtures carreguem para nosso teste.
+- Um método setup() que será executado antes de cada teste. Iremos configurar/setup nosso model aqui.
+- Um método tearDown() para executar após cada teste. Iremos destruir nosso model aqui para garantir que o próximo caso de teste tenha um ambiente limpo.
+
+Tomei a liberdade de escrever isso para você e você pode copiar o seguinte em seu arquivo de teste DeletedAtBehabior:
+
+<?php
+  public $fixtures = array(
+    'plugin.deleted_at.deleted_user'
+  );
+  public function setUp() {
+    parent::setUp();
+    $this->DeletedUser = ClassRegistry::init('User');
+    $this->DeletedUser->useTable = 'deleted_users';
+    $this->DeletedUser->Behaviors->load('DeletedAt.DeletedAt');
+  }
+  public function tearDown() {
+    unset($this->DeletedUser);
+    parent::tearDown();
+  }
+?>
+
+Agora deixe adicionar um teste. Irei procurar todos os registros deleted e non-deleted:
+
+<?php
+  public function testFindDeleted() {
+    $records = $this->DeletedUser->find('all', array(
+      'conditions' => array('deleted <>' => null)
+    ));
+    $this->assertEqual(1, count($records));
+  }
+  public function testFindNonDeleted() {
+    $records = $this->DeletedUser->find('all', array(
+      'conditions' => array('deleted' => null)
+    ));
+    $this->assertEqual(2, count($records));
+  }
+?>
+
+Encontros Customizados
+
+Para simplificar nossa lógica, não substituiremos o método embutido Model::delete(). Em vez disso, faremos o seguinte:
+- Adicionaremos um custom finder para encontrar registros deleted e non-deleted.
+- Adicionaremos um método customizado para registros softdelete e un-coftdelete
+
+Aqui está um código para lidar com find custom em um behavior. Ele vem do meu post anterior sobre:
+embedding custom finds within behaviors (http://josediazgonzalez.com/2010/12/01/embedding-custom-finds-in-behaviors/)
+com relevante atualização para 2.x.
+
+<?php
+  public $mapMethods = array(
+    '/findDeleted/' => 'findDeleted',
+    '/findNon_deleted/' => 'findNonDeleted',
+  );
+  public function setup(Model $model, $config = array()) {
+      $model->_findMethods['deleted'] = true;
+      $model->_findMethods['non_deleted'] = true;
+  }
+  public function findDeleted(&$model, $functionCall, $state, $query, $results = array()) {
+      if ($state == 'before') {
+        if (empty($query['conditions'])) {
+          $query['conditions'] = array();
+        }
+        $query['conditions']["{$model->alias}.deleted <>"] = null;
+        return $query;
+      }
+      return $results;
+  }
+  public function findNonDeleted(&$model, $functionCall, $state, $query, $results = array()) {
+      if ($state == 'before') {
+        if (empty($query['conditions'])) {
+          $query['conditions'] = array();
+        }
+        $query['conditions']["{$model->alias}.deleted"] = null;
+        return $query;
+      }
+      return $results;
+  }
+?>
+
+Agora que nós temos nosso custom find no lugar, deixa modificar nossos testes para usar:
+
+<?php
+  public function testFindDeleted() {
+    $records = $this->DeletedUser->find('deleted');
+    $this->assertEqual(1, count($records));
+  }
+  public function testFindNonDeleted() {
+    $records = $this->DeletedUser->find('non_deleted');
+    $this->assertEqual(2, count($records));
+  }
+?>
+
+Executando
+bin/cake test DeletedAt AllDeletedAt --stderr
+
+Deve nos dar dois textes que passaram.
+
+Excluindo Registros
+
+Agora iremos adicionar dois métodos customizados. Crie os eguinte teste:
+
+<?php
+  public function testSoftdelete() {
+    $this->DeletedUser->softdelete(1);
+    $deleted = $this->DeletedUser->find('deleted');
+    $nonDeleted = $this->DeletedUser->find('non_deleted');
+    $this->assertEqual(1, count($deleted));
+    $this->assertEqual(2, count($nonDeleted));
+    $this->DeletedUser->softdelete(2);
+    $deleted = $this->DeletedUser->find('deleted');
+    $nonDeleted = $this->DeletedUser->find('non_deleted');
+    $this->assertEqual(2, count($deleted));
+    $this->assertEqual(1, count($nonDeleted));
+    $this->DeletedUser->softdelete(3);
+    $deleted = $this->DeletedUser->find('deleted');
+    $nonDeleted = $this->DeletedUser->find('non_deleted');
+    $this->assertEqual(3, count($deleted));
+    $this->assertEqual(0, count($nonDeleted));
+  }
+  public function testUnDelete() {
+    $this->DeletedUser->undelete(3);
+    $deleted = $this->DeletedUser->find('deleted');
+    $nonDeleted = $this->DeletedUser->find('non_deleted');
+    $this->assertEqual(1, count($deleted));
+    $this->assertEqual(2, count($nonDeleted));
+    $this->DeletedUser->undelete(2);
+    $deleted = $this->DeletedUser->find('deleted');
+    $nonDeleted = $this->DeletedUser->find('non_deleted');
+    $this->assertEqual(1, count($deleted));
+    $this->assertEqual(2, count($nonDeleted));
+    $this->DeletedUser->undelete(1);
+    $deleted = $this->DeletedUser->find('deleted');
+    $nonDeleted = $this->DeletedUser->find('non_deleted');
+    $this->assertEqual(0, count($deleted));
+    $this->assertEqual(3, count($nonDeleted));
+  }
+?>
+
+Executando os testes agora deve nos dar dois testes bem sucedidos (anteriores) e dois falhos (os novos).
+Os novos testes falham por que CakePHP irá mapear undelete e softundelete para os métodos do banco de dados
+caso eles não existam - que é útil em alguns casos, mas em nosso caso, iremos implementar os métodos.
+
+<?php
+  public function softdelete(Model $model, $id = null) {
+    if ($id) {
+      $model->id = $id;
+    }
+    if (!$model->id) {
+      return false;
+    }
+    $deleteCol = 'deleted';
+    if (!$model->hasField($deleteCol)) {
+      return false;
+    }
+    $db = $model->getDataSource();
+    $now = time();
+    $default = array('formatter' => 'date');
+    $colType = array_merge($default, $db->columns[$model->getColumnType($deleteCol)]);
+    $time = $now;
+    if (array_key_exists('format', $colType)) {
+      $time = call_user_func($colType['formatter'], $colType['format']);
+    }
+    if (!empty($model->whitelist)) {
+      $model->whitelist[] = $deleteCol;
+    }
+    $model->set($deleteCol, $time);
+    return $model->saveField($deleteCol, $time);
+  }
+  public function undelete(Model $model, $id = null) {
+    if ($id) {
+      $model->id = $id;
+    }
+    if (!$model->id) {
+      return false;
+    }
+    $deleteCol = 'deleted';
+    if (!$model->hasField($deleteCol)) {
+      return false;
+    }
+    $model->set($deleteCol, null);
+    return $model->saveField($deleteCol, null);
+  }
+?>
+
+Agora deixe rodar testes usando
+
+bin/cake test DeletedAt AllDeletedAt --stderr
+
+Você deve receber a seguinte saída:
+
+Wellcome to cakePHP v.2.4.3 Console
+App: app
+Path: /vagrant/app/app
+CakePHP Test Shell
+...
+Time 1.53 seconds, Memory: 18.25MB
+OK (4 tests, 14 assertions)
+
+

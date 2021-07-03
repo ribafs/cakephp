@@ -1,0 +1,80 @@
+Instalação do CakePHP 3
+
+Via Composer
+Esta é a instalação recomendada e suportada
+
+Via download
+https://github.com/cakephp/cakephp/releases
+
+Aplicativo para Aprendizado de uso do código do CakePHP 3.6
+
+Criar aplicativo
+
+cake cake36_code
+
+Criar banco cake36_code com as tabelas users e clientes relacionadas
+
+Configurar o banco no cake (config/app.php) e o routes para Clientes/index
+
+Gerar o CRUD com o bake
+
+Abrir no navegador
+
+http://localhost/cake36_code
+
+Cadastrar um novo cliente
+
+== Introdução
+
+O CakePHP é um framework que foi concebido para tornar tarefas de desenvolvimento web mais simples e fáceis.
+
+== Convenções
+
+O CakePHP provê uma estrutura organizacional básica que cobre nomes de classes, nomes de arquivos, nomes de banco de dados, e outras convenções. Apesar das convenções levarem algum tempo para serem assimiladas, ao seguí-las o CakePHP evita configuração desnecessária e cria uma estrutura de aplicação uniforme que torna o trabalho com vários projetos uma tarefa suave. O capítulo de convenções cobre as variadas convenções que o CakePHP utiliza está aqui - https://book.cakephp.org/3.0/pt/intro/conventions.html
+
+== Instalação
+
+= Requisitos
+
+- Servidor web, como o Apache
+- PHP 5.6 ou superior.
+- Extensões para PHP: mbstring e intl
+- Servidor de bancos de dados:
+    - MySQL (5.1.10 ou superior)
+    - PostgreSQL
+    - Microsoft SQL Server (2008 ou superior)
+    - SQLite 3
+
+O processo de instalação recomendado e suportado é usando o composer
+Instale o composer globalmente e execute
+
+cd /var/www/html
+composer create-project --prefer-dist cakephp/app nome_app
+
+Com isso ele criará a pasta noma_app contendo toda a estrutura do CakePHP atual e pronto para a criação do aplicativo em
+
+/var/www/html/nome_app
+
+
+== Criação de um CRUD om o CakePHP
+
+Veja o tutorial resumido sobre a criação de um CRUD com o CakePHP ou veja os tutoriais do site oficial:
+- Blog - https://book.cakephp.org/3.0/pt/tutorials-and-examples/blog/blog.html#
+- Bookmarker - https://book.cakephp.org/3.0/pt/tutorials-and-examples/bookmarks/intro.html
+- CMS - https://book.cakephp.org/3.0/en/tutorials-and-examples/cms/installation.html
+
+== Models
+
+São as classes que servem como camada de negócio na aplicação. Isso significa que eles devem ser responsáveis pela gerenciar quase tudo o que acontece com os dados, sua validação, interações e evolução.
+No CakePHP os models são divididos basicamente em duas partes, table e entity.
+    - table - que é uma classe que representa uma tabela e as ações que incidam sobre toda a tabela. Ele permite salvar novos registros, modificar/deletar os que já existem, definir relacionamentos, validações, executar operações em massa, etc.
+    - entity - este representa registros individuais e permite definir comportamento em nível de linha/registro e funcionalidades.
+
+O ORM (Mapeamento Objeto-Relacional) do Cakephp toma emprestadas ideias e conceitos dos padrões ActiveRecord e Datamapper. 
+
+== Configuração do Banco de Dados
+
+O arquivo de configuração do banco é o
+
+/var/www/html/nome_app/config/app.php
+

@@ -1,0 +1,33 @@
+Plugin Controllers
+
+Os Controllers para o nosso plug-in do ContactManager serão armazenados em plugins/ContactManager/src/Controller/. Como a principal coisa que vamos estar fazendo gerenciar contatos, precisaremos de um ContactsController para este plugin.
+
+Então, colocamos nosso new ContactsController em plugins/ContactManager/src/Controller e parece ser assim:
+
+// plugins/ContactManager/src/Controller/ContactsController.php
+namespace ContactManager\Controller;
+
+use ContactManager\Controller\AppController;
+
+class ContactsController extends AppController
+{
+
+    public function index()
+    {
+        //...
+    }
+}
+
+
+<?php
+namespace CakeAclBr\Controller\Component;
+
+use Cake\Controller\Component;
+use Cake\Controller\ComponentRegistry;
+use Cake\Datasource\ConnectionManager;
+
+class ControlComponent extends Component
+{
+    protected $_defaultConfig = [];
+
+

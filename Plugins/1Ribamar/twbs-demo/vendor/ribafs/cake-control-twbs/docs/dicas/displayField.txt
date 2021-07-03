@@ -1,0 +1,17 @@
+Implementação do displayField()
+
+Tenho duas tabelas relacionadas: users e servidores.
+Servidores tem um campo user_id
+
+Em
+src/Model/Table/UsersTable.php
+
+Mude o displayField para mostrar não o id mas o username
+
+        $this->displayField('username');
+        
+No Template/Servidores/index.ctp no valor do user_id, 
+mude apenas $servidore->user->id para $servidore->user->username:
+
+                <td><?= $servidore->has('user') ? $this->Html->link($servidore->user->username, ['controller' => 'Users', 'action' => 'view', $servidore->user->id]) : '' ?></td>
+

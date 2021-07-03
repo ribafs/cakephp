@@ -1,0 +1,345 @@
+Plugins
+https://book.cakephp.org/3.0/en/plugins.html
+
+Plugin Map File
+---------------
+
+Ao instalar plugins através do Composer, você pode notar que
+**vendor/cakephp-plugins.php** é criado. Este arquivo de configuração contém
+um mapa de nomes de plugins e seus caminhos no sistema de arquivos. Isso torna possível
+para que os plugins sejam instalados no diretório padrão do vendor que está fora
+dos caminhos de pesquisa normais. A classe ``Plugin`` usará este arquivo para localizar
+plugins quando são carregados com ``load ()`` ou ``loadAll ()``. Você geralmente
+não precisará editar este arquivo à mão, como Composer e ``plugin-installer``
+O pacote o gerenciará para você.
+
+
+Autoloading Plugin Classes
+--------------------------
+
+Ao usar ``bake`` para criar um plugin ou quando instalar um plugin usando o
+Composer, você normalmente não precisa fazer alterações em seu aplicativo para
+faça com que o CakePHP reconheça as classes que vivem dentro dele.
+
+Em qualquer outro caso, você precisará modificar o arquivo do composer.json do seu aplicativo.
+Para conter as seguintes informações::
+
+    "psr-4": {
+        (...)
+        "MyPlugin\\": "./plugins/MyPlugin/src",
+        "MyPlugin\\Test\\": "./plugins/MyPlugin/tests"
+    }
+
+Se você estiver usando o vendor namespaces para seus plugins, o espaço para nome para mapeamento de caminho
+deve se parecer com o seguinte::
+
+    "psr-4": {
+        (...)
+        "AcmeCorp\\Users\\": "./plugins/AcmeCorp/Users/src",
+        "AcmeCorp\\Users\\Test\\": "./plugins/AcmeCorp/Users/tests"
+    }
+
+Além disso, você precisará dizer ao Composer para atualizar o cache de autoloading::
+
+    $ php composer.phar dumpautoload
+
+Se você não conseguir usar o Composer por qualquer outro motivo, você também pode usar um recurso alternativo
+Autoloading para o seu plugin::
+
+    Plugin::load('ContactManager', ['autoload' => true]);
+
+.. _plugin-configuration:
+
+
+Usando Plugins
+==============
+
+Você pode fazer referência aos controllers, models, components,
+behaviors, e helpers, prefixando o nome do plugin antes
+
+Por exemplo, vamos supor que você queria usar o plugin do ContactManager
+ContactInfoHelper para produzir algumas informações de contato legítimas em
+uma das suas opiniões. No seu controller, o ``$helpers`` array
+poderia ficar assim::
+
+    public $helpers = ['ContactManager.ContactInfo'];
+
+.. note::
+    Esse nome de classe separado por pontos é denominado :term:`sintaxe plugin`.
+
+Você poderia então acessar o ``ContactInfoHelper`` como
+qualquer outro helper em sua view, como::
+
+    echo $this->ContactInfo->address($contact);
+
+.. _plugin-create-your-own:
+
+
+Criando um plugin usando bake
+-----------------------------
+
+O processo de criação de plugins pode ser bastante simplificado usando o bake
+shell.
+
+.. note::
+	Use sempre o bake para gerar código, isso evitará muitas dores de cabeça.
+
+Para criar um plugin com o bake, use o seguinte comando:
+
+    bin/cake bake plugin ContactManager
+
+Agora você pode user o bake com as mesmas convenções que se aplicam ao resto
+do seu aplicativo. Por exemplo - baking controllers:
+
+    bin/cake bake controller --plugin ContactManager Contacts
+
+Consulte o capítulo
+:doc:`/bake/usage` se você
+tiver problemas para usar a linha de comando. Certifique-se de voltar a gerar o seu
+autoloader uma vez que você criou seu plugin:
+
+    $ php composer.phar dumpautoload
+
+
+Criação de Plugin para o CakePHP 3
+
+Irei relatar como criei o plugin twbs-cake-css:
+https://github.com/ribafs/twbs-cake-css
+
+Eu criei um plugin que controla a autenticação em aplicativos do Cake, que é o
+https://github.com/ribafs/cake-control-br
+
+E neste plugin, para melhorar o aspecto, adicionei o plugin twbs-cake-plugin:
+https://github.com/elboletaire/twbs-cake-plugin
+
+Acontece que o twbs-cake-plugin usa less ao invés de css puro e é meio lento. Então resolvi editar o mesmo e criar um que ficasse como eu queria, somente com CSS, mais simples e mais rápido. Resolvi usar o Bootstrap, apenas com CSS.
+
+Baixei o Bootstrap:
+http://getbootstrap.com/docs/4.0/getting-started/download/
+Eu ainda usei a versão 3, que vinha com as fontes glyphicons.
+
+Baixei o twbs-cake-plugin, que tem a seguinte estrutura:
+
+/config
+bootstrap.php
+/src
+/Template
+/Bake
+/Element
+form.ctp
+/Template
+add.ctp
+edit.ctp
+index.ctp
+view.ctp
+/Layout
+default.ctp
+/webroot
+/fonts
+glyphicons-halflings-regular.eot
+glyphicons-halflings-regular.svg
+glyphicons-halflings-regular.ttf
+glyphicons-halflings-regular.woff
+glyphicons-halflings-regular.woff2
+/js
+affix.js
+alert.js
+button.js
+carousel.js
+collapse.js
+dropdown.js
+modal.js
+popover.js
+scrollspy.js
+tab.js
+tooltip.js
+transition.js
+/less
+43 arquivos .less e duas pastas: cakephp e mixins contendo diversos arquivos .less
+composer.json
+LICENSE
+readme.md
+
+Agora veja como mudei o plugin acima para deixar como eu queria:
+
+Comecei eliminando a pasta config com o arquivo bootstrap.php. Ele chama dois outros plugins que não usarei.
+
+Todo o conteúdo da pasta /src eu usarei como está sem nenhuma modificação, pois ela contém o template para que o bake gere o conteúdo com o CSS, apenas mudarei o layout default.ctp.
+
+Veja como ficou o layout default.ctp:
+
+<?php
+/**
+* CakePHP(tm) : Rapid Development Framework (http://cakephp.org)
+* Copyright (c) Cake Software Foundation, Inc. (http://cakefoundation.org)
+*
+* Licensed under The MIT License
+* For full copyright and license information, please see the LICENSE.txt
+* Redistributions of files must retain the above copyright notice.
+*
+* @copyright Copyright (c) Cake Software Foundation, Inc. (http://cakefoundation.org)
+* @link http://cakephp.org CakePHP(tm) Project
+* @since 0.10.0
+* @license http://www.opensource.org/licenses/mit-license.php MIT License
+*/
+
+$cakeDescription = 'CakePHP: the rapid development php framework';
+?>
+<!DOCTYPE html>
+<html>
+<head>
+<?= $this->Html->charset() ?>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+<?= $cakeDescription ?>:
+<?= $this->fetch('title') ?>
+</title>
+<?= $this->Html->meta('icon') ?>
+
+<?= $this->Html->css('base.css') ?>
+<?= $this->Html->css('bootstrap.min.css') ?>
+<?= $this->Html->script('bootstrap.min') ?>
+
+<?= $this->fetch('meta') ?>
+<?= $this->fetch('css') ?>
+<?= $this->fetch('script') ?>
+</head>
+<body>
+<style>
+/* Remover as duas linhas abaixo, caso o texto do site fique com letras muito grandes */
+html { font-size: 14px; }
+body { font-size: 14px; }
+</style>
+
+<nav class="top-bar expanded" data-topbar role="navigation">
+<ul class="title-area large-3 medium-4 columns">
+<li class="name">
+<h1><a href="/"><?= $this->fetch('title') ?></a></h1>
+</li>
+</ul>
+<div class="top-bar-section">
+<ul class="right">
+<li><a target="_blank" href="http://book.cakephp.org/3.0/">Documentation</a></li>
+<li><a target="_blank" href="http://api.cakephp.org/3.0/">API</a></li>
+</ul>
+</div>
+</nav>
+<?= $this->Flash->render() ?>
+<div class="container clearfix"> <!-- Assim <div class="clearfix"> ocupará toda a tela-->
+<?= $this->fetch('content') ?>
+</div>
+<footer>
+</footer>
+</body>
+</html>
+
+Agora vejamos como ficou o conteúdo da pasta /webroot:
+
+/css
+bootstrap.min.css
+/fonts
+glyphicons-halflings-regular.ttf
+/js
+bootstrap.min.js
+
+Um arquivo muito importante é o composer.json, que contém informações para a instalação pelo composer:
+
+{
+"name": "ribafs/twbs-cake-css",
+"authors": [
+{
+"name": "Ribamar FS",
+"email": "ribafs@gmail.com",
+"homepage": "http://racotecnic.com",
+"role": "Developer"
+}
+],
+"description": "Twitter Bootstrap Plugin for CakePHP 3",
+"type": "cakephp-plugin",
+"keywords": ["cakephp", "bootstrap", "plugin", "template"],
+"license": "MIT",
+"support": {
+"issues": "https://github.com/ribafs/twbs-cake-css/issues",
+"source": "https://github.com/ribafs/twbs-cake-css.git"
+},
+"homepage": "https://github.com/ribafs/twbs-cake-css",
+"require": {
+"cakephp/cakephp": "^3.3"
+},
+"autoload": {
+"psr-4": {
+"Bootstrap\\": "src"
+}
+}
+}
+
+
+Outro arquivo importante, que no GitHub funciona como o index.html em sites, é o README.md. Ele geralmente contém o help ensinando a instalar e outras informações.
+
+README.md
+
+Simple plugin to implement Bootstrap in CakePHP 3
+===================================================
+
+This plugin is a fork of the Twitter Bootstrap Plugin
+https://github.com/elboletaire/twbs-cake-plugin
+
+This plugin only use CSS, dont use Less.
+
+It also contains bake templates that will help you starting *twitter-bootstraped*
+CakePHP webapps.
+
+General Features
+----------------
+
+- Bake templates.
+- Generic Bootstrap layout.
+
+Installation
+------------
+
+### Adding the plugin
+
+You can easily install this plugin using composer as follows:
+
+```bash
+composer require ribafs/twbs-cake-css
+```
+
+### Enabling the plugin
+
+After adding the plugin remember to load it in your `config/bootstrap.php` file:
+
+```php
+bin/cake plugin load Bootstrap
+```
+
+This will load the CSS for you.
+
+### Add Template to src/Controller/AppController.php
+```php
+public function beforeRender(Event $event)
+{
+$this->viewBuilder()->theme('Bootstrap');
+...
+```
+
+### Baking views
+
+You can bake your views using the twitter bootstrap templates bundled with this
+plugin. To do so, simply specify the `bootstrap` template when baking your files:
+
+```bash
+bin/cake bake all amigos --theme Bootstrap
+```
+
+License
+-------
+
+The MIT License (MIT)
+
+
+Faltou apenas a licença, que mantive a mesma: MIT.
+
+Caso tenha interesse pela publicação no Packgist veja o artigo:
+http://ribafs.org/portal/cakephp-3/tutoriais/projeto-no-github

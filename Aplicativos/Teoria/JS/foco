@@ -1,0 +1,3 @@
+
+Foco em um campo
+echo $this->Form->input('grupo',['style'=>'width: 100px', 'type'=>'text', 'autofocus']);

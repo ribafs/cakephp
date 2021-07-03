@@ -1,0 +1,25 @@
+Sexto Aplicativo
+Agora iremos adicionar ao aplicativo um element e um layout. O element criará um menu que facilitará a navegação através dos controllers e o layout deverá diferenciar a área administrativa. Quando o usuário admin fizer login ele encontrará um layout diferente dos demais usuários. Podemos criar um layout específico para cada usuário.
+
+
+Adicionando um Element e um Layout
+
+Devemos customizar o ambiente de trabalho do administrador, usando para isso um element e um layout.
+
+Adicionaremos ao beforeFilter() do AppController:
+
+		$this->set('title_for_app','Meu Aplicativo');
+		$this->set('title_for_admin','Administração do Aplicativo');
+		$this->set('loggedyes','Logado como');
+		$this->set('loggedno','Não logado!');
+
+
+		$this->set('current_user', $user);
+		if($user == 'admin'){
+			$this->layout = 'admin';
+		}
+
+Criaremos o Elemento topmenu.ctp e o layout_admin.ctp.
+
+
+

@@ -1,0 +1,5 @@
+		// Para criar select no Persmissions/add
+		$query = TableRegistry::get('Permissions')->find();
+		$query->select(['controller'])->distinct(['controller']);
+		$this->set('permissions', $query);
+

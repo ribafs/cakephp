@@ -1,0 +1,5 @@
+Daquelas que não vem do banco, mas são estáticas. Caso precise alterar precisar fazer manualmente no código.
+
+            $actions = ['add'=>'add','edit'=>'edit','index'=>'index','vied'=>'view','delete'=>'delete'];
+            echo $this->Form->input('action',['options'=>$actions,'class'=>'col3','empty'=>'Selecione']);
+

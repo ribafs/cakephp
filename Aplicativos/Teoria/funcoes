@@ -1,0 +1,119 @@
+Enviar para os sites daqui pra ffrente somente conteúdo relevante, aqules que fazem diferença e não mais de tudo
+
+Escrever tutorial sobre segurança no FreeBSD
+
+Estudando algumas Funções do CakePHP 3
+
+Configurações
+
+Model
+    Behavior
+    - Criar um novo Behavior
+
+Controller
+    Component
+    - Criar um novo componente
+    - Tutorial de criação do ControlComponent
+
+View
+    Helper
+    - Criar um novo helper
+    Element
+    - Criar um novo element
+    - Tutorial de criação do element topmenu
+    Layout
+    - Criação de um novo template
+
+Plugin
+    - Criação de um novo plugin
+    - Tutorial de criação do plugin cake-acl-br
+
+Partiremos do aplicativo gerado com a ajuda da ferramenta Bake, o crud.
+
+Observaremos parte do código que se encontra na pasta config e na pasta src
+
+
+== Pasta config
+
+Os arquivos básicos com configurações a serem customizadas são:
+- config/app.php - este guarda configurações sobre:
+
+    Debug. Anes de enviar um aplicativo para a produção aterar para false
+    - 'debug' => filter_var(env('DEBUG', true), FILTER_VALIDATE_BOOLEAN),
+
+    Também é importante alterar o salt padrão por conta de segurança, antes de enviar para produção
+    - 'salt' => env('SECURITY_SALT', 'f504145ed549a05c74bd75e05d7c77b9b6d565de30b06e81dce10144f718ab98'),
+
+    Exibição de erros. Por padrão é E_ALL. Usamos o abaixo para não mostrar as mensagens deprecateds
+    - 'errorLevel' => E_ALL & ~E_USER_DEPRECATED,
+
+    Bancos de dados
+        'Datasources' => [
+                'default' => [
+                    'className' => 'Cake\Database\Connection',
+                    'driver' => 'Cake\Database\Driver\Mysql',
+                    'persistent' => false,
+                    'host' => 'localhost',
+                    /*
+                     * CakePHP will use the default DB port based on the driver selected
+                     * MySQL on MAMP uses port 8889, MAMP users will want to uncomment
+                     * the following line and set the port accordingly
+                     */
+                    //'port' => 'non_standard_port_number',
+                    'username' => 'root',
+                    'password' => 'root',
+                    'database' => 'crud',
+
+    Quando for postgresql e estiver usando um esquema diferente do default usamos assim:
+        'Datasources' => [
+                'default' => [
+                    'className' => 'Cake\Database\Connection',
+                    'driver' => 'Cake\Database\Driver\Postgres',
+                    'persistent' => false,
+                    'host' => 'localhost',
+                    /*
+                     * CakePHP will use the default DB port based on the driver selected
+                     * MySQL on MAMP uses port 8889, MAMP users will want to uncomment
+                     * the following line and set the port accordingly
+                     */
+                    //'port' => 'non_standard_port_number',
+                    'username' => 'postgres',
+                    'password' => 'postgres',
+                    'database' => 'crud',
+                    'schema' => 'sc_pedidos',
+
+    Podemos ter várias conexões com bancos de dados e não somente a defualt.
+
+- config/bootstrap.php
+
+    Neste podemos configurar data/hora e é muito usado, até a versão 3.5, para armazenar as cargas dos plugins, assim:
+    - Plugin::load('CakeAclBr', ['bootstrap' => true]);
+
+- config/routes.php
+
+    Neste difinimos as rotas do aplicativo, de forma que o aplicativo saiba para onde ir quando se chamar uma URL
+    - O mais usual e simples é definir quam será o action/método default de um certo controller. Vamos definir o método index do controller Clientes como
+    o default de um aplicativo:
+
+    $routes->connect('/', ['controller' => 'Clientes', 'action' => 'index']);
+
+
+== Model
+
+
+
+Componentes Nativos
+
+- Redirect
+- Request
+- Response
+- Authentication
+- Authorization
+- Pagination
+
+CallBacks
+
+- beforeFilter
+- beforeRender
+- ...
+

@@ -1,0 +1,172 @@
+Criação de um aplicativo tipo CRUD com o CakePHP3
+
+O objetivo maior deste tutorial é criar um aplicativo tipo CRUD com o Cake, mas agora apenas codificando, sem a ajuda do bake.
+
+Vamos seguir as dicas do CakePHP para ir criando nosso aplicativo.
+
+Este aplicativo será apenas para mostrar como funcionam alguams coisas no CakePHP. Ele não faz nada de tão útil mas conhecer estas coisas no Cake é muito importante. Quando mais você dominar o funcionamento mais poderá fazer com o framework.
+
+- Criar o aplicativo base usando o composer na pasta crud0
+cd /var/www/html
+composer create-project --prefer-dist cakephp/app crud0
+
+- Configurar o banco no aplicativo
+Neste exemplo não precisaremos configurar o banco de dados, pois usaremos apenas código sem acesso a bancos.
+
+Configure o routes.php de forma semelhante, para Clientes/index
+
+- Acessar o aplicativo pelo navegador
+    http://localhost/crud0
+
+Ele nos mostra uma página padrão criada automaticamente pelo Cake com diversas informações úteis, mas sem nada do nosso banco
+
+- Vamos tentar acessar nossa tabela de clientes
+    http://localhost/crud0/clientes
+
+Veja os erros:
+Error: ClientesController could not be found. 
+
+ Error: Create the class ClientesController below in file: src/Controller/ClientesController.php
+
+    <?php
+    namespace App\Controller;
+
+    use App\Controller\AppController;
+
+    class ClientesController extends AppController
+    {
+
+    }
+
+Ele diz que precisamos ter um controller chamado Clientes e nos indica uma estrutura básica. Então vamos seguir suas dicas
+
+    cd /var/www/html/crud0
+
+    Lembre que a pasta src guarda todo o código do aplicativo em CakePHP. Todo o código que adicionamos diretamente para o aplicativo deve ficar nesta pasta.
+    Crie o arquivo:
+
+    nano src/Controller/ClientesController.php
+    Contendo
+
+<?php
+namespace App\Controller;
+
+use App\Controller\AppController;
+
+class ClientesController extends AppController
+{
+
+}
+
+Chamemos agora novamente pelo navegador
+
+    http://localhost/crud0/clientes
+
+Veja os erros agora
+
+ The action index is not defined in ClientesController
+
+Error: Create ClientesController::index() in file: src/Controller/ClientesController.php.
+
+<?php
+namespace App\Controller;
+
+use App\Controller\AppController;
+
+class ClientesController extends AppController
+{
+
+    public function index()
+    {
+
+    }
+}
+
+Ele está dizendo que precisamos criar o action index() no nosso controller, então vamos criar como indicado dentro da classe
+
+    public function index()
+    {
+
+    }
+
+Chamemos novamente pelo navegador
+
+    http://localhost/crud0/clientes
+
+E agora os erros são diferentes:
+
+ Error: The view for ClientesController::index() was not found.
+
+Confirm you have created the file: "Clientes/index.ctp" in one of the following paths:
+
+    /backup/www/crud/src/Template/Clientes/index.ctp
+
+Ele nos pede uma view chamada index.ctp em src/Template/Clientes
+    
+    mkdir /var/www/html/crud/src/Template/Clientes
+    nano /var/www/html/crud/src/Template/Clientes/index.ctp
+
+Criando apenas o arquivo index.ctp vazio já atende e não mais veremos erro.
+Mas a tela abrirá limpa, somente com o título Clientes
+
+Adicione para o index.ctp:
+
+<h1>Meu primeiro aplicativo</h1>
+
+Chamemos novamente pelo navegador
+
+    http://localhost/crud0/clientes
+
+Porque ao chamar clientes ele abre o action index() que chama o index.ctp correspondente?
+É o padrão do Cake, ao chamar um controller, ele chama por padrão o action index().
+E ao chamar um action ele chama  o template correspondente, no caso o index.ctp.
+
+Agora nada de erro, apenas a mensagem que adicionamos.
+
+Veja toda a sequência:
+- Criar o controller
+- Criar no controller o método/action ClientesController/index()
+- Criar uma view/template correspondente ao método do controller, no caso o Tempalte/Clientes/index.ctp
+
+Veja como o Cake ajuda na criação. Em algumas etapas ele diz exatamente o que precisamos fazer.
+
+- Configurar o routes.php para que nosso aplicativo acesse automaticamente o action index() do controller Clientes
+    cd /var/www/html/crud0
+    nano config/routes.php
+
+Mudar apenas esta linha
+    $routes->connect('/', ['controller' => 'Pages', 'action' => 'display', 'home']);
+Para
+    $routes->connect('/', ['controller' => 'Clientes', 'action' => 'index']);
+
+Fazendo isso podemos chamar nosso aplicativo assim:
+
+    http://localhost/crud0
+
+E ele automaticamente chamará 
+    http://localhost/crud0/clientes/index
+
+Pois definimos o controller Clientes e o action index como defaults.
+
+O que vem a seguir?
+
+Veja que nosso aplicativo crud0 não é funcional. Seu código não é usável. Não trabalha com o banco de dados.
+Na próxima etapa criaremos o aplicativo crud1 e então trabalharemos com o banco de dados.
+
+Leituras recomendadas:
+
+https://github.com/ribafs/cake-control-br
+
+O site oficial do CakePHP é uma das grandes forças do framework, com tutoriais de exemplo de aplicativos:
+https://book.cakephp.org/3.0/en/tutorials-and-examples.html
+https://book.cakephp.org/3.0/en/tutorials-and-examples/blog/blog.html
+https://book.cakephp.org/3.0/en/tutorials-and-examples/blog-auth-example/auth.html
+https://book.cakephp.org/3.0/en/tutorials-and-examples/bookmarks/intro.html
+
+E uma ótima documentação, que pode ser vista online
+https://book.cakephp.org/3.0/en/index.html
+
+Ou offline em PDF ou Epub
+https://book.cakephp.org/3.0/_downloads/en/CakePHPCookbook.pdf
+https://book.cakephp.org/3.0/_downloads/en/CakePHPCookbook.epub
+

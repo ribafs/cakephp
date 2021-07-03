@@ -1,0 +1,105 @@
+Segundo Aplicativo
+
+Nome de banco de dados – tuto em minúsculas e no singular. Palavras compostas separadas por sublinhado.
+Nome de tabela – tudo em minúsculas e no plural.
+
+Para este primeiro aplicativo útil criaremos um banco chamado cadastro contendo apenas uma tabela chamada clientes. Depois de configurar o banco no aplicativo geraremos o código do aplicativo usando o bake, que gera um CRUD completo e com bons recursos.
+
+Banco de Dados
+
+Banco – cadastro
+Tabela – clientes
+
+Criar o banco no phpmyadmin e colar o script abaixo:
+
+CREATE TABLE IF NOT EXISTS `clientes` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `nome` char(45) NOT NULL,
+  `email` varchar(50) DEFAULT NULL,
+  `data_nasc` date DEFAULT NULL,
+  `cpf` char(11) NOT NULL,
+  PRIMARY KEY (`id`)
+);
+
+INSERT INTO `clientes` (`id`, `nome`, `email`, `data_nasc`, `cpf`) VALUES
+(1, 'Erin Pate Skinner', 'dolor.vitae.dolor@mollisvitaeposuere.ca', '2013-10-07', '74426302285'),
+(2, 'Leonard Martinez Hays', 'dignissim.magna.a@dolorvitae.org', '2012-08-22', '75278965048'),
+(3, 'Aladdin Curry French', 'eu.augue@eutemporerat.org', '2012-10-28', '10376915676'),
+(4, 'Chloe Macdonald Dalton', 'parturient.montes@Mauris.ca', '2013-05-12', '64444679077'),
+(5, 'Mallory Sweet Strong', 'lorem@fringillaporttitor.ca', '2013-05-19', '15687101505'),
+(6, 'Jermaine Pierce Woodward', 'mi.pede.nonummy@molestiearcu.ca', '2013-03-22', '36712502261'),
+(7, 'Bell Raymond Pruitt', 'dignissim.tempor.arcu@nuncac.org', '2013-03-09', '64629428663'),
+(8, 'Lydia Bell Whitfield', 'Sed@semper.com', '2013-12-02', '41962749289'),
+(9, 'Tad Mason Graham', 'elit.erat@vestibulum.edu', '2012-06-08', '05642745964'),
+(10, 'Felix Bradshaw Mccray', 'dui@elitCurabitursed.edu', '2013-09-16', '82071617437'),
+(11, 'Idona Jensen Garrett', 'sem@Crasvulputate.com', '2014-01-08', '07941004794'),
+(12, 'Wayne Ray Padilla', 'luctus.felis.purus@nonjustoProin.org', '2014-04-03', '60934465323'),
+(13, 'Nelle Finch Cantu', 'placerat.eget@Donec.ca', '2012-05-29', '64704574060'),
+(14, 'Maite Emerson Best', 'dui.augue@quisdiam.com', '2014-04-01', '04531857574'),
+(15, 'Jada Holman Wilkins', 'dolor@tristiquealiquet.com', '2013-01-11', '88994190741'),
+(16, 'Beverly Lane Lindsay', 'et.euismod@ametfaucibusut.com', '2013-10-22', '40194697135'),
+(17, 'Hayden Clayton Foreman', 'enim@aliquamenimnec.edu', '2013-04-16', '72583040904'),
+(18, 'Hadassah Leonard Key', 'dui.quis@augueidante.com', '2013-04-07', '72626859924'),
+(19, 'Adrian Ballard Peters', 'enim.Curabitur@faucibus.com', '2012-07-13', '50918748283'),
+(20, 'Phyllis Richmond Wynn', 'eget.laoreet@justoeuarcu.org', '2013-07-01', '62712888794'),
+(21, 'Amelia Baird Barrera', 'id.ante@dignissim.org', '2012-06-09', '12106836368'),
+(22, 'Whitney Mack Lamb', 'quam.Curabitur.vel@PraesentluctusCurabitur.org', '2012-06-26', '52403407001'),
+(23, 'Myra Mcmahon Valentine', 'ac.mi@fringillami.edu', '2012-07-27', '42961419194');
+
+ALERTA – tome cuidado ao copiar e colar de processadores de texto como o Word ou Writer, pois algumas vezes eles alteram o texto. Um exemplo é este: --, que o writer gosta de mudar para –.
+
+Criando o aplicativo
+
+Ctrl+Alt+C
+comp app2
+ 
+Configurações
+
+Configurar o banco de dados. Editar o arquivo app2/config/app.php
+
+Alterar apenas 3 linhas:
+
+Em 
+    'Datasources' => [
+        'default' => [
+
+Altere as linhas:
+
+            'username' => 'root',
+            'password' => '',
+            'database' => 'cadastro',
+
+Salve e feche
+
+Configure as rotas. Editar o arquivo app2/config/routes.php
+
+Copiar e linha:
+    $routes->connect('/', ['controller' => 'Pages', 'action' => 'display', 'home']);
+
+Colar logo acima e alterar assim:
+    $routes->connect('/', ['controller' => 'Clientes', 'action' => 'index']);
+
+Com isso estamos dizendo que o raiz do nosso aplicativo será respondido pelo action index() do controller Clientes, assim, ao abrir http://localhost/treinamento/app2 ele mostrará a view index.ctp do template clientes, chamada pelo action index() do controller Clientes.
+
+Agora, chamando pelo navegador:
+http://localhost/treinamento/app2
+
+Como ele procura o controller Clientes e não encontra, então mostra a mensagem de erro e já ajuda com a mesma. Então vamos criar o código do nosso aplicativo: controllers, models e views.
+
+Gerando o Código do Aplicativo
+
+Abra o terminal, acesse o diretório app2 e execute o comando abaixo:
+
+bin/cake bake all clientes
+
+Observe as mensagens e veja que com isso o bake gerou o código básico de um CRUD, com o controller, o model e a view, criando assim um aplicativo simples mas funcional.
+
+Acesse novamente e veja como ficou. Navegue pelas seções do site.
+
+Veja que já aplicou paginação, CSS e todo um layout adequado para a gente trabalhar.
+
+Experimente adicionar, editar, remover e visualizar registros. Como também mudar para a segunda página e reordenar as colunas de campos clicando no título e bem mais. E mais ainda existe a nossa disposição no framework.
+
+Mais detalhes sobre a geração de código com Bake, veja a seção respectiva ou o site oficial:
+http://book.cakephp.org/3.0/en/bake/usage.html 
+

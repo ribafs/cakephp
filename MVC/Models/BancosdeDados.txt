@@ -1,0 +1,16 @@
+Dicas sobre Bancos de dados
+
+Relacionamentos
+
+O campo secundário do relacionamento precisa ser NOT NULL na tabela.
+Exemplo
+users com clientes
+
+Em clientes temos o campo user_id que relaciona as tabelas.
+Na tabela clientes o campo user_id precisa ser:
+user_id int not null
+
+Caso contrário teremos sérios problemas de cadastramento de todos os registros 
+vazios e fura o relacionamento.
+
+

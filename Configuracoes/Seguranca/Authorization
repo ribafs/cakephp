@@ -1,0 +1,133 @@
+Autorização
+https://book.cakephp.org/3.0/en/controllers/components/authentication.html#authorization
+
+Authorization
+
+Authorization is the process of ensuring that an identified/authenticated user is allowed to access the resources they are requesting. If enabled AuthComponent can automatically check authorization handlers and ensure that logged in users are allowed to access the resources they are requesting. There are several built-in authorization handlers and you can create custom ones for your application or as part of a plugin.
+
+    ControllerAuthorize Calls isAuthorized() on the active controller, and uses the return of that to authorize a user. This is often the most simple way to authorize users.
+
+The ActionsAuthorize & CrudAuthorize adapter available in CakePHP 2.x have now been moved to a separate plugin cakephp/acl.
+
+
+
+Configuring Authorization Handlers
+
+You configure authorization handlers using the authorize config key. You can configure one or many handlers for authorization. Using multiple handlers allows you to support different ways of checking authorization. When authorization handlers are checked, they will be called in the order they are declared. Handlers should return false, if they are unable to check authorization, or the check has failed. Handlers should return true if they were able to check authorization successfully. Handlers will be called in sequence until one passes. If all checks fail, the user will be redirected to the page they came from. Additionally, you can halt all authorization by throwing an exception. You will need to catch any thrown exceptions and handle them.
+
+You can configure authorization handlers in your controller’s beforeFilter() or initialize() methods. You can pass configuration information into each authorization object, using an array:
+
+// Basic setup
+$this->Auth->config('authorize', ['Controller']);
+
+// Pass settings in
+$this->Auth->config('authorize', [
+    'Actions' => ['actionPath' => 'controllers/'],
+    'Controller'
+]);
+
+Much like authenticate, authorize, helps you keep your code DRY, by using the all key. This special key allows you to set settings that are passed to every attached object. The all key is also exposed as AuthComponent::ALL:
+
+// Pass settings in using 'all'
+$this->Auth->config('authorize', [
+    AuthComponent::ALL => ['actionPath' => 'controllers/'],
+    'Actions',
+    'Controller'
+]);
+
+In the above example, both the Actions and Controller will get the settings defined for the ‘all’ key. Any settings passed to a specific authorization object will override the matching key in the ‘all’ key.
+
+If an authenticated user tries to go to a URL he’s not authorized to access, he’s redirected back to the referrer. If you do not want such redirection (mostly needed when using stateless authentication adapter) you can set config option unauthorizedRedirect to false. This causes AuthComponent to throw a ForbiddenException instead of redirecting.
+
+
+
+Making Actions Public
+
+AuthComponent::allow($actions = null)
+
+There are often times controller actions that you wish to remain entirely public or that don’t require users to be logged in. AuthComponent is pessimistic and defaults to denying access. You can mark actions as public actions by using AuthComponent::allow(). By marking actions as public, AuthComponent will not check for a logged in user nor will authorize objects to be checked:
+
+// Allow all actions
+$this->Auth->allow();
+
+// Allow only the index action.
+$this->Auth->allow('index');
+
+// Allow only the view and index actions.
+$this->Auth->allow(['view', 'index']);
+
+By calling it empty you allow all actions to be public. For a single action, you can provide the action name as a string. Otherwise, use an array.
+
+You should not add the “login” action of your UsersController to allow list. Doing so would cause problems with the normal functioning of AuthComponent.
+
+
+
+Using ControllerAuthorize
+
+ControllerAuthorize allows you to handle authorization checks in a controller callback. This is ideal when you have very simple authorization or you need to use a combination of models and components to do your authorization and don’t want to create a custom authorize object.
+
+The callback is always called isAuthorized() and it should return a boolean as to whether or not the user is allowed to access resources in the request. The callback is passed the active user so it can be checked:
+
+class AppController extends Controller
+{
+    public function initialize()
+    {
+        parent::initialize();
+        $this->loadComponent('Auth', [
+            'authorize' => 'Controller',
+        ]);
+    }
+
+    public function isAuthorized($user = null)
+    {
+        // Any registered user can access public functions
+        if (!$this->request->getParam('prefix')) {
+            return true;
+        }
+
+        // Only admins can access admin functions
+        if ($this->request->getParam('prefix') === 'admin') {
+            return (bool)($user['role'] === 'admin');
+        }
+
+        // Default deny
+        return false;
+    }
+}
+
+The above callback would provide a very simple authorization system where only users with role = admin could access actions that were in the admin prefix.
+
+
+https://book.cakephp.org/3.0/en/development/testing.html#testing-authentication
+
+Testing Actions That Require Authentication
+
+If you are using AuthComponent you will need to stub out the session data that AuthComponent uses to validate a user’s identity. You can use helper methods in IntegrationTestCase to do this. Assuming you had an ArticlesController that contained an add method, and that add method required authentication, you could write the following tests:
+
+public function testAddUnauthenticatedFails()
+{
+    // No session data set.
+    $this->get('/articles/add');
+
+    $this->assertRedirect(['controller' => 'Users', 'action' => 'login']);
+}
+
+public function testAddAuthenticated()
+{
+    // Set session data
+    $this->session([
+        'Auth' => [
+            'User' => [
+                'id' => 1,
+                'username' => 'testing',
+                // other keys.
+            ]
+        ]
+    ]);
+    $this->get('/articles/add');
+
+    $this->assertResponseOk();
+    // Other assertions.
+}
+
+

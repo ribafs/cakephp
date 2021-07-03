@@ -1,0 +1,118 @@
+Aplicativo app5c
+
+Usaremos o componente Control
+As tabelas: groups, users, permissions, clientes e produtos
+
+Liberar o action add no beforeFilter() do AppController e cadastrar os grupos e usuários.
+$this->Auth->allow(['index','add']);
+
+localhost/treinamento/app5b/groups/add
+
+E cadastre os grupos e usuários
+
+Após comente a linha abaixo para que o aplicativo como um todo não possa ser acessado pelo público, somente por usuários logados.
+//$this->Auth->allow(['index','add']);
+
+Observe que como está os registros na tabela permissions somente serão cadastrados quando for feito o primeiro login no sistema.
+Após o primeiro login e execução do sistema, pode comentar 
+
+
+Deixe o AppController assim:
+
+<?php
+namespace App\Controller;
+
+use Cake\Controller\Controller;
+use Cake\Event\Event;
+
+class AppController extends Controller
+{
+
+    public function initialize()
+    {
+        parent::initialize();
+
+        $this->loadComponent('RequestHandler');
+        $this->loadComponent('Flash');
+		$this->loadComponent('Control'); // Own component
+
+        $this->loadComponent('Auth', [
+            'loginRedirect' => [
+                'controller' => 'Clientes',
+                'action' => 'index',
+				'base' => false
+            ],
+            'logoutRedirect' => [
+                'controller' => 'Users',
+                'action' => 'login'
+            ],
+			'unauthorizedRedirect' => [
+				'controller' => 'Users',
+				'action' => 'login',
+				'prefix' => false
+			],
+		    'authError' => 'Faça login antes',
+		    'storage' => 'Session'
+        ]);
+
+    }
+
+    public function beforeFilter(\Cake\Event\Event $event) {
+	    parent::beforeFilter($event);
+
+		$user = $this->request->session()->read('Auth.User');
+		$group=$user['group_id'];
+
+		$controller = $this->request->controller;
+		$action = $this->request->action;
+
+		//$this->Auth->allow(['index','add']);// Descomentando dá acesso total aos actions index e view
+
+		if(isset($group)){
+			$this->Control->populate('Supers');// Cadastrar todos as permissões para o grupo Supers
+			$this->Control->populate('Admins');// Permissão para para os usuários do grupo Admins
+			$this->Control->populate('Managers');// Cadastrar todos as permissões grupo Managers
+			// Após o primeiro login no aplicativo pode comentar as três linhas acima
+		}
+
+		if($action != 'login' && $action != 'logout'){
+			if(isset($group) && $this->Control->access($controller,$action,$group)==false){	
+				$this->Flash->error(__('Como usuário "'.$user['username'].'", você não tem permissão para acessar '.$controller.'/'.$action));
+				return $this->redirect($this->referer());
+			}
+		}
+	}
+
+    /**
+     * Before render callback.
+     *
+     * @param \Cake\Event\Event $event The beforeRender event.
+     * @return void
+     */
+    public function beforeRender(Event $event)
+    {
+        if (!array_key_exists('_serialize', $this->viewVars) &&
+            in_array($this->response->type(), ['application/json', 'application/xml'])
+        ) {
+            $this->set('_serialize', true);
+        }
+    }
+}
+
+
+Agora teremos 4 grupos:
+
+Supers - poder total, acessam tudo do aplicativo
+Admins -acesso total às tabelas administrativas: groups, users e permissions
+Managers - acessam tudo que Admins não acessam: todas as tabelas diferentes de groups, users e permissions
+Users - inicialmente tem acesso somente ao login e logout. Para que possa acessar qualquer outro action precisa que seja cadastrado nos actions respectivos. Basta acessar como um Supers ou Admins e cadastrar suas permissões.
+
+Tomar cuidado, pois os grupos são referenciados pelo group_id
+
+Caso precise de mais grupos precisará efetuar as adaptações no componente Group, que me parece estar simples.
+
+To do/Por fazer
+
+Interessante recurso deve ser deixar o grupo livre e não fixo.
+Seria interessante uma forma de cadastrar o grupo que quizesse e relacionar o grupo com as permissões.
+

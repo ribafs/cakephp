@@ -1,0 +1,9 @@
+Ler e gravar em variáveis de configuração
+
+Configure::load('bootstrap','intl.default_locale');//, 'intl.default_locale');        
+//Configure::write('intl.default_locale','en_US');
+
+$configValue = Configure::read('intl.default_locale');
+echo $configValue;
+exit;
+

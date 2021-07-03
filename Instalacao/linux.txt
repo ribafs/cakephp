@@ -1,0 +1,58 @@
+Pré-requisitos para o CakePHP 3.2.9
+
+- Apache2 ou outro servidor web
+- PHP 5.5.9 ou superior
+- Módulos do Apache: mod_rewrite
+- Extensões: mcrypt, php5-mcrypt, intl, mbstring
+- composer e git
+
+Instalação do servidor no Linux/Ubuntu
+
+Atualizar pacotes
+
+sudo su
+apt-get update
+apt-get upgrade
+
+Reinicie se sugerido.
+
+Instalar MySQL
+
+apt-get update 
+apt-get -y install mysql-server mysql-client 
+
+Apache, PHP e Módulos/Extensões
+
+apt-get update 
+
+apt-get install -y apache2 
+
+apt-get install -y php5 libapache2-mod-php5 php5-gd php5-mysql php5-imap php-pear php5-xmlrpc php5-xsl mcrypt php5-mcrypt php5-curl php5-intl php5-openssl php5-zlib php5-pear curl
+
+Obs: O pacote liapache2-mod-php5 vem com o mbstring e vários outros.
+
+apt-get install -y phpmyadmin
+
+nano /etc/php5/apache2/php.ini
+display_errors = On
+(Somente em aplicativos ainda em desenvolvimento)
+
+php5enmod mcrypt
+
+Habilitar módulos
+a2enmod rewrite 
+a2enmod php5
+
+Habilitar o mod_rewrite
+Altere o script:
+nano /etc/apache2/apache2.conf
+
+Onde tem
+AllowOverride None
+
+Trocar por
+AllowOverride All
+
+service apache2 restart
+
+

@@ -1,0 +1,56 @@
+
+4.0 Roadmap
+Mark Story edited this page 10 days ago · 17 revisions
+
+Clone this wiki locally
+
+CakePHP 4.0 will be a breaking change from 3.x. Unlike 3.0, 4.0 will primarily be a clean-up release. Instead of introducing large backwards incompatible changes, 4.0.0 will focus on removing all the deprecated features we've accumulated throughout the life of 3.x. Any method/feature emitting run-time warnings in 3.6 will be removed from 4.0. 4.0 will not add significant new features as the bulk of the release will be spent on cleanup efforts.
+Cleanup Tasks
+
+    Remove all deprecated methods.
+    Remove non-static methods from Cake\Database\Type and move the common instance methods into a trait.
+    Fix array options for PaginatorHelper::generateUrl() and Url::build().
+    Add methods to all interfaces currently defined with @method.
+    Clean up Request\Response objects. Both objects will become immutable as per the PSR7 recommendations.
+    Implement batch casting for core database types. See 11754.
+    Remove auto-id addition in form URL calls. See 11794
+    Remove magic file handling from responses 11921
+
+Require at Least PHP 7.1
+
+By the time CakePHP 4.x ships PHP5 will only be receiving security fixes. The same is true for PHP 7.0.x. Because of this, CakePHP 4.x will require at least PHP 7.1, maybe 7.2.
+Use stricter typing where possible
+
+With PHP5 support removed, internally we should aim to leverage scalar type hints and strict typing as much as possible. These features reduce the number of tests and code we need to maintain/run for type checking. The addition of type hints should not be added if they will cause significant backwards compatibility breaks. One of the goals of 4.x is be a 'simple' upgrade from 3.x.
+Use new features of PHP 7.1+
+
+    Use Null coalesce
+    Use nullable return types and parameter types.
+
+API improvements
+Implement PSR 6 or PSR 16
+
+See https://github.com/cakephp/cakephp/issues/9507
+Splitting up combined setter/getter methods
+
+Splitting the combined wrappers reduces complexity and risk of errors and at the same time provides a simpler API that is also more PHP7+ compatible. We will try to be as BC as possible here during 4.x and remove them in the next major version only.
+Typehinting with Interfaces
+
+    Behavior constructor typehint from Table to RepositoryInterface
+    Event typehint from Event to EventInterface
+
+Better defaults
+
+Some of these things couldn't be done in 3.x due to BC reasons, but can be applied to 4.x.
+
+    Use null instead of false for "nullable" return alternative where possible (string|false => string|null).
+    Config merges shallow by default #7267
+    Hash::extract() not transforming values anymore #8053
+
+Documentation updates
+
+    Remove all the 'prior to' notices.
+    Remove all the versionadded and versionchanged admonitions.
+    Update routing examples to use {var} style placeholders.
+
+

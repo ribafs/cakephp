@@ -1,0 +1,202 @@
+Exemplos de Validações
+
+As validações no CakePHP são implementadas no Model, especificamente na classe Table.
+
+Algumas Validações no core:
+date
+datetime
+time
+timestamp
+alphaNumeric
+blank
+notBlank
+boolean
+decimal
+inList
+email
+ip
+url
+numeric
+range
+userDefined
+
+add() - usado para criar uma validação customizada
+
+src/Model/Table/UsersTable.php
+ou
+src/Model/Table/ClientesTable.php
+
+Campo username unique
+
+        $validator
+            ->requirePresence('username', 'create')
+            ->notEmpty('username')
+            ->add('username', 'unique', ['rule' => 'validateUnique', 'provider' => 'table']);
+
+
+Senha
+
+        $validator
+            ->requirePresence('password', 'create')
+            ->notEmpty('password');
+
+
+E-mail requerido
+
+        $validator
+            ->email('email')
+            ->notBlank('email')
+            ->add('email', 'unique', [
+            	'rule' => 'validateUnique', 
+            	'provider' => 'table'
+            ]);
+ou
+        $validator
+		   ->requirePresence('email')
+			->add('email', 'validFormat', [
+				'rule' => 'email',
+				'message' => 'E-mail inválido'
+			]);
+
+
+Nome requerido
+
+        $validator
+            ->requirePresence('nome', 'create')
+            ->notEmpty('nome');
+
+
+No Model/Table/ClientesTable.php
+
+Rule customizada para o campo nascimento
+
+    public function validationDefault(Validator $validator)
+    {
+        $validator
+            ->integer('id')
+            ->allowEmpty('id', 'create');
+
+        $validator
+            ->requirePresence('nome', 'create')
+            ->notEmpty('nome');
+
+        $validator
+            ->email('email')
+            ->notBlank('email')
+            ->add('email', 'unique', ['rule' => 'validateUnique', 'provider' => 'table']);
+
+//        $validator
+  //          ->date('nascimento')
+    //        ->allowEmpty('nascimento');
+
+        $validator->add('nascimento',[
+	        'notEmptyCheck'=>[
+    		    'rule'=>[$this,'notEmptyNascimento'],
+    		    'provider'=>'table',
+    		    'message'=>'Favor selecionar uma data de nascimento'
+    		 ]
+         ]);
+
+        $validator
+            ->allowEmpty('cpf');
+
+        $validator
+            ->allowEmpty('cnpj');
+
+        $validator
+            ->allowEmpty('fone');
+
+        $validator
+            ->allowEmpty('observacao');
+
+        $validator
+            ->notBlank('user_id');
+
+        return $validator;
+    }
+
+    public function notEmptyNascimento($value,$context){
+        if(empty($context['data']['nascimento'])) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+    
+Dica: O campo group_id não aparecia por padrão na lista de validações e mesmo que não fosse selecionado nenhum grupo
+o registro era armazenado. Então adicionei a validação como notBlank e na view add.ctp usei:
+
+            echo $this->Form->input('user_id', ['options' => $users,'empty'=>true]);
+            
+Assim aparece o asterisco vermelho indicando requerido e somente quando alguém esoclhe um grupo na lista é permitodo cadastrar.            
+    
+Sugestão para lista    
+
+    public function validationDefault(Validator $validator)
+    {
+        return $validator
+            ->notEmpty('first_name', 'A username is required')
+            ->notEmpty('last_name', 'A username is required')
+            ->notEmpty('email', 'A username is required')
+            ->notEmpty('username', 'A username is required')
+            ->notEmpty('password', 'A username is required')
+            ->add('role', 'inList', [
+                'rule' => ['inList', ['Employer', 'Job Seeker']],
+                'message' => 'Please enter a valid role'
+            ]);
+    }
+
+
+Como o Cake exige que as datas sejam null por default, uma forma de contornar isso exigindo o preenchimento
+é criando uma validação customizada:
+
+No Model/Table/ClientesTable.php
+    public function validationDefault(Validator $validator)
+    {
+		...
+        $validator->add('nascimento',[
+	        'notEmptyCheck'=>[
+    		    'rule'=>[$this,'notEmptyNascimento'],
+    		    'provider'=>'table',
+    		    'message'=>'Favor selecionar uma data de nascimento'
+    		 ]
+         ]);
+		...
+        return $validator;
+    }
+
+    public function notEmptyNascimento($value,$context){
+        if(empty($context['data']['nascimento'])) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+
+Validação de telefone (falta testar)
+
+'fone' => [
+        'rule' => array('isValidBRFoneFormat')
+    ],
+
+// Formatos aceitos: (99) 99999-9999 e (99) 9999-9999
+
+ /*isValidBRFoneFormat() - Custom method to validate US Phone Number
+ * @params Int $phone
+ */
+ function isValidBRFoneFormat($phone){
+ $fone=$fone['fone'];
+ $errors = array();
+    if(empty($fone)) {
+        $errors [] = "Favor entrar um tenefone válido";
+    }
+    else if (!preg_match('/^(\(11\) [9][0-9]{4}-[0-9]{4})|(\(1[2-9]\) [5-9][0-9]{3}-[0-9]{4})|(\([2-9][1-9]\) [5-9][0-9]{3}-[0-9]{4})$/', $fone)) {
+        $errors [] = "Favor entrar um tenefone válido";
+    } 
+
+    if (!empty($errors))
+    return implode("\n", $errors);
+
+    return true;
+}

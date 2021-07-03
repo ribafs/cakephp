@@ -1,0 +1,6 @@
+Bootstrap
+
+Customizar CSS do bootstrap numa view
+
+    echo $this->Form->input('grupo',['style'=>'width: 200px']);
+

@@ -1,0 +1,37 @@
+- Trocar campo texto por combo em add.ctp e edit.ctp
+
+Caso queira adicionar uma combo no campo user_id então proceda assim.
+Isso somente se não tiver aparecendo a combo nas views add e edit, pois elas são adicionadas automaticamente sempre que implementamos o relacionamento de forma correta
+
+Como exemplo o Funcionarios
+
+    - Edite o src/FuncionariosController.php e mude os actions add() e edit() para que seu final fique assim:
+
+add
+        ...
+        $empresas = $this->Funcionarios->Empresas->find('list', ['limit' => 200]);
+        $user = $this->Funcionarios->Users->find('list', ['limit' => 200]);
+        $this->set(compact('funcionario', 'empresas'));
+        $this->set(compact('user', 'user'));
+        $this->set('_serialize', ['funcionario','user']);
+    }
+
+edit
+
+        $empresas = $this->Funcionarios->Empresas->find('list', ['limit' => 200]);
+        $user = $this->Funcionarios->Users->find('list', ['limit' => 200]);
+        $this->set(compact('funcionario', 'empresas'));
+        $this->set(compact('user', 'user'));
+        $this->set('_serialize', ['funcionario', 'user']);
+    }
+
+    - Edite o src/Template/Funcionarios.add e mude a linha do user_id para que fique assim:
+            echo $this->Form->input('user_id', ['options' => $user]);
+
+    - Agora o edit.ctp
+            echo $this->Form->input('user_id', ['options' => $user]);
+
+Agora são combos.
+
+
+

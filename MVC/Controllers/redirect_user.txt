@@ -1,0 +1,38 @@
+Temos 4 grupos
+super - 1
+admin - 2
+manager - 3
+user - 4
+
+Controllers
+Clientes
+Users
+Groups
+Permissions
+
+O routes.php redireciona como default para Permissions
+
+O grupo 4 somente pode acessar Clientes e recebe mensagem de erro ao logar, assim comoo grupo 3
+
+Para que cada usuário ao logar seja redirecionado para o controller/action que tem acesso
+
+No UsersController.php
+
+    public function login()
+    {
+        if ($this->request->is('post')) {
+            $user = $this->Auth->identify();
+
+            $group = $user['group_id'];
+
+            if ($user && ($group == 3 || $group == 4)) {
+                $this->Auth->setUser($user);
+				return $this->redirect(['controller'=>'Clientes','action' => 'index']);
+			}else{
+                $this->Auth->setUser($user);
+				return $this->redirect($this->Auth->redirectUrl());                
+            }
+            $this->Flash->error(__('Credenciais inválias, tente novamente!'));
+        }
+    }
+

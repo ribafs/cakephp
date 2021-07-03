@@ -1,0 +1,262 @@
+Quinto Aplicativo
+
+Criando um Componente para Controlar o Acesso
+
+Agora iremos criar o esqueleto de um componente usando o bake e mover para ele a função populate() e a função go(), para ficar algo mais profissional.
+
+Criando o Aplicativo
+
+Agora, para criar o aplicativo faremos uma cópia da pasta modelo para app5.
+
+Criação do banco de dados
+
+Criaremos o banco app5 e importaremos o script app5.sql, que contem as tabelas groups, users e privileges, além de clientes.
+
+Configurações
+
+Configurar o banco e as rotas.
+
+Geração do Código do Aplicativo
+
+cd /backup/www/treinamento/app5
+
+bin/cake bake all groups
+bin/cake bake all users
+bin/cake bake all privileges
+bin/cake bake all clientes
+
+Experimente navegar pelo aplicativo
+
+http://localhost/treinamento/app5
+
+Adicionando o Bcrypt
+
+Fazer como fizemos no aplicativo anterior.
+
+
+Criar Grupos e Usuários
+
+Vamos criar 3 usuários, um para cada grupo:
+
+Groups	Users		Password
+Admins	admin		admin
+Managers	manager	manager
+Users		user		user
+
+Acesse
+http://localhost/treinamento/app4/groups/add
+
+E cadastro os 3 grupos acima.
+
+Acesse
+http://localhost/treinamento/app4/users/add
+
+E cadastre os 3 usuários acima com as respectivas senhas.
+É interessante editar as views src/Template/Users/index.ctp, view.ctp e edit.ctp removendo o campo senha do form.
+
+Cadastro dos Privilégios
+
+Os privilégios de acesso dos usuários aos actions de cada controller é você quem define. Para isso basta cadastrar no controller Privileges, antes de implementar o controle de acesso e fazer um pequneo ajuste no módulo go() se necessário.
+
+Por padrão o controle que já vem na tabela privileges é:
+
+Grupo		Controller	Actions
+Admins	Groups		Todos
+Admins	Users		Todos
+Admins	Privileges	Todos
+
+Falta Cadastrar o acesso para
+
+Admins	Clientes	Todos
+Manager	Clientes	Todos
+Users		Clientes	index
+
+Para Admins e Manager  usaremos o método populate().
+Faremos o cadastro do acesso de Users ao controller Clientes e ao action index pelo navegador, através do controller Privileges, antes de implementar o controle de acesso.
+
+Criando nosso Componente Control
+
+Usando o bake para isso:
+
+cd /backup/www/treinamento/app5
+
+bin/cake bake component Control
+
+Com isso o bake gera o esqueleto do nosso 
+src/Controller/Component/ControlComponent.php
+
+Vamos começar adicionando as duas linhas abaixo:
+use Cake\Datasource\ConnectionManager;
+use Cake\ORM\TableRegistry;
+
+Adicione logo abaixo de:
+use Cake\Controller\ComponentRegistry;
+
+
+
+Abaixo da propriedade adicione a função populate:
+
+	public function populate($group, $controller){
+		$conn = ConnectionManager::get('default');
+
+		$actions = $conn->execute("SELECT action FROM `privileges` WHERE group_name = '$group' and controller = '$controller' and action='index'")->fetchAll();
+
+		if(!$actions){
+			$conn->execute("insert into privileges (group_name,controller,action) values ('$group', '$controller', 'index')");
+			$conn->execute("insert into privileges (group_name,controller,action) values ('$group', '$controller', 'view')");
+			$conn->execute("insert into privileges (group_name,controller,action) values ('$group', '$controller', 'add')");
+			$conn->execute("insert into privileges (group_name,controller,action) values ('$group', '$controller', 'edit')");
+			$conn->execute("insert into privileges (group_name,controller,action) values ('$group', '$controller', 'delete')");
+		}
+	}
+
+Logo abaixo da função populate() adicione a função go():
+
+	public function go($controller,$action,$groupo){
+		$user = $this->request->session()->read('Auth.User');
+		$username=$user['username'];
+		if($username == 'admin'){
+			$groupo='Admins';
+		}elseif($username == 'manager'){
+			$groupo='Managers';
+		}elseif($username == 'user'){
+			$groupo='Users';			
+		}
+
+		$conn = ConnectionManager::get('default');
+		$group = $conn->execute("select group_name from privileges where controller = '$controller' and action ='$action' and group_name='$groupo'")->fetchAll();
+
+		if($group){
+			$group = $group[0][0];
+		}
+
+		if($username == 'admin' && $group=='Admins'){	
+			return true;
+		}elseif($username == 'manager' && $group == 'Managers' && $controller == 'Clientes'){
+			return true;
+		}elseif($username == 'user' && $group == 'Users' && $controller == 'Clientes' && ($action == 'index' || $action == 'view')){
+			return true;
+		}else{
+			return false;
+		}
+	}
+
+Ajustando o src/Controller/AppController.php
+
+Removi os comentários
+
+<?php
+namespace App\Controller;
+
+use Cake\Controller\Controller;
+use Cake\Event\Event;
+
+class AppController extends Controller
+{
+	public $msg;
+
+    public function initialize()
+    {
+        parent::initialize();
+
+        $this->loadComponent('RequestHandler');
+        $this->loadComponent('Flash');
+		$this->loadComponent('Control');
+
+        $this->loadComponent('Auth', [
+            'loginRedirect' => [
+                'controller' => 'Clientes',
+                'action' => 'index'
+            ],
+            'logoutRedirect' => [
+                'controller' => 'Users',
+                'action' => 'login'
+            ],
+			'unauthorizedRedirect' => [
+				'controller' => 'Users',
+				'action' => 'login',
+				'prefix' => false
+			],
+		    'authError' => 'Faça login antes',
+		    'authenticate' => [
+		        'Form' => [
+		            'fields' => ['username' => 'username']
+		        ]
+		    ],
+		    'storage' => 'Session'
+        ]);
+
+    }
+
+    public function beforeFilter(\Cake\Event\Event $event) {
+	    parent::beforeFilter($event);
+
+		$controller = $this->request->controller;
+		$action = $this->request->action;
+
+		//$this->Control->populate('Admins', 'Clientes');
+		//$this->Control->populate('Managers', 'Clientes');
+
+		$user = $this->request->session()->read('Auth.User');
+		$username=$user['username'];
+
+		$this->Auth->allow(['view', 'index']);//,'add'
+
+		if(isset($username) && $username == 'admin'){
+			$group='Admins';
+		}elseif($username == 'manager'){
+			$group='Managers';
+		}elseif($username == 'user'){
+			$group='Users';			
+		}
+
+		$denied='Acesso Negado!';
+		$privilege = 'Privilégio não Cadastrado!';
+		if(isset($username) && $action != 'login' && $action != 'logout'){
+			if($this->Control->go($controller,$action,$group)==false){	
+				$this->Flash->error(__($denied));
+				// Voltar para onde veio, ou seja, nem sair de onde está
+				return $this->redirect($this->referer());
+				//return $this->redirect(['controller' => 'Users','action' => 'login']);
+				// $this->redirect($this->Auth->logout());							
+			}else{
+				if($this->msg == 'priv'){
+					$this->Flash->set(__($this->privilege));
+				}
+			}
+		}
+	}
+
+    public function beforeRender(Event $event)
+    {
+        if (!array_key_exists('_serialize', $this->viewVars) &&
+            in_array($this->response->type(), ['application/json', 'application/xml'])
+        ) {
+            $this->set('_serialize', true);
+        }
+    }
+}
+
+
+Antes de começar a testar vamos efetuar os devidos registros para Admins, Managers e Users.
+Após executar o aplicativo, o método populate() irá cadastrar Clientes para Admins e Managers.
+Falta somente abrir o aplicativo como admin e cadastrar index em Clientes para Users.
+
+Agora podemos testar o aplicativo com nosso componente.
+
+http://localhost/treinamento/app5
+
+Faça login como admin, depois logout e login como manager e logout então login como user e navegue pelos vários controllers e actions para ver como reage.
+
+Veja que nenhum action está liberado ao público. Ao acessar o raiz do aplicativo será rdirecionado para o login. Faça o login e experimente.
+
+O aplicativo demo já tem todos estes registros cadastrados e está pronto para ser testado. Apenas crie o banco e configure para testar.
+
+Se tentar logar como usuário user terá acesso negado, pois não cadastrou ainda nenhum action para o user. 
+Acesse como admin e vá em privileges e cadastre o controller Clientes e action index para o usuário user. Faça logout e agora login como user.
+Agora poderá acessar o index de Clientes.
+
+Tente acessar qualquer outro action que será barrado. Libere agora o action view de Clientes para o user e experimente.
+
+Veja a versão melhorada deste componente no próximo aplicativo (app5a).
+

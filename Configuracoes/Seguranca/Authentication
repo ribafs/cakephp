@@ -1,0 +1,291 @@
+Autenticação
+https://book.cakephp.org/3.0/en/controllers/components/authentication.html
+
+
+class AuthComponent(ComponentCollection $collection, array $config = [])
+
+Identifying, authenticating, and authorizing users is a common part of almost every web application. In CakePHP AuthComponent provides a pluggable way to do these tasks. AuthComponent allows you to combine authentication objects and authorization objects to create flexible ways of identifying and checking user authorization.
+
+Leia antes
+
+Configuring authentication requires several steps including defining a users table, creating a model, controller & views, etc.
+
+This is all covered step by step in the CMS Tutorial: https://book.cakephp.org/3.0/en/tutorials-and-examples/cms/authentication.html
+
+If you are looking for existing authentication and/or authorization solutions for CakePHP, have a look at the Authentication and Authorization (https://github.com/FriendsOfCake/awesome-cakephp/blob/master/README.md#authentication-and-authorization) section of the Awesome CakePHP list.
+
+Authentication
+
+Authentication is the process of identifying users by provided credentials and ensuring that users are who they say they are. Generally, this is done through a username and password, that are checked against a known list of users. In CakePHP, there are several built-in ways of authenticating users stored in your application.
+
+    - FormAuthenticate allows you to authenticate users based on form POST data. Usually, this is a login form that users enter information into.
+    - BasicAuthenticate allows you to authenticate users using Basic HTTP authentication.
+    - DigestAuthenticate allows you to authenticate users using Digest HTTP authentication.
+
+By default AuthComponent uses FormAuthenticate.
+
+
+
+Choosing an Authentication Type
+
+Generally, you’ll want to offer form based authentication. It is the easiest for users using a web-browser to use. If you are building an API or webservice, you may want to consider basic authentication or digest authentication. The key differences between digest and basic authentication are mostly related to how passwords are handled. In basic authentication, the username and password are transmitted as plain-text to the server. This makes basic authentication un-suitable for applications without SSL, as you would end up exposing sensitive passwords. Digest authentication uses a digest hash of the username, password, and a few other details. This makes digest authentication more appropriate for applications without SSL encryption.
+
+You can also use authentication systems like OpenID as well; however, OpenID is not part of CakePHP core.
+Configuring Authentication Handlers
+
+You configure authentication handlers using the authenticate config. You can configure one or many handlers for authentication. Using multiple handlers allows you to support different ways of logging users in. When logging users in, authentication handlers are checked in the order they are declared. Once one handler is able to identify the user, no other handlers will be checked. Conversely, you can halt all authentication by throwing an exception. You will need to catch any thrown exceptions and handle them as needed.
+
+You can configure authentication handlers in your controller’s beforeFilter() or initialize() methods. You can pass configuration information into each authentication object using an array:
+
+// Simple setup
+$this->Auth->config('authenticate', ['Form']);
+
+// Pass settings in
+$this->Auth->config('authenticate', [
+    'Basic' => ['userModel' => 'Members'],
+    'Form' => ['userModel' => 'Members']
+]);
+
+In the second example, you’ll notice that we had to declare the userModel key twice. To help you keep your code DRY, you can use the all key. This special key allows you to set settings that are passed to every attached object. The all key is also exposed as AuthComponent::ALL:
+
+// Pass settings in using 'all'
+$this->Auth->config('authenticate', [
+    AuthComponent::ALL => ['userModel' => 'Members'],
+    'Basic',
+    'Form'
+]);
+
+In the above example, both Form and Basic will get the settings defined for the ‘all’ key. Any settings passed to a specific authentication object will override the matching key in the ‘all’ key. The core authentication objects support the following configuration keys.
+
+    fields The fields to use to identify a user by. You can use keys username and password to specify your username and password fields respectively.
+    userModel The model name of the users table; defaults to Users.
+    finder The finder method to use to fetch a user record. Defaults to ‘all’.
+    passwordHasher Password hasher class; Defaults to Default.
+    The scope and contain options have been deprecated as of 3.1. Use a custom finder instead to modify the query to fetch a user record.
+    The userFields option has been deprecated as of 3.1. Use select() in your custom finder.
+
+To configure different fields for user in your initialize() method:
+
+public function initialize()
+{
+    parent::initialize();
+    $this->loadComponent('Auth', [
+        'authenticate' => [
+            'Form' => [
+                'fields' => ['username' => 'email', 'password' => 'passwd']
+            ]
+        ]
+    ]);
+}
+
+Do not put other Auth configuration keys, such as authError, loginAction, etc., within the authenticate or Form element. They should be at the same level as the authenticate key. The setup above with other Auth configuration should look like:
+
+public function initialize()
+{
+    parent::initialize();
+    $this->loadComponent('Auth', [
+        'loginAction' => [
+            'controller' => 'Users',
+            'action' => 'login',
+            'plugin' => 'Users'
+        ],
+        'authError' => 'Did you really think you are allowed to see that?',
+        'authenticate' => [
+            'Form' => [
+                'fields' => ['username' => 'email']
+            ]
+        ],
+        'storage' => 'Session'
+    ]);
+}
+
+In addition to the common configuration, Basic authentication supports the following keys:
+
+    realm The realm being authenticated. Defaults to env('SERVER_NAME').
+
+In addition to the common configuration Digest authentication supports the following keys:
+
+    realm The realm authentication is for. Defaults to the servername.
+    nonce A nonce used for authentication. Defaults to uniqid().
+    qop Defaults to auth; no other values are supported at this time.
+    opaque A string that must be returned unchanged by clients. Defaults to md5($config['realm']).
+
+To find the user record, the database is queried only using the username. The password check is done in PHP. This is necessary because hashing algorithms like bcrypt (which is used by default) generate a new hash each time, even for the same string and you can’t just do simple string comparison in SQL to check if the password matches.
+
+
+
+Customizing Find Query
+
+You can customize the query used to fetch the user record using the finder option in authenticate class config:
+
+public function initialize()
+{
+    parent::initialize();
+    $this->loadComponent('Auth', [
+        'authenticate' => [
+            'Form' => [
+                'finder' => 'auth'
+            ]
+        ],
+    ]);
+}
+
+This will require your UsersTable to have finder method findAuth(). In the example shown below the query is modified to fetch only required fields and add a condition. You must ensure that you select the fields you need to authenticate a user, such as username and password:
+
+public function findAuth(\Cake\ORM\Query $query, array $options)
+{
+    $query
+        ->select(['id', 'username', 'password'])
+        ->where(['Users.active' => 1]);
+
+    return $query;
+}
+
+finder option is available since 3.1. Prior to that you can use scope and contain options to modify a query.
+
+
+
+Identifying Users and Logging Them In
+
+AuthComponent::identify()
+
+You need to manually call $this->Auth->identify() to identify the user using credentials provided in request. Then use $this->Auth->setUser() to log the user in, i.e., save user info to session.
+
+When authenticating users, attached authentication objects are checked in the order they are attached. Once one of the objects can identify the user, no other objects are checked. A sample login function for working with a login form could look like:
+
+public function login()
+{
+    if ($this->request->is('post')) {
+        $user = $this->Auth->identify();
+        if ($user) {
+            $this->Auth->setUser($user);
+            return $this->redirect($this->Auth->redirectUrl());
+        } else {
+            $this->Flash->error(__('Username or password is incorrect'));
+        }
+    }
+}
+
+The above code will attempt to first identify a user by using the POST data. If successful we set the user info to the session so that it persists across requests and then redirect to either the last page they were visiting or a URL specified in the loginRedirect config. If the login is unsuccessful, a flash message is set.
+
+$this->Auth->setUser($data) will log the user in with whatever data is passed to the method. It won’t actually check the credentials against an authentication class.
+
+
+Using Basic Authentication
+
+Basic authentication allows you to create a stateless authentication that can be used in intranet applications or for simple API scenarios. Basic authentication credentials will be rechecked on each request.
+
+Basic authentication transmits credentials in plain-text. You should use HTTPS when using Basic authentication.
+
+To use basic authentication, you’ll need to configure AuthComponent:
+
+$this->loadComponent('Auth', [
+    'authenticate' => [
+        'Basic' => [
+            'fields' => ['username' => 'username', 'password' => 'api_key'],
+            'userModel' => 'Users'
+        ],
+    ],
+    'storage' => 'Memory',
+    'unauthorizedRedirect' => false
+]);
+
+Here we’re using username + API key as our fields and use the Users model.
+
+
+
+Displaying Auth Related Flash Messages
+
+In order to display the session error messages that Auth generates, you need to add the following code to your layout. Add the following two lines to the src/Template/Layout/default.ctp file in the body section:
+
+// Only this is necessary after 3.4.0
+echo $this->Flash->render();
+
+// Prior to 3.4.0 this will be required as well.
+echo $this->Flash->render('auth');
+
+You can customize the error messages and flash settings AuthComponent uses. Using flash config you can configure the parameters AuthComponent uses for setting flash messages. The available keys are
+
+    key - The key to use, defaults to ‘default’. Prior to 3.4.0, the key defaulted to ‘auth’.
+    element - The element name to use for rendering, defaults to null.
+    params - The array of additional params to use, defaults to [].
+
+In addition to the flash message settings you can customize other error messages AuthComponent uses. In your controller’s beforeFilter(), or component settings you can use authError to customize the error used for when authorization fails:
+
+$this->Auth->config('authError', "Woopsie, you are not authorized to access this area.");
+
+Sometimes, you want to display the authorization error only after the user has already logged-in. You can suppress this message by setting its value to boolean false.
+
+In your controller’s beforeFilter() or component settings:
+
+if (!$this->Auth->user()) {
+    $this->Auth->config('authError', false);
+}
+
+Hashing Passwords
+
+You are responsible for hashing the passwords before they are persisted to the database, the easiest way is to use a setter function in your User entity:
+
+namespace App\Model\Entity;
+
+use Cake\Auth\DefaultPasswordHasher;
+use Cake\ORM\Entity;
+
+class User extends Entity
+{
+
+    // ...
+
+    protected function _setPassword($password)
+    {
+        if (strlen($password) > 0) {
+          return (new DefaultPasswordHasher)->hash($password);
+        }
+    }
+
+    // ...
+}
+
+AuthComponent is configured by default to use the DefaultPasswordHasher when validating user credentials so no additional configuration is required in order to authenticate users.
+
+DefaultPasswordHasher uses the bcrypt hashing algorithm internally, which is one of the stronger password hashing solutions used in the industry. While it is recommended that you use this password hasher class, the case may be that you are managing a database of users whose password was hashed differently.
+
+
+
+Manually Logging Users In
+
+AuthComponent::setUser(array $user)
+
+Sometimes the need arises where you need to manually log a user in, such as just after they registered for your application. You can do this by calling $this->Auth->setUser() with the user data you want to ‘login’:
+
+public function register()
+{
+    $user = $this->Users->newEntity($this->request->getData());
+    if ($this->Users->save($user)) {
+        $this->Auth->setUser($user->toArray());
+        return $this->redirect([
+            'controller' => 'Users',
+            'action' => 'home'
+        ]);
+    }
+}
+
+Be sure to manually add the new User id to the array passed to the setUser() method. Otherwise, you won’t have the user id available.
+
+
+
+Logging Users Out
+
+AuthComponent::logout()
+
+Eventually, you’ll want a quick way to de-authenticate someone and redirect them to where they need to go. This method is also useful if you want to provide a ‘Log me out’ link inside a members’ area of your application:
+
+public function logout()
+{
+    return $this->redirect($this->Auth->logout());
+}
+
+Logging out users that logged in with Digest or Basic auth is difficult to accomplish for all clients. Most browsers will retain credentials for the duration they are still open. Some clients can be forced to logout by sending a 401 status code. Changing the authentication realm is another solution that works for some clients.
+
+
+    

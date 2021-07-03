@@ -1,0 +1,54 @@
+Modelo de Aplicativo para a Intranet do DNOCS
+Usando o Framework CakePKP 3
+
+Criação de Layouts
+
+Criar 3 novos layouts e os aplicar respectivamente aos usuários:
+super
+admin
+manager
+
+- Baixear os arquivos:
+bootstrap.css, jquery.min.js e bootstrap.css e alterei o plugin TwitterBootstrap para que os use offline
+
+- Copia do arquivo app/webroot/css/bootstrap.css para bootstrap.super.css, bootstrap.admin.css e
+bootstrap.manager.css (todos no webroot/css)
+
+- Editar cada um dos copiados acima e apenas alterar a cor de fundo do body na linha do background-color abaixo a título de demonstração:
+
+body {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.42857143;
+  color: #333;
+  background-color: #B78999;
+}
+
+- Copiar o arquivo:
+/vendor/cakephp-brasil/twitter-bootstrap/src/Template/Layout/default.ctp
+para super.ctp, admin.ctp e manager.ctp
+
+- Editar cada um dos 3 criados (super.ctp, admin.ctp e manager.ctp) e alterei a linha:
+	<?= $this->Html->css('bootstrap');?>
+para
+	<?= $this->Html->css('bootstrap.super');?>
+	<?= $this->Html->css('bootstrap.admin');?>
+	<?= $this->Html->css('bootstrap.manager');?>
+
+- Adicionar ao initialize() do AppController.php:
+
+		$this->set('project_name', 'Título do Aplicativo');
+		if($loguser == 'super'){
+			//$this->viewBuilder()->theme('TwitterBootstrap');
+			$this->viewBuilder()->layout('TwitterBootstrap.super');
+		}elseif($loguser == 'admin'){
+			$this->viewBuilder()->layout('TwitterBootstrap.admin');
+		}elseif($loguser=='manager'){
+			$this->viewBuilder()->layout('TwitterBootstrap.manager');
+		}elseif($loguser=='user'){
+			$this->viewBuilder()->layout('TwitterBootstrap.default');
+		}
+
+Assim, ao logar cada usuário terá seu próprio ambiente.
+Claro que falta fazer um bom acabamento nos layouts, nas cores.
+

@@ -1,0 +1,136 @@
+Criação de um aplicativo tipo CRUD com o CakePHP3 mas na unha
+
+O objetivo maior deste tutorial é criar um aplicativo tipo CRUD com o Cake, mas agora apenas codificando, sem a ajuda do bake.
+Vamos seguir de onde paramos no tutorial anterior sobre o crud1.
+
+Desta vez não criaremos outro aplicativo iremos apenas copiar a pasta do crud1 e renomear para crud2 aproveitando tudo que fizemos
+Caso seja necessário num Linux ajuste as permissões dos arquivos da pasta crud2.
+
+== Criar os links para editar, ver e excluir no index.ctp
+
+Chame pelo navegador com:
+
+http://localhost/crud2
+
+Veja que ele lista todos os registros, com respectivos id, nome e email.
+Vamos adicionar uma coluna/label chamada Ações após o email e ela conterá em cada registro os três links: editar, ver e excluir, como faz o Bake.
+
+Vamos para isso editar o src/Template/Clientes/index.ctp
+
+Atualmente ele está assim:
+
+<table>
+<?php 
+print '<tr><td>ID</td><td>Nome</td><td>E-mail</td></tr>';
+foreach ($clientes as $cliente){ 
+     print '<tr><td>'.$cliente->id.'</td><td>'.$cliente->nome.'</td><td>'.$cliente->email.'</td></tr>';
+}
+
+Vamos alterar (aproveitando o código gerado pelo Bake no app crud):
+
+<table>
+<?php 
+print '<tr><td><strong>ID</td><td><strong>Nome</td><td><strong>E-mail</td><td><strong>Ações</td></tr>';
+?>
+        <tbody>
+            <?php foreach ($clientes as $cliente): ?>
+            <tr>
+                <td><?= $cliente->id ?></td>
+                <td><?= h($cliente->nome) ?></td>
+                <td><?= h($cliente->email) ?></td>
+                <td class="actions">
+                    <?= $this->Html->link(__('View'), ['action' => 'view', $cliente->id]) ?>
+                    <?= $this->Html->link(__('Edit'), ['action' => 'edit', $cliente->id]) ?>
+                    <?= $this->Form->postLink(__('Delete'), ['action' => 'delete', $cliente->id], ['confirm' => __('Are you sure you want to delete # {0}?', $cliente->id)]) ?>
+                </td>
+            </tr>
+            <?php endforeach; ?>
+        </tbody>
+    </table>
+
+No crud1 faltou a criação do método delete() para o controller Clientes
+
+Adicione ao controller ClientesController.php
+
+    public function delete($id = null)
+    {
+        $this->request->allowMethod(['post', 'delete']);
+        $cliente = $this->Clientes->get($id);
+        $this->Clientes->delete($cliente);
+        return $this->redirect(['action' => 'index']);
+    }
+
+Veja que mais uma vez eu simplifiquei o código, removendo validações e mensagens de erro ou acerto apenas para facilitar o entendimento.
+Mas o ideal é fazer como faz o Bake, com tudo que tem direito para tornar o código mais amigável e mais seguro.
+
+Agora podemos chamar novamente pelo navegador e testar todas as operações do crud:
+
+http://localhost/crud2
+
+Ops, ainda falta a opção na index para criar um novo registro, ou seja, um link para o add.ctp
+
+Vamos adicioná-lo acima da listagem, logo abaixo da tag <table>.
+
+<li><?= $this->Html->link(__('New Cliente'), ['action' => 'add']) ?></li>
+
+Assim nosso CRUD está completo. Todo criado linha a linha do código.
+
+
+O que vem a seguir?
+
+Veja que nosso aplicativo crud2 não está completo mas já está funcional, inserindo, editando, visutalizando e excluindo registros.
+Para excluir precisamos incluir o action delete(). Inclua este action:
+
+    public function delete($id = null)
+    {
+        $this->request->allowMethod(['post', 'delete']);
+        $cliente = $this->Clientes->get($id);
+        if ($this->Clientes->delete($cliente)) {
+            $this->Flash->success(__('The cliente has been deleted.'));
+        } else {
+            $this->Flash->error(__('The cliente could not be deleted. Please, try again.'));
+        }
+
+        return $this->redirect(['action' => 'index']);
+    }
+
+
+Falta muita coisa para que fique decente. Mas nesta linha pararemos por aqui. 
+Daqui pra frente estudaremos as partes mais avançadas do código do Cake:
+- Como validar informações usando o model
+- Como programar nas três camadas, model, crontroller e view e fazer as informações conversarem entre si, mostrando todo o fluxo, onde ela começa e onde ela termina. Desde a solicitação do usuário ao clicar em um link, em um botão ou chamar um link até a resposta final da informação voltando para o usuário. Com isso precisaremos usar funções que são próprias do model, outras que são próprias do controller e outras que são próprias da view.
+
+Em seguida veremos o aplicativo app_code.
+
+Existe muita coisa para aprendermos. 
+
+
+== Onde obter ajuda?
+
+O site do Cake é a melhor fonte de consulta que conheço. Com toda a documentação fornecida online. Também é oferecida em forma de pdf e epub.
+
+Mas não existe documentação perfeita. Seria praticamente impossível chegar perto.
+Devemos contar com outras fontes de pesquisa que ajudam:
+
+Lista oficial em inglês, onde podemos tirar dúvidas - https://discourse.cakephp.org/
+Forum sobre CakePHP em inglês no StackOverflow - https://stackoverflow.com/tags/cakephp/new
+Forum do StackOverflow em pt-br sobre o CakePHP 3 - https://pt.stackoverflow.com/questions/tagged/cakephp-3
+Claro que também temos os instrumentos de busca caso falte algo.
+
+Leituras recomendadas:
+
+https://github.com/ribafs/cake-control-br
+
+Tutoriais de exemplo de aplicativos:
+https://book.cakephp.org/3.0/en/tutorials-and-examples.html
+https://book.cakephp.org/3.0/en/tutorials-and-examples/blog/blog.html
+https://book.cakephp.org/3.0/en/tutorials-and-examples/blog-auth-example/auth.html
+https://book.cakephp.org/3.0/en/tutorials-and-examples/bookmarks/intro.html
+
+Book Online
+https://book.cakephp.org/3.0/en/index.html
+
+Ou offline em PDF ou Epub
+https://book.cakephp.org/3.0/_downloads/en/CakePHPCookbook.pdf
+https://book.cakephp.org/3.0/_downloads/en/CakePHPCookbook.epub
+

@@ -1,0 +1,78 @@
+Podemos usar Helpers e Elements em nosso template do Bake.
+
+Os templates do bake usam as tags do Asp <%, <%= e %>
+
+Exemplo de template de um Helper no bake:
+
+<?php
+namespace &lt;%= $namespace %>\View\Helper;
+use Cake\View\Helper;
+use Cake\View\View;
+/**
+ * <%= $name %> helper
+ */
+class <%= $name %>Helper extends Helper {
+/**
+ * Default configuration.
+ *
+ * @var array
+ */
+  protected $_defaultConfig = [];
+}
+?>
+
+Quando o código acima é interpretada pelo Cake fica assim:
+
+<?php
+namespace App\View\Helper;
+use Cake\View\Helper;
+use Cake\View\View;
+/**
+ * Post helper
+ */
+class PostHelper extends Helper {
+/**
+ * Default configuration.
+ *
+ * @var array
+ */
+  protected $_defaultConfig = [];
+}
+?>
+
+Se quizermos customizar o emplate do bake apenas para um certo controler, como o
+Servidores, para que o bake gere para o mesmo somente os actions: index(), view() e add(),
+alteramos o código do config/bootstrap_cli.php para algo assim:
+
+<?php
+use Cake\Event\Event;
+use Cake\Event\EventManager;
+use Cake\Utility\Hash;
+EventManager::instance()->attach(function (Event $event) {
+    $view = $event->subject;
+    $name = Hash::get($view->viewVars, 'name');
+    $isController = strpos($event->data[0], 'Bake/Controller/controller.ctp') !== false;
+    if ($isController !== false && $name == 'Servidores') {
+        $view->viewVars['actions'] = ['index', 'view', 'add'];
+    }
+    if ($isController && $name == 'Comentarios') {
+        $view->viewVars['actions'] = ['add'];
+    }
+}, 'Bake.beforeRender');
+?>
+
+Este código deve:
+
+- Anexar ao evento Bake.beforeRender, que permite modificar qualquer dado indo
+para o template/view
+
+- Receber o nome do template
+
+- Caso o nome do arquivo termine com Bake/Controller/controller.ctp, o template
+usado sendo o Servidores, gerará apenas os referidos actions.
+
+- Também adicionamos somente o action add() caso o controller seja Comentários.
+
+Mais detalhes no artigo do José Gonzales em:
+http://josediazgonzalez.com/2014/12/03/customizing-bake-and-installing-plugins-with-cakephp-3/
+

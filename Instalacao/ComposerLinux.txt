@@ -1,0 +1,73 @@
+Instalação e uso do Composer no Linux
+
+O composer é um gerenciador de dependências que instala o CakePHP e também instala as dependências que forem necessárias.
+
+É uma ferramenta para gerenciamento de dependências para o PHP que vem ganhando espaço e se tornando cada vez mais importante. Com algumas poucas linhas de configuração você define todas as bibliotecas de terceiros ou mesmo suas que deseja/precisa utilizar em seu projeto. O composer encarrega-se de baixá-las e criar um autoloader deixando-as prontas para uso.
+
+O composer não limita-se a uso somente em frameworks, você pode tranquilamente utilizá-lo em seus projetos com PHP puro desde que siga as recomendações da FIG (Framework Interoperability Group).
+
+Pense no composer mais ou menos como o apt-get do Linux debian-like. Nele, ao instalar um pacote qualquer todas suas dependências são resolvidas automaticamente e também instaladas.
+
+
+Instalar Globalmente o Composer no Linux
+Após ter instalado o servidor e ter configurado o ambiente é hora de instalar o composer.
+
+sudo apt-get install composer
+
+sudo su
+curl -sS https://getcomposer.org/installer | php
+
+Colocar no path do Linux
+mv composer.phar /usr/local/bin/composer
+
+Criar App
+composer create-project --prefer-dist cakephp/app nome_ap
+
+Criar script no Linux para automatizar a criação de aplicativos:
+sudo nano /usr/local/bin/comp
+
+Cole a linha:
+composer create-project --prefer-dist cakephp/app $1
+
+Execute
+sudo chmod +x /usr/local/bin/comp
+
+Usando
+comp nomeapp
+
+
+Desabilitando o xdebug (como recomendado) no Linux:
+sudo php5dismod -s cli xdebug
+
+Desabilitar xdebug no php7:
+
+sudo nano /etc/php/7.0/cli/conf.d/20-xdebug.ini
+
+Apenas comente a linha
+
+
+Usando o Composer:
+
+composer install
+Este comando fará o composer ler as configurações setadas no arquivo json e instalar todas as bibliotecas/pacotes necessários para a sua aplicação e também estas mesmas bibliotecas que possuírem dependências terão as mesmas resolvidas. 
+
+composer update
+composer init
+composer validate
+composer self-update
+
+Detalhes
+https://getcomposer.org/doc/03-cli.md
+http://tableless.com.br/composer-para-iniciantes/
+
+
+Removendo pacote instalado
+
+Acesse a pasta do projeto
+Edite o composer.json
+Remova a linha do pacote no require ou require-dev
+Execute
+composer update
+
+Removerá o pacote e suas dependências
+

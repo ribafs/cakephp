@@ -1,0 +1,71 @@
+Após criar o banco e configurar em config/app_local.php
+
+Também configurar config/routes.php a rota default para Produtos/index
+
+Baixei o bootstrap versão 5:
+
+https://getbootstrap.com/docs/5.0/getting-started/download/
+
+Descompactei e copiei
+
+css/bootstrap.min.css para webroot/css
+
+Agora editar o leyout default
+
+templates/layout/default.php
+
+Aqui alterei apenas a linha abaixo:
+
+    <?= $this->Html->css(['normalize.min', 'milligram.min', 'cake']) ?>
+
+Para
+
+    <?= $this->Html->css(['bootstrap.min', 'cake']) ?>
+
+Experimentei remover 'cake', mas me pareceu que não valeria a pena e o deixei.
+
+Agora alterar as views de produtos, pois já tem alguns registros:
+
+index.php
+
+A linha:
+
+    <?= $this->Html->link(__('New Produto'), ['action' => 'add'], ['class' => 'button float-right']) ?>
+
+Mudei o botão:
+
+    <?= $this->Html->link(__('New Produto'), ['action' => 'add'], ['class' => 'button float-right btn btn-primary']) ?>
+
+As duas linhas abaixo:
+
+    <div>
+        <table class="table">
+
+
+edit.php
+
+Aqui irei customizar as caixas de texto para adaptar ao bootstrap (depois de pesquisar sobre forms em: https://getbootstrap.com/docs/5.0/forms/form-control/)
+
+Mudei as 3 caixas de texto assim:
+
+                    echo $this->Form->control('descricao',['class'=>'form-control']);
+                    echo $this->Form->control('estoque_minimo',['class'=>'form-control']);
+                    echo $this->Form->control('estoque_maximo',['class'=>'form-control']);
+
+E o botão ao final:
+
+            <?= $this->Form->button(__('Submit'),['class'=>'btn btn-primary']) ?>
+
+add.php
+
+Neste basicamente mudei de forma parecida com a feita em edit.php
+
+view.php
+
+Nesta mudei apenas duas linhas, com a classe container e a tabela:
+
+        <div class="container">
+            <h3><?= h($produto->id) ?></h3>
+            <table class="table">
+
+De forma semelhante alterar também compras, vendas e estoques.

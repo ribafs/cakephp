@@ -1,0 +1,151 @@
+https://book.cakephp.org/3.0/en/orm/schema-system.html#schema-collections
+
+        // insert into begin of the controller file
+        use Cake\Datasource\ConnectionManager;
+
+        $db = ConnectionManager::get('default');
+
+        // Create a schema collection.
+        $collection = $db->schemaCollection();
+
+        // Get a single table (instance of Schema\TableSchema)
+        $tableSchema = $collection->describe('articles');
+        
+        //Get columns list from table
+        $columns = $tableSchema->columns();
+        
+        //Empty array for fields
+        $fields = [];
+        
+        //iterate columns
+        foreach ( $columns as $column ){
+            $fields[ $column ] = $tableSchema->column( $column );
+        }
+
+And now - in the $fields return:
+
+[
+	'id' => [
+		'type' => 'integer',
+		'length' => (int) 10,
+		'unsigned' => false,
+		'null' => false,
+		'default' => null,
+		'comment' => '',
+		'autoIncrement' => true,
+		'precision' => null
+	],
+	'name' => [
+		'type' => 'string',
+		'length' => (int) 255,
+		'null' => false,
+		'default' => null,
+		'collate' => 'utf8_general_ci',
+		'comment' => 'Артикль',
+		'precision' => null,
+		'fixed' => null
+	],
+	'description' => [
+		'type' => 'string',
+		'length' => (int) 255,
+		'null' => true,
+		'default' => null,
+		'collate' => 'utf8_general_ci',
+		'comment' => '',
+		'precision' => null,
+		'fixed' => null
+	],
+	'article_good_id' => [
+		'type' => 'integer',
+		'length' => (int) 11,
+		'unsigned' => false,
+		'null' => true,
+		'default' => null,
+		'comment' => 'Товарная группа артикля',
+		'precision' => null,
+		'autoIncrement' => null
+	],
+	'disabled' => [
+		'type' => 'boolean',
+		'length' => null,
+		'null' => true,
+		'default' => '0',
+		'comment' => '',
+		'precision' => null
+	],
+	'date_expired' => [
+		'type' => 'date',
+		'length' => null,
+		'null' => true,
+		'default' => null,
+		'comment' => '',
+		'precision' => null
+	],
+	'article_type_id' => [
+		'type' => 'integer',
+		'length' => (int) 11,
+		'unsigned' => false,
+		'null' => true,
+		'default' => null,
+		'comment' => '',
+		'precision' => null,
+		'autoIncrement' => null
+	],
+	'producer_company_id' => [
+		'type' => 'integer',
+		'length' => (int) 11,
+		'unsigned' => false,
+		'null' => true,
+		'default' => null,
+		'comment' => 'Производитель',
+		'precision' => null,
+		'autoIncrement' => null
+	],
+	'supplier_company_id' => [
+		'type' => 'integer',
+		'length' => (int) 11,
+		'unsigned' => false,
+		'null' => true,
+		'default' => null,
+		'comment' => 'Поставщик',
+		'precision' => null,
+		'autoIncrement' => null
+	],
+	'created' => [
+		'type' => 'datetime',
+		'length' => null,
+		'null' => true,
+		'default' => null,
+		'comment' => '',
+		'precision' => null
+	],
+	'updated' => [
+		'type' => 'datetime',
+		'length' => null,
+		'null' => true,
+		'default' => null,
+		'comment' => '',
+		'precision' => null
+	],
+	'created_user_id' => [
+		'type' => 'integer',
+		'length' => (int) 11,
+		'unsigned' => false,
+		'null' => true,
+		'default' => null,
+		'comment' => '',
+		'precision' => null,
+		'autoIncrement' => null
+	],
+	'updated_user_id' => [
+		'type' => 'integer',
+		'length' => (int) 11,
+		'unsigned' => false,
+		'null' => true,
+		'default' => null,
+		'comment' => '',
+		'precision' => null,
+		'autoIncrement' => null
+	]
+]
+

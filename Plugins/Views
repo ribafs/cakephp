@@ -1,0 +1,14 @@
+Plugin Views
+
+As views se comportam exatamente como ocorrem em aplicações normais. Basta colocá-los na pasta plugins/[PluginName]/src/Template/. Para nós o plugin ContactManager, precisamos de uma view para o nosso ContactsController::index() action, então incluamos isso também:
+
+// plugins/ContactManager/src/Template/Contacts/index.ctp:
+<h1>Contacts</h1>
+<p>Following is a sortable list of your contacts</p>
+<!-- A sortable list of contacts would go here....-->
+
+Os plugins podem fornecer seus próprios layouts. Para adicionar layouts em plugins, coloque seus arquivos de template dentro plugins/[PluginName]/src/Template/Layout. Para usar um layout de plug-in em seu controller você pode fazer o seguinte:
+
+public $layout = 'ContactManager.admin';
+
+

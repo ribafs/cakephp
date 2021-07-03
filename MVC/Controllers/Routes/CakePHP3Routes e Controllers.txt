@@ -1,0 +1,99 @@
+Routes e Controllers
+
+Rotas são pontos de entrada para usuários à nossa aplicação e em geral este ponto de entrada vai representar nossa aplicação
+Cada rota aponta a um controller para que futuramente interaja com seus correspondentes actions,
+que finalmente gerará uma resposta para o usuário e será no formato HTML com as Views/Templates ou em outro formato.
+
+Rota default:
+
+$routes->connect('/', ['controller' => 'Pages', 'action' => 'display', 'home']);
+
+No caso acima temos um action chamado display() e uma view chamada home.
+
+Quando o action chama-se display e a view também chama-se display, temos um route assim:
+$routes->connect('/', ['controller' => 'Pages', 'action' => 'display']);
+
+Vejamos como se comunicam as rotas com os controllers.
+
+Editar o routes.php e adicionar ao final, antes de Plugin::routes();
+Router->connect('/users/index', ['controller' => 'Users', 'action' => 'index']);
+
+Criar Controller sem actions:
+bin\cake bake controller Users --no-actions
+
+Então editar o UsersController e adicionar o método index:
+
+public function index()
+{
+	echo "Lista de usuários";
+	exit();
+}
+
+Agora chamamos no navegador:
+
+http://localhost/cliente/users/index
+
+Nos mostrará:
+Lista de usuários
+
+Adicionando rota para a View view:
+
+Editar o routes.php e adicionar ao final, antes de Plugin::routes();
+Agora vamos usar o método scope de Router
+
+Router::scope('/users', function ($routes)
+{
+	$routes->connect('/index',(controller' => 'Users', 'action' => 'index'));
+	$routes->connect('/view',(controller' => 'Users', 'action' => 'view'));	
+}
+Criar Controller sem actions:
+bin\cake bake controller Users --no-actions
+
+Então editar o UsersController e adicionar o método index:
+public function view()
+{
+	echo "Detalhes de usuário";
+	exit();
+}
+
+Agorachamamos no navegador:
+
+http://localhost/cliente/users/view
+
+Nos mostrará:
+Detalhes de usuário
+
+Também podemos passar parâmetros para as rotas:
+	$routes->connect('/view/*',(controller' => 'Users', 'action' => 'view'));	
+
+public function view($nome)
+{
+	echo "Detalhes de usuário: ".$nome;
+	exit();
+}
+	
+http://localhost/cliente/users/view/ribafs
+
+Detalhes de usuário: ribafs
+
+Documentação
+http://book.cakephp.org/3.0/en/development/routing.html
+
+
+O Cake tem rotas default.
+Caso excluamos as duas rotas criadas para inde e view e acessarmos:
+
+http://localhost/cliente/users/index
+http://localhost/cliente/users/view/ribafs
+
+Ainda assim funcionará, pois assume as rotas default do Cake.
+
+Assim, basta adicionar o action e chamar pelo navegador:
+
+public function add()
+{
+	echo "Cadastro de usuário";
+	exit();
+}
+
+http://localhost/cliente/users/add

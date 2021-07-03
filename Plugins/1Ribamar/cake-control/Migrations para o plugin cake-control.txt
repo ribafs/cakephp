@@ -1,0 +1,433 @@
+Migrations para o plugin cake-control
+
+No aplicativo cake-control-pt com banco cake-control-demo
+cd cake-control-pt
+
+composer update
+
+Configurar o banco e remover as tabelas dele, caso existam.
+
+1) Criar o esquema da tabela groups
+bin/cake bake migration create_groups name:string created modified -p CakeControl
+
+Editar o arquiuvo gerado em cake-control-pt/vendor/ribafs/cake-control/config/Migrations:
+
+    public function change()
+    {
+        $table = $this->table('groups');
+        $table->addColumn('name', 'string', [
+            'default' => null,
+            'limit' => 8,
+            'null' => false,
+        ]);
+        $table->addColumn('created', 'datetime', [
+            'default' => null,
+            'null' => false,
+        ]);
+        $table->addColumn('modified', 'datetime', [
+            'default' => null,
+            'null' => false,
+        ]);
+        $table->create();
+    }
+
+2) Gerando a tabela:
+bin/cake migrations migrate -p CakeControl
+
+Adicionar registros para a tabela groups
+
+3) Criar o seed
+bin/cake migrations create GroupsSeed -p CakeControl
+
+Editar o arquivo gerado e mudar o método de change para up, assim:
+
+    public function up()
+    {
+		$faker = \Faker\Factory::create();
+		$populator = new Faker\ORM\CakePHP\Populator($faker);
+
+		$populator->addEntity('Groups', 1, [
+			'name'=>'Supers',			
+			'created' => function() use ($faker) {
+				return $faker->dateTimeBetween($startDate = 'now', $endDate = 'now');
+			},
+			'modified' => function() use ($faker) {
+				return $faker->dateTimeBetween($startDate = 'now', $endDate = 'now');
+			}
+		]);
+		$populator->execute();
+
+		$populator->addEntity('Groups', 1, [
+			'name'=>'Admins',			
+			'created' => function() use ($faker) {
+				return $faker->dateTimeBetween($startDate = 'now', $endDate = 'now');
+			},
+			'modified' => function() use ($faker) {
+				return $faker->dateTimeBetween($startDate = 'now', $endDate = 'now');
+			}
+		]);
+		$populator->execute();
+
+		$populator->addEntity('Groups', 1, [
+			'name'=>'Managers',			
+			'created' => function() use ($faker) {
+				return $faker->dateTimeBetween($startDate = 'now', $endDate = 'now');
+			},
+			'modified' => function() use ($faker) {
+				return $faker->dateTimeBetween($startDate = 'now', $endDate = 'now');
+			}
+		]);
+		$populator->execute();
+
+		$populator->addEntity('Groups', 1, [
+			'name'=>'Users',			
+			'created' => function() use ($faker) {
+				return $faker->dateTimeBetween($startDate = 'now', $endDate = 'now');
+			},
+			'modified' => function() use ($faker) {
+				return $faker->dateTimeBetween($startDate = 'now', $endDate = 'now');
+			}
+		]);
+		$populator->execute();		
+    }    
+
+4) Adicionar os registros para a tabela
+bin/cake migrations migrate -p CakeControl
+
+
+5) Criar o esquema da tabela users
+bin/cake migrations create Users -p CakeControl
+
+Editar o script criado em config/Migrations
+
+E alterar assim:
+
+    public function up()
+    {
+		$table = $this->table('users');
+		$table->addColumn('username', 'string', ['limit'=>7]);
+		$table->addColumn('password', 'string');
+		$table->addColumn('group_id', 'integer');		
+		$table->addColumn('created', 'datetime');
+		$table->addColumn('modified', 'datetime');				
+		$table->create();
+    }
+
+
+6) Agora vamos efetuar a migração para criar a tabela:
+bin/cake migrations migrate -p CakeControl
+
+Adicionar o plugin Faker:
+composer require fzaninotto/faker
+
+7) Adicionar registros para a tabela users
+bin/cake migrations create UsersSeed -p CakeControl
+
+Editar o arquivo gerado e deixar assim (mudar o método de change para up):
+
+config/Migrations/*users_seed.php
+
+<?php
+
+use Phinx\Migration\AbstractMigration;
+use Cake\Auth\DefaultPasswordHasher;
+
+class UsersSeed extends AbstractMigration
+{
+    /**
+     * Change Method.
+     *
+     * Write your reversible migrations using this method.
+     *
+     * More information on writing migrations is available here:
+     * http://docs.phinx.org/en/latest/migrations.html#the-abstractmigration-class
+     *
+     * The following commands can be used in this method and Phinx will
+     * automatically reverse them when rolling back:
+     *
+     *    createTable
+     *    renameTable
+     *    addColumn
+     *    renameColumn
+     *    addIndex
+     *    addForeignKey
+     *
+     * Remember to call "create()" or "update()" and NOT "save()" when working
+     * with the Table class.
+     */
+    public function up()
+    {
+		$faker = \Faker\Factory::create();
+		$populator = new Faker\ORM\CakePHP\Populator($faker);
+		
+		$populator->addEntity('Users', 1, [
+			'username' => 'super',	
+			'group_id' => 1,				
+			'password' => function (){
+				$hasher = new DefaultPasswordHasher();
+				return $hasher->hash('super');
+			},
+			'created' => function() use ($faker) {
+				return $faker->dateTimeBetween($startDate = 'now', $endDate = 'now');
+			},
+			'modified' => function() use ($faker) {
+				return $faker->dateTimeBetween($startDate = 'now', $endDate = 'now');
+			}
+		]);
+		$populator->execute();
+				
+		$populator->addEntity('Users', 1, [
+			'username' => 'admin',	
+			'group_id' => 2,							
+			'password' => function (){
+				$hasher = new DefaultPasswordHasher();
+				return $hasher->hash('admin');
+			},
+			'created' => function() use ($faker) {
+				return $faker->dateTimeBetween($startDate = 'now', $endDate = 'now');
+			},
+			'modified' => function() use ($faker) {
+				return $faker->dateTimeBetween($startDate = 'now', $endDate = 'now');
+			}
+		]);		
+		$populator->execute();
+				
+		$populator->addEntity('Users', 1, [
+			'username' => 'manager',	
+			'group_id' => 3,							
+			'password' => function (){
+				$hasher = new DefaultPasswordHasher();
+				return $hasher->hash('manager');
+			},
+			'created' => function() use ($faker) {
+				return $faker->dateTimeBetween($startDate = 'now', $endDate = 'now');
+			},
+			'modified' => function() use ($faker) {
+				return $faker->dateTimeBetween($startDate = 'now', $endDate = 'now');
+			}
+		]);				
+		$populator->execute();
+				
+		$populator->addEntity('Users', 1, [
+			'username' => 'user',	
+			'group_id' => 4,							
+			'password' => function (){
+				$hasher = new DefaultPasswordHasher();
+				return $hasher->hash('user');
+			},
+			'created' => function() use ($faker) {
+				return $faker->dateTimeBetween($startDate = 'now', $endDate = 'now');
+			},
+			'modified' => function() use ($faker) {
+				return $faker->dateTimeBetween($startDate = 'now', $endDate = 'now');
+			}
+		]);				
+		$populator->execute();
+    }
+}
+
+
+8) Agora vamos efetuar a migração para cadaastrar os registros na tabela:
+bin/cake migrations migrate -p CakeControl
+
+OBS.: Gera os group_id errados. Precisamos corrigir para uma sequência:
+
+id	username	group_id
+1	super		1
+2	admin		2
+3	manager		3
+4	user		4
+
+9) Gerar a migration permissions
+bin/cake bake migration create_permissions group_id:integer controller:string action:string created modified -p CakeControl
+
+Editar o arquico gerado e alterar o tamanho dos campos controller e action para 55.
+
+10) Gerando a tabela:
+bin/cake migrations migrate -p CakeControl
+
+Não criar seed para a permissions
+As permissões serão geradas pelo componente no aplicativo
+
+11) Gerar a migration para customers
+bin/cake bake migration create_customers name:string birthday:date phone:string user_id:integer observation:text created modified -p CakeControl
+
+Editar o arquico gerado e alterar o tamanho dos campos name para 50 e phone para 10.
+
+12) Gerando a tabela:
+bin/cake migrations migrate -p CakeControl
+
+13) Criar o seed
+bin/cake migrations create CustomersSeed -p CakeControl
+
+Editar o arquivo gerado e mudar o método de change para up, assim:
+
+    public function up()
+    {
+		$faker = \Faker\Factory::create();
+		$populator = new Faker\ORM\CakePHP\Populator($faker);
+
+		$populator->addEntity('Customers', 100, [
+			'name'=> function() use ($faker) {
+				return $faker->name();
+			},
+			'birthday'=>function() use ($faker) {
+				return $faker->dateTimeBetween($startDate = 'now', $endDate = 'now');
+			},						
+			'phone'=> function() use ($faker) {
+				return $faker->phoneNumber();
+			},		
+			'user_id'=>function() use ($faker) {
+				return $faker->numberBetween($min = 1, $max = 100);
+			},													
+			'observation'=>function() use ($faker) {
+				return $faker->realText($faker->numberBetween(10,100));
+			},			
+			'created' => function() use ($faker) {
+				return $faker->dateTimeBetween($startDate = 'now', $endDate = 'now');
+			},
+			'modified' => function() use ($faker) {
+				return $faker->dateTimeBetween($startDate = 'now', $endDate = 'now');
+			}
+		]);
+		$populator->execute();
+
+14) Adicionar os registros para a tabela
+bin/cake migrations migrate -p CakeControl
+
+========= Manter no plugin apenas: groups, users, permissions e customers (daqui pra cima)
+
+
+15) Gerar o migration para products
+bin/cake bake migration create_products name:string unity:string register:date user_id:integer customer_id:integer created modified -p CakeControl
+
+Edite o arquivo gerado e altere o tamanho de alguns campos string.
+
+16) Gerando a tabela:
+bin/cake migrations migrate -p CakeControl
+
+17) Criar o seed
+bin/cake migrations create ProductsSeed -p CakeControl
+
+Exemplo:
+public function up(){ 
+    
+  $this->execute('INSERT INTO usuarios 
+   (nome, email, created,  modified) VALUES 
+   ("Biu da Silva", "biu@gmail.com", NOW(), NOW())');
+
+}
+
+ou
+use Cake\ORM\TableRegistry;
+...
+public function up()
+{
+  $usuarios = TableRegistry::get('Usuarios');
+
+  $usuario = $usuarios->newEntity();
+  $usuario->nome = 'Biu da Silva';
+  $usuario->email = 'biu@gmail.com';
+  
+  $usuarios->save($usuario);
+}
+
+ou
+public function up()
+{
+  $data = [
+    'nome' => 'Biu da Silva',
+    'email' => 'biu@gmail.com'
+  ];
+  $table = $this->table('usuarios');
+  $table->insert($data)->save();
+}
+
+
+Editar o arquivo gerado e mudar o método de change para up, assim:
+TEstar para único:
+$faker->unique()->randomDigit;
+$faker->unique()->randomNumber(100);
+
+
+    public function up()
+    {
+		$faker = \Faker\Factory::create();
+		$populator = new Faker\ORM\CakePHP\Populator($faker);
+
+		$populator->addEntity('Products', 100, [
+			'name'=> function() use ($faker) {
+				return $faker->name();
+			},
+			'unity'=> function() use ($faker) {
+				return $faker->word();
+			},					
+			'register'=>function() use ($faker) {
+				return $faker->dateTimeBetween($startDate = 'now', $endDate = 'now');
+			},						
+			'user_id'=> function() use ($faker){
+				return $faker->unique()->randomNumber(5);
+			},
+			'customer_id'=> function() use ($faker){
+				return $faker->unique()->randomNumber(5);
+			},
+			'created' => function() use ($faker) {
+				return $faker->dateTimeBetween($startDate = 'now', $endDate = 'now');
+			},
+			'modified' => function() use ($faker) {
+				return $faker->dateTimeBetween($startDate = 'now', $endDate = 'now');
+			}
+		]);
+		$populator->execute();
+
+		// Não consegui fazer variar de 1 a 100
+		// $this->execute('update products set customer_id = 20');
+	}
+	
+18) Adicionar os registros para a tabela
+bin/cake migrations migrate -p CakeControl
+
+19) Gerar o migration para product_items
+bin/cake bake migration create_product_items product_id:integer quantity:integer price:decimal created modified -p CakeControl
+
+Edite o arquivo gerado e altere o tamanho de alguns campos string.
+
+20) Gerando a tabela:
+bin/cake migrations migrate -p CakeControl
+
+21) Criar o seed
+bin/cake migrations create ProductItemsSeed -p CakeControl
+
+Editar o arquivo gerado, mudar a função para up e deixar assim:
+
+    public function up()
+    {
+		$faker = \Faker\Factory::create();
+		$populator = new Faker\ORM\CakePHP\Populator($faker);
+		
+		$populator->addEntity('ProductItems', 100, [
+			'product_id'=> function() use ($faker){
+				return $faker->unique()->randomNumber(2);
+			},		
+			'quantity'=> function() use ($faker) {
+				return $faker->numberBetween(5,100);
+			},
+			'price'=> function() use ($faker) {
+				return $faker->numberBetween(5,100);
+			},					
+			'created' => function() use ($faker) {
+				return $faker->dateTimeBetween($startDate = 'now', $endDate = 'now');
+			},
+			'modified' => function() use ($faker) {
+				return $faker->dateTimeBetween($startDate = 'now', $endDate = 'now');
+			}
+		]);
+		$populator->execute();		
+		// Não consegui fazer variar de 1 a 100
+		// $this->execute('update product_items set product_id = 20');
+
+	}
+
+22) Adicionar os registros para a tabela
+bin/cake migrations migrate -p CakeControl
+

@@ -1,0 +1,9 @@
+Dicas sobre data e hora
+
+Para o CakePHP os campos do tipo data, datatime ou timestamp obrigatoriamente devem usar DEFAULT NULL:
+
+nascimento date DEFAULT NULL
+
+E também não podemos alterar sua validação para exigir preenchimento com notEmpty ou notBlank. Caso contrário
+o Cake não reconhece e não adiciona o registro.
+

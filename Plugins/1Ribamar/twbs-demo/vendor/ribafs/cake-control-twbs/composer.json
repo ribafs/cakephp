@@ -1,0 +1,32 @@
+{
+    "name": "ribafs/cake-control-twbs",
+    "authors": [
+        {
+            "name": "Òscar Casajuana",
+            "email": "elboletaire@underave.net",
+            "homepage": "http://racotecnic.com",
+            "role": "Developer"
+        },
+        {
+            "name": "Ribamar FS",
+            "email": "contato@ribafs.org",
+            "homepage": "http://ribafs.org",
+            "role": "Developer"
+        }
+    ],
+    "description": "Plugin que implementa controle de acesso. Com bons recursos como busca, bcrypt, tradução para pt_BR e template com o Bootstrap",
+    "type": "cakephp-plugin",
+    "keywords": ["cakephp", "bootstrap", "plugin", "busca", "bcrypt", "tradução pt_BR", "Controle de Acesso"],
+    "license": "MIT",
+    "require": {
+        "php": ">=5.5.9",
+        "cakephp/cakephp": "~3.0",
+        "elboletaire/less-cake-plugin": ">=1.6.1",
+        "friendsofcake/bootstrap-ui": "~0.3"
+    },
+    "autoload": {
+        "psr-4": {
+            "CakeControlTwbs\\": "src"
+        }
+    }
+}

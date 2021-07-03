@@ -1,0 +1,3 @@
+
+Gerando código usando plugin
+bin/cake bake all --plugin CakePtbr articles

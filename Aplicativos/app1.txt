@@ -1,0 +1,68 @@
+Primeiro Aplicativo
+
+Este primeiro aplicativo apenas instala o CakePHP 3.2.9 através do composer e mostra o aplicativo padrão que já vem com com o Cake. Vem um controller, um action e um template.
+
+
+Customizando o Terminal/Prompt
+
+Eu gosto de configurar para que ele já abra no diretório onde trabalho.
+
+No Windows 
+Clique com o botão direito – propriedades – Iniciar em c:\xampp\htdocs\treinamento
+Aproveita e entra com uma combinação de teclas tipo Ctrl+Alt+C
+
+No Linux
+Crie um atalho para o terminal assim:
+Configurações do sistema – Teclado – Atalhos de teclado – Atalhos personalizados
+Clicar no sinal de +
+Nome – Terminal
+Comando - gnome-terminal –working-directory=/var/www/html/treinamento
+Teclar Enter
+Adicionar o atalho – Ctrl+Alt+C
+
+Agora sempre que teclar Ctrl+Alt+C ele abre nosso ambiente já no respectivo diretório.
+
+Alterando o document root do Apache no Linux
+
+Em meu computador desktop no Linux eu gosto de mudar do /var/www/html para /backup/www, backup é minha partiçãod e backup e como ribafs sou o dono dela e assim fica mais confortável para trabalhar.
+
+Criando o aplicativo app1
+
+Ctrl+Alt+C
+comp app1
+
+Com este comando, aguardamos um pouco e ele traz o CakePHP atualizado para sua última versão estável juntamente com todas as dependências.
+
+Vejamos. Execute o comando:
+cd app1
+bin/cake
+Mude a barra para \ caso esteja usando o Windows.
+Ele mostra algumas informações importantes, inclusive a versão do cake, a do php e alguns diretórios:
+
+Welcome to CakePHP v3.2.9 Console
+---------------------------------------------------------------
+Path: /backup/www/treinamento/app1/src/
+PHP : 5.6.11-1ubuntu3.4
+---------------------------------------------------------------
+* app:  src – neste subdiretório fica todo o código do aplicativo
+Abaixo fica todo o código do framework
+* core: /backup/www/treinamento/app1/vendor/cakephp/cakephp
+
+Acesse o aplicativo padrão embutido no Cake pelo navegador:
+
+http://localhost/treinamento/app1
+
+Já veremos uma página padrão criada pelo controller padrão e seu template.
+Como podemos ver que arquivos são os responsáveis por isso? São muitos, mas os principais são
+src/Controller/PagesController.php
+src/Template/home.ctp
+
+Este aplicativo não tem um banco de dados, usa apenas página estática.
+
+
+Convenções do CakePHP 3
+
+Sempre que for encontrando oportunidade irei abordando as convenções necessárias e importantes, mas caso queira se antecipar veja a respectiva seção ou o site oficial:
+http://book.cakephp.org/3.0/en/intro/conventions.html 
+
+

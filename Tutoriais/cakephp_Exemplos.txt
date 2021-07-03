@@ -1,0 +1,1307 @@
+Exemplos Práticos com o CakePHP 3
+https://www.tutorialspoint.com/cakephp/index.htm
+
+== Exemplo 1 - Routing
+
+config/routes.php
+
+<?php
+   use Cake\Core\Plugin;
+   use Cake\Routing\RouteBuilder;
+   use Cake\Routing\Router;
+
+   Router::defaultRouteClass('DashedRoute');
+   Router::scope('/', function (RouteBuilder $routes) {
+      $routes->connect('/', ['controller' => 'Tests', 'action' => 'index']);
+      $routes->connect('/pages/*', ['controller' => 'Pages', 'action' => 'display']);
+      $routes->fallbacks('DashedRoute');
+   });
+   Plugin::routes();
+
+src/Controller/TestsController.php
+
+<?php
+   namespace App\Controller;
+   use App\Controller\AppController;
+
+   class TestsController extends AppController{
+      public function index(){
+      }
+   }
+?>
+
+src/Template/Tests/index.ctp
+
+This is CakePHP tutorial and this is an example of connecting routes.
+
+http:/localhost/exemplos
+
+Passando argumentos
+
+Adicionar a linha ao routes.php:
+$routes->connect('tests/:arg1/:arg2', ['controller' => 'Tests', 'action' =>'index'],['pass' => ['arg1', 'arg2']]);
+
+Visite:
+
+http:/localhost/exemplos/tests/value1/value2
+
+
+== Exemplo 2 - Passando argumentos
+
+config/routes.php
+
+<?php
+   use Cake\Core\Plugin;
+   use Cake\Routing\RouteBuilder;
+   use Cake\Routing\Router;
+
+   Router::defaultRouteClass('DashedRoute');
+   Router::scope('/', function (RouteBuilder $routes) {
+      $routes->connect('tests/:arg1/:arg2', ['controller' => 'Tests', 'action'=>'index'],['pass' =>['arg1', 'arg2']]);
+      
+      $routes->connect('/pages/*', ['controller' => 'Pages', 'action' => 'display']);
+      $routes->fallbacks('DashedRoute');
+   });
+
+   Plugin::routes();
+
+src/Controller/TestsController.php
+
+<?php
+   namespace App\Controller;
+   use App\Controller\AppController;
+
+   class TestsController extends AppController{
+      public function index($arg1,$arg2){
+         $this->set('argument1',$arg1);
+         $this->set('argument2',$arg2);
+      }
+   }
+?>
+
+src/Template/Tests/index.ctp
+
+This is CakePHP tutorial and this is an example of Passed arguments.<br />
+Argument-1: <?=$argument1?><br />
+Argument-2: <?=$argument2?><br />
+
+Visite
+http:/localhost/exemplos/tests/Ribamar/Sousa
+
+
+== Exemplo 3 - Gerando URLs
+config/routes.php
+
+<?php
+   use Cake\Core\Plugin;
+   use Cake\Routing\RouteBuilder;
+   use Cake\Routing\Router;
+
+   Router::defaultRouteClass('DashedRoute');
+   Router::scope('/', function (RouteBuilder $routes){
+      $routes->connect('/generate',['controller'=>'Generates','action'=>'index']);
+   });
+
+   Plugin::routes();
+
+src/Controller/GeneratesController.php
+
+<?php
+   namespace App\Controller;
+   use App\Controller\AppController;
+   use Cake\ORM\TableRegistry;
+   use Cake\Datasource\ConnectionManager;
+
+   class GeneratesController extends AppController{
+      public function index(){
+      }
+   }
+?>
+
+src/Template/Generates/index.ctp
+
+This is CakePHP tutorial and this is an example of Generating URLs.
+
+Visite
+http://localhost/exemplos/generate
+
+
+== Exemplo 4 - redirect Routing
+
+config/routes.php
+
+<?php
+   use Cake\Core\Plugin;
+   use Cake\Routing\RouteBuilder;
+   use Cake\Routing\Router;
+
+   Router::defaultRouteClass('DashedRoute');
+   Router::scope('/', function (RouteBuilder $routes) {
+      $routes->connect('/generate2', ['controller' => 'Tests', 'action' => 'index']);
+      $routes->redirect('/generate1','http://tutorialspoint.com/');
+      $routes->connect('/generate_url',['controller'=>'Generates','action'=>'index']);
+      $routes->fallbacks('DashedRoute');
+   });
+   Plugin::routes();
+
+Visite:
+
+URL 1 — http://localhost/exemplos/generate_url
+URL 2 — http://localhost/exemplos/generate1
+URL 3 — http://localhost/exemplos/generate2
+
+
+== Exemplo 5 - Controllers
+
+src/Controller/AppController.php
+
+<?php
+   namespace App\Controller;
+   use Cake\Controller\Controller;
+   use Cake\Event\Event;
+
+   class AppController extends Controller{
+      public function initialize(){
+         parent::initialize();
+         $this->loadComponent('RequestHandler');
+         $this->loadComponent('Flash');
+      }
+      public function beforeRender(Event $event){
+         if (!array_key_exists('_serialize', $this->viewVars) &&
+            in_array($this->response->type(), ['application/json', 'application/xml'])) {
+            $this->set('_serialize', true);
+         }
+      }
+   }
+
+config/routes.php
+
+<?php
+   use Cake\Core\Plugin;
+   use Cake\Routing\RouteBuilder;
+   use Cake\Routing\Router;
+
+   Router::defaultRouteClass('DashedRoute');
+   Router::scope('/', function (RouteBuilder $routes) {
+      $routes->connect('/redirect-controller',['
+         controller'=>'Redirects','action'=>'action1']);
+      
+      $routes->connect('/redirectcontroller2',['
+         controller'=>'Redirects','action'=>'action2']);
+      
+      $routes->fallbacks('DashedRoute');
+   });
+   Plugin::routes();
+
+src/Controller/RedirectsController.php
+
+<?php
+   namespace App\Controller;
+   use App\Controller\AppController;
+   use Cake\ORM\TableRegistry;
+   use Cake\Datasource\ConnectionManager;
+
+   class RedirectsController extends AppController{
+      public function action1(){
+      }
+      public function action2(){
+         echo "redirecting from action2";
+         $this->setAction('action1');
+      }
+   }
+?>
+
+src/Template/Redirects/action1.ctp
+
+This is an example of how to redirect within controller.
+
+Visite
+http://localhost/exemplos/redirect-controller
+
+http://localhost/exemplos/redirect-controller2
+
+
+== Exemplo 6 - Views
+
+config/routes.php
+
+<?php
+   use Cake\Core\Plugin;
+   use Cake\Routing\RouteBuilder;
+   use Cake\Routing\Router;
+
+   Router::defaultRouteClass('DashedRoute');
+   Router::scope('/', function (RouteBuilder $routes) {
+      $routes->connect('template',['controller'=>'Products','action'=>'view']);
+      $routes->fallbacks('DashedRoute');
+   });
+   Plugin::routes();
+
+src/Controller/ProductsController.php
+
+<?php
+   namespace App\Controller;
+   use App\Controller\AppController;
+   
+   class ProductsController extends AppController{
+      public function view(){
+         $this->set('Product_Name','XYZ');
+      }
+   }
+?>
+
+src/Template/Products/view.ctp
+
+Value of variable is: <?php echo $Product_Name; ?>
+
+Visite
+
+http://localhost/exemplos/template
+
+
+== Exemplo 7 - Extendendo Views
+
+config/routes.php
+
+<?php
+   use Cake\Core\Plugin;
+   use Cake\Routing\RouteBuilder;
+   use Cake\Routing\Router;
+
+   Router::defaultRouteClass('DashedRoute');
+   Router::scope('/', function (RouteBuilder $routes) {
+      $routes->connect('extend',['controller'=>'Extends','action'=>'index']);
+      $routes->fallbacks('DashedRoute');
+   });
+   Plugin::routes();
+
+src/Controller/ExtendsController.php
+
+<?php
+   namespace App\Controller;
+   use App\Controller\AppController;
+
+   class ExtendsController extends AppController{
+      public function index(){
+      }
+   }
+?>
+
+src/Template/Extends/header.ctp
+
+<div align = "center"><h1>Common Header</h1></div>
+<?= $this->fetch('content') ?>
+
+src/Template/Extends/index.ctp
+
+<?php $this->extend('header'); ?>
+This is an example of extending view.
+
+Visite
+http://localhost/exemplos/extend
+
+
+== Exemplo 8 - Element
+
+src/Template/Element/helloworld.ctp
+
+<p>Hello World</p>
+
+src/Template/Elems/index.ctp
+
+Element Example: <?php echo $this->element('helloworld'); ?>
+
+config/routes.php
+
+<?php
+   use Cake\Core\Plugin;
+   use Cake\Routing\RouteBuilder;
+   use Cake\Routing\Router;
+
+   Router::defaultRouteClass('DashedRoute');
+   Router::scope('/', function (RouteBuilder $routes) {
+      $routes->connect('/element',['controller'=>'Elems','action'=>'index']);
+      $routes->fallbacks('DashedRoute');
+   });
+   Plugin::routes();
+
+src/Controller/ElemsController.php
+
+<?php
+   namespace App\Controller;
+   use App\Controller\AppController; 
+   use Cake\ORM\TableRegistry;
+   use Cake\Datasource\ConnectionManager;
+
+   class ElemsController extends AppController{
+      public function index(){
+      }
+   }
+?>
+
+Visite
+http://localhost/exemplos/element-example
+
+
+Operações com Registros
+
+CREATE TABLE `users` (
+   `id` int(11) NOT NULL AUTO_INCREMENT,
+   `username` varchar(50) NOT NULL,
+   `password` varchar(255) NOT NULL,
+   PRIMARY KEY (`id`)
+) 
+ENGINE = InnoDB AUTO_INCREMENT = 7 DEFAULT CHARSET = latin1
+
+
+== Exemplo 9 - Inserir um registros
+
+config/routes.php
+
+<?php
+   use Cake\Core\Plugin;
+   use Cake\Routing\RouteBuilder;
+   use Cake\Routing\Router;
+
+   Router::defaultRouteClass('DashedRoute');
+   Router::scope('/', function (RouteBuilder $routes) {
+      $routes->connect('/users/add', ['controller' => 'Users', 'action' => 'add']);
+      $routes->fallbacks('DashedRoute');
+   });
+   Plugin::routes();
+
+src/controller/UsersController.php
+
+<?php
+   namespace App\Controller;
+   use App\Controller\AppController;
+   use Cake\ORM\TableRegistry;
+   use Cake\Datasource\ConnectionManager;
+   use Cake\Auth\DefaultPasswordHasher;
+
+   class UsersController extends AppController{
+
+      public function add(){
+         if($this->request->is('post')){
+            $username = $this->request->data('username');
+            $hashPswdObj = new DefaultPasswordHasher;
+            $password = $hashPswdObj->hash($this->request->data('password'));
+            $users_table = TableRegistry::get('users');
+            $users = $users_table->newEntity();
+            $users->username = $username;
+            $users->password = $password;
+         
+            if($users_table->save($users))
+            echo "User is added.";
+         }
+      }
+   }
+?>
+
+src/Template/Users/add.ctp
+
+<?php
+   echo $this->Form->create("Users",array('url'=>'/users/add'));
+   echo $this->Form->input('username');
+   echo $this->Form->input('password');
+   echo $this->Form->button('Submit');
+   echo $this->Form->end();
+?>
+
+Visite
+http://localhost/exemplos/users/add
+
+
+== Exemplo 10 - Visualizar registro
+
+Para visualizar um registro antes precisamos registrar o objeto TableRegistry.
+
+config/routes.php
+
+<?php
+   use Cake\Core\Plugin;
+   use Cake\Routing\RouteBuilder;
+   use Cake\Routing\Router;
+
+   Router::defaultRouteClass('DashedRoute');
+   Router::scope('/', function (RouteBuilder $routes) {
+      $routes->connect('/users', ['controller' => 'Users', 'action' => 'index']);
+      $routes->fallbacks('DashedRoute');
+   });
+   Plugin::routes();
+
+src/controller/UsersController.php
+
+<?php
+   namespace App\Controller;
+   use App\Controller\AppController;
+   use Cake\ORM\TableRegistry;
+   use Cake\Datasource\ConnectionManager;
+
+   class UsersController extends AppController{
+
+      public function index(){
+         $users = TableRegistry::get('users');
+         $query = $users->find();
+         $this->set('results',$query);
+      }
+   }
+?>
+
+src/Template/Users/index.ctp
+
+<a href = "Users/add">Add User</a>
+<table>
+   <tr>
+      <td>ID</td>
+      <td>Username</td>
+      <td>Password</td>
+      <td>Edit</td>
+      <td>Delete</td>
+   </tr>
+
+   <?php
+      foreach ($results as $row):
+         echo "<tr><td>".$row->id."</td>";
+         echo "<td>".$row->username."</td>";
+         echo "<td>".$row->password."</td>";
+         echo "<td><a href = '".$this->Url->build
+         (["controller" => "Users","action"=>"edit",$row->id])."'>Edit</a></td>";
+         
+         echo "<td><a href = '".$this->Url->build
+         (["controller" => "Users","action"=> "delete",$row->id])."'>Delete</a></td></tr>";
+      endforeach;
+   ?>
+</table>
+
+Visite
+http://localhost/exemplos/users
+
+== Exemplo 11 - Atualizar registro
+
+Para atualizar um registro antes precisamos registrar o objeto TableRegistry.
+
+config/routes.php
+
+<?php
+   use Cake\Core\Plugin;
+   use Cake\Routing\RouteBuilder;
+   use Cake\Routing\Router;
+   
+   Router::defaultRouteClass('DashedRoute');
+   Router::scope('/', function (RouteBuilder $routes) {
+      $routes->connect('/users/edit', ['controller' => 'Users', 'action' => 'edit']);
+      $routes->fallbacks('DashedRoute');
+   });
+   Plugin::routes();
+
+src/controller/UsersController.php
+
+<?php
+   namespace App\Controller;
+   use App\Controller\AppController;
+   use Cake\ORM\TableRegistry;
+   use Cake\Datasource\ConnectionManager;
+
+   class UsersController extends AppController{
+      public function index(){
+         $users = TableRegistry::get('users');
+         $query = $users->find();
+         $this->set('results',$query);
+      }
+      public function edit($id){
+         if($this->request->is('post')){
+            $username = $this->request->data('username');
+            $password = $this->request->data('password');
+            $users_table = TableRegistry::get('users');
+            $users = $users_table->get($id);
+            $users->username = $username;
+            $users->password = $password;
+         
+            if($users_table->save($users))
+            echo "User is udpated";
+            $this->setAction('index');
+         } else {
+            $users_table = TableRegistry::get('users')->find();
+            $users = $users_table->where(['id'=>$id])->first();
+            $this->set('username',$users->username);
+            $this->set('password',$users->password);
+            $this->set('id',$id);
+         }
+      }
+   }
+?>
+
+src/Template/Users/index.ctp
+
+<a href = "Users/add">Add User</a>
+<table>
+   <tr>
+      <td>ID</td>
+      <td>Username</td>
+      <td>Password</td>
+      <td>Edit</td>
+      <td>Delete</td>
+   </tr>
+   
+   <?php
+      foreach ($results as $row):
+         echo "<tr><td>".$row->id."</td>";
+         echo "<td>".$row->username."</td>";
+         echo "<td>".$row->password."</td>";
+         echo "<td><a href = '".$this->Url->build
+            (["controller" => "Users","action" => "edit",$row->id]).
+            "'>Edit</a></td>";
+         echo "<td><a href = '".$this->Url->build
+            (["controller" => "Users","action" => "delete",$row->id]).
+            "'>Delete</a></td></tr>";
+      endforeach;
+   ?>
+</table>
+
+src/Template/Users/edit.ctp
+
+<?php
+   echo $this->Form->create("Users",array('url'=>'/users/edit/'.$id));
+   echo $this->Form->input('username',['value'=>$username]);
+   echo $this->Form->input('password',['value'=>$password]);
+   echo $this->Form->button('Submit');
+   echo $this->Form->end();
+?>
+
+Visite
+http://localhost/exemplos/users
+
+== Exemplo 12 - Excluir um registro
+
+Para excluir um registro antes precisamos registrar o objeto TableRegistry.
+
+config/routes.php
+
+<?php
+   use Cake\Core\Plugin;
+   use Cake\Routing\RouteBuilder;
+   use Cake\Routing\Router;
+
+   Router::defaultRouteClass('DashedRoute');
+   Router::scope('/', function (RouteBuilder $routes) {
+      $routes->connect('/users/delete', ['controller' => 'Users', 'action' => 'delete']);
+      $routes->fallbacks('DashedRoute');
+   });
+   Plugin::routes();
+
+src/controller/UsersController.php
+
+<?php
+   namespace App\Controller;
+   use App\Controller\AppController;
+   use Cake\ORM\TableRegistry;
+   use Cake\Datasource\ConnectionManager;
+   
+   class UsersController extends AppController{
+      public function index(){
+         $users = TableRegistry::get('users');
+         $query = $users->find();
+         $this->set('results',$query);
+      }
+      public function delete($id){
+         $users_table = TableRegistry::get('users');
+         $users = $users_table->get($id);
+         $users_table->delete($users);
+         echo "User deleted successfully.";
+         $this->setAction('index');
+      }
+   }
+?>
+
+src/Template/Users/index.ctp
+
+<a href = "Users/add">Add User</a>
+<table>
+   <tr>
+      <td>ID</td>
+      <td>Username</td>
+      <td>Password</td>
+      <td>Edit</td>
+      <td>Delete</td>
+   </tr>
+
+   <?php
+      foreach ($results as $row):
+         echo "<tr><td>".$row->id."</td>";
+         echo "<td>".$row->username."</td>";
+         echo "<td>".$row->password."</td>";
+         echo "<td><a href='".$this->Url->build(["controller" => "Users","action" => "edit",$row->id])."'>Edit</a></td>";
+         
+         echo "<td><a href='".$this->Url->build(["controller" => "Users","action" -> "delete",$row->id])."'>Delete</a></td></tr>";
+      endforeach;
+   ?>
+</table>
+
+Visite
+http://localhost/exemplos/users
+
+== Exemplo 13 - Serviços - FormAuthentication
+
+config/routes.php
+
+<?php
+   use Cake\Core\Plugin;
+   use Cake\Routing\RouteBuilder;
+   use Cake\Routing\Router;
+
+   Router::defaultRouteClass('DashedRoute');
+   Router::scope('/', function (RouteBuilder $routes) {
+      $routes->connect('/auth',['controller'=>'Authexs','action'=>'index']);
+      $routes->connect('/login',['controller'=>'Authexs','action'=>'login']);
+      $routes->connect('/logout',['controller'=>'Authexs','action'=>'logout']);
+      $routes->fallbacks('DashedRoute');
+   });
+   Plugin::routes();
+
+src/Controller/AppController.php
+
+<?php
+   namespace App\Controller;
+   use Cake\Controller\Controller;
+   use Cake\Event\Event;
+   use Cake\Controller\Component\AuthComponent;
+
+   class AppController extends Controller{
+      public function initialize(){
+         parent::initialize();
+         
+         $this->loadComponent('RequestHandler');
+         $this->loadComponent('Flash');
+         $this->loadComponent('Auth', [
+            'authenticate' => [
+               'Form' => [
+                  'fields' => ['username' => 'username', 'password' => 'password']
+               ]
+            ],
+            'loginAction' => ['controller' => 'Authexs', 'action' => 'login'],
+            'loginRedirect' => ['controller' => 'Authexs', 'action' => 'index'],
+            'logoutRedirect' => ['controller' => 'Authexs', 'action' => 'login']
+         ]);
+      
+         $this->Auth->config('authenticate', [
+            AuthComponent::ALL => ['userModel' => 'users'], 'Form']);
+      }
+   
+      public function beforeRender(Event $event){
+         if (!array_key_exists('_serialize', $this=>viewVars) &&
+         in_array($this->response=>type(), ['application/json', 'application/xml'])) {
+            $this->set('_serialize', true);
+         }
+      }
+   }
+
+src/Controller/AuthexsController.php
+
+<?php
+   namespace App\Controller;
+   use App\Controller\AppController;
+   use Cake\ORM\TableRegistry;
+   use Cake\Datasource\ConnectionManager;
+   use Cake\Event\Event;
+   use Cake\Auth\DefaultPasswordHasher;
+
+   class AuthexsController extends AppController{
+      var $components = array('Auth');
+      public function index(){
+      }
+      public function login(){
+         if($this->request->is('post')){
+            $user = $this->Auth->identify();
+            
+            if($user){
+               $this->Auth->setUser($user);
+               return $this->redirect($this->Auth->redirectUrl());
+            } else
+            $this->Flash->error('Your username or password is incorrect.');
+         }
+      }
+      public function logout(){
+         return $this->redirect($this->Auth->logout());
+      }
+   }
+?>
+
+src/Template/Authexs/login.ctp
+
+<?php
+   echo $this->Form->create();
+   echo $this->Form->input('username');
+   echo $this->Form->input('password');
+   echo $this->Form->button('Submit');
+   echo $this->Form->end();
+?>
+
+src/Template/Authexs/logout.ctp
+
+You are successfully loggedout.
+
+src/Template/Authexs/index.ctp
+
+You are successfully logged in. 
+<?php echo 
+   $this->Html->link('logout',["controller" => "Authexs","action" => "logout"]); 
+?>
+
+Visite
+http://localhost/exemplos/auth
+
+
+== Exemplo 14 - Errors and Exception Handling
+
+config/routes.php
+
+<?php
+   use Cake\Core\Plugin;
+   use Cake\Routing\RouteBuilder;
+   use Cake\Routing\Router;
+
+   Router::defaultRouteClass('DashedRoute');
+   Router::scope('/', function (RouteBuilder $routes) {
+      $routes->connect('/exception/:arg1/:arg2',[
+         'controller'=>'Exps','action'=>'index'],['pass' => ['arg1', 'arg2']]);
+      $routes->fallbacks('DashedRoute');
+   });
+   Plugin::routes();
+
+src/Controller/ExpsController.php
+
+<?php
+   namespace App\Controller;
+   use App\Controller\AppController;
+   use Cake\Core\Exception\Exception;
+
+   class ExpsController extends AppController{
+      public function index($arg1,$arg2){
+         try{
+            $this->set('argument1',$arg1);
+            $this->set('argument2',$arg2);
+            
+            if(($arg1 < 1 || $arg1 > 10) || ($arg2 < 1 || $arg2 > 10))
+            throw new Exception("One of the number is out of range[1-10].");
+         }catch(\Exception $ex){
+            echo $ex->getMessage();
+         }
+      }
+   }
+?>
+
+src/Template/Exps/index.ctp
+
+This is CakePHP tutorial and this is an example of Passed arguments.
+Argument-1: <?=$argument1?>
+Argument-2: <?=$argument2?>
+
+Visite
+http://localhost/exemplos/exception/5/0
+
+
+== Exemplo 15 - Logging
+
+config/routes.php
+
+<?php
+   use Cake\Core\Plugin;
+   use Cake\Routing\RouteBuilder;
+   use Cake\Routing\Router;
+
+   Router::defaultRouteClass('DashedRoute');
+   Router::scope('/', function (RouteBuilder $routes) {
+      $routes->connect('logex',['controller'=>'Logexs','action'=>'index']);
+      $routes->fallbacks('DashedRoute');
+   });
+   Plugin::routes();
+
+src/Controller/LogexController.php
+
+<?php
+   namespace App\Controller;
+   use App\Controller\AppController;
+   use Cake\Log\Log;
+
+   class LogexsController extends AppController{
+      public function index(){
+         /*The first way to write to log file.*/
+         Log::write('debug',"Something didn't work.");
+         
+         /*The second way to write to log file.*/
+         $this->log("Something didn't work.",'debug');
+      }
+   }
+?>
+
+src/Template/Logexs/index.ctp
+
+Something is written in log file. Check log file logs\debug.log
+
+Visite
+http://localhost/exemplos/logex
+
+
+== Exemplo 16 - Manupulação de Forms
+
+config/routes.php
+
+<?php
+   use Cake\Core\Plugin;
+   use Cake\Routing\RouteBuilder;
+   use Cake\Routing\Router;
+
+   Router::defaultRouteClass('DashedRoute');
+   Router::scope('/', function (RouteBuilder $routes) {
+      $routes->connect('register',['controller'=>'Registrations','action'=>'index']);
+      $routes->fallbacks('DashedRoute');
+   });
+   Plugin::routes();
+
+src/Controller/RegistrationsController.php
+
+<?php
+   namespace App\Controller;
+   use App\Controller\AppController;
+
+   class RegistrationsController extends AppController{
+      public function index(){
+         $country = array('India','United State of America','United Kingdom');
+         $this->set('country',$country);
+         $gender = array('Male','Female');
+         $this->set('gender',$gender);
+      }
+   }
+?>
+
+src/Template/Registrations/index.ctp
+
+<?php
+   echo $this->Form->create("Registrations",array('url'=>'/register'));
+   echo $this->Form->input('username');
+   echo $this->Form->input('password');
+   echo $this->Form->input('password');
+   echo '<label for="country">Country</label>';
+   echo $this->Form->select('country',$country);
+   echo '<label for="gender">Gender</label>';
+   echo $this->Form->radio('gender',$gender);
+   echo '<label for="address">Address</label>';
+   echo $this->Form->textarea('address');
+   echo $this->Form->file('profilepic');
+   echo '<div>'.$this->Form->checkbox('terms').
+      '<label for="country">Terms &Conditions</label></div>';
+   echo $this->Form->button('Submit');
+   echo $this->Form->end();
+?>
+
+Visite
+http://localhost/exemplos/register
+
+
+== Exemplo 17 - E-mail
+
+config/routes.php
+
+<?php
+   use Cake\Core\Plugin;
+   use Cake\Routing\RouteBuilder;
+   use Cake\Routing\Router;
+
+   Router::defaultRouteClass('DashedRoute');
+   Router::scope('/', function (RouteBuilder $routes) {
+      $routes->connect('/email',['controller'=>'Emails','action'=>'index']);
+      $routes->fallbacks('DashedRoute');
+   });
+   Plugin::routes();
+
+src/Controller/EmailsController.php
+
+<?php
+   namespace App\Controller;
+   use App\Controller\AppController;
+   use Cake\Mailer\Email;
+
+   class EmailsController extends AppController{
+      public function index(){
+         $email = new Email('default');
+         $email->to('abc@gmail.com')->subject('About')->send('My message');
+      }
+   }
+?>
+
+config/app.php
+
+'Emailtransport' => [
+	'default' => [
+		'className' => 'Mail',
+		// as seguintes chaves são usadas no SMTP
+		'host' => 'localhost',
+		'port' => 25,
+		'timeout' => 30,
+		'username' => 'users',
+		'password' => 'senha',
+		'client' => null,
+		'tls' => null,
+		'url' => env('EMAIL_TRANSPORT_DEFAULT_URL', null),
+	],
+	'gmail' => [
+		'host' => 'ssl://smtp.gmail.com',
+		'port' => 465,
+		'username' => 'GMAIL USERNAME',
+		'password' => 'APP PASSWORD',
+		'className' => 'Smtp'
+	],
+],
+
+Visite
+http://localhost/exemplos/email
+
+== Exemplo 18 - Session
+
+config/routes.php
+
+<?php
+   use Cake\Core\Plugin;
+   use Cake\Routing\RouteBuilder;
+   use Cake\Routing\Router;
+
+   Router::defaultRouteClass('DashedRoute');
+   Router::scope('/', function (RouteBuilder $routes) {
+      $routes->connect('/sessionobject',
+         ['controller'=>'Sessions','action'=>'index']);
+      $routes->connect('/sessionread',
+         ['controller'=>'Sessions','action'=>'retrieve_session_data']);
+      $routes->connect('/sessionwrite',
+         ['controller'=>'Sessions','action'=>'write_session_data']);
+      $routes->connect('/sessioncheck',
+         ['controller'=>'Sessions','action'=>'check_session_data']);
+      $routes->connect('/sessiondelete',
+         ['controller'=>'Sessions','action'=>'delete_session_data']);
+      $routes->connect('/sessiondestroy',
+         ['controller'=>'Sessions','action'=>'destroy_session_data']);
+      $routes->fallbacks('DashedRoute');
+   });
+   Plugin::routes();
+
+src/Controller/SessionsController.php
+
+<?php
+   namespace App\Controller;
+   use App\Controller\AppController;
+
+   class SessionsController extends AppController{
+      public function retrieveSessionData(){
+         //create session object
+         $session = $this->request->session();
+      
+         //read data from session
+         $name = $session->read('name');
+         $this->set('name',$name);
+      }
+      public function writeSessionData(){
+         //create session object
+         $session = $this->request->session();
+         
+         //write data in session
+         $session->write('name','Virat Gandhi');
+      }
+      public function checkSessionData(){
+         //create session object
+         $session = $this->request->session();
+      
+         //check session data
+         $name = $session->check('name');
+         $address = $session->check('address');
+         $this->set('name',$name);
+         $this->set('address',$address);
+      }
+      public function deleteSessionData(){
+         //create session object
+         $session = $this->request->session();
+         
+         //delete session data
+         $session->delete('name');
+      }
+      public function destroySessionData(){
+         //create session object
+         $session = $this->request->session();
+         
+         //destroy session
+         $session->destroy();
+      }
+   }
+?>
+
+src/Template/Sessions/write_session_data.ctp
+
+The data has been written in session.
+
+src/Template/Sessions/retrieve_session_data.ctp
+
+Here is the data from session.
+Name: <?=$name;?>
+
+src/Template/Sessions/check_session_data.ctp
+
+<?php if($name): ?>
+name exists in the session.
+
+<?php else: ?>
+name doesn't exist in the database
+
+<?php endif;?>
+<?php if($address): ?>
+address exists in the session.
+
+<?php else: ?>
+address doesn't exist in the database
+
+<?php endif;?>
+
+src/Template/Sessions/delete_session_data.ctp
+
+Data deleted from session.
+
+src/Template/Sessions/destroy_session_data.ctp
+
+Session Destroyed.
+
+Visite
+http://localhost/exemplos/session-write
+
+http://localhost/exemplos/session-read
+
+http://localhost/exemplos/sessioncheck
+
+http://localhost/exemplos/sessiondelete
+
+http://localhost/exemplos/sessiondestroy
+
+
+== Exemplo 19 - Cookies
+
+config/routes.php
+
+<?php
+   use Cake\Core\Plugin;
+   use Cake\Routing\RouteBuilder;
+   use Cake\Routing\Router;
+
+   Router::defaultRouteClass('DashedRoute');
+   Router::scope('/', function (RouteBuilder $routes) {
+      $routes->connect('cookie/write',['controller'=>'Cookies','action'=>'write_cookie']);
+      $routes->connect('cookie/read',['controller'=>'Cookies','action'=>'read_cookie']);
+      $routes->connect('cookie/check',['controller'=>'Cookies','action'=>'check_cookie']);
+      $routes->connect('cookie/delete',['controller'=>'Cookies','action'=>'delete_cookie']);
+      $routes->fallbacks('DashedRoute');
+   });
+   Plugin::routes();
+
+src/Controller/Cookies/CookiesController.php
+
+<?php
+   namespace App\Controller;
+   use App\Controller\AppController;
+   use Cake\Controller\Component\CookieComponent;
+
+   class CookiesController extends AppController{
+      public $components = array('Cookie');
+   
+      public function writeCookie(){
+         $this->Cookie->write('name', 'Virat');
+      }
+      public function readCookie(){
+         $cookie_val = $this->Cookie->read('name');
+         $this->set('cookie_val',$cookie_val);
+      }
+      public function checkCookie(){
+         $isPresent = $this->Cookie->check('name');
+         $this->set('isPresent',$isPresent);
+      } 
+      public function deleteCookie(){
+         $this->Cookie->delete('name');
+      }
+   }
+?>
+
+src/Template/Cookie/write_cookie.ctp
+
+The cookie has been written.
+
+src/Template/Cookie/read_cookie.ctp
+
+The value of the cookie is: <?php echo $cookie_val; ?> 
+
+src/Template/Cookie/check_cookie.ctp
+
+<?php
+   if($isPresent):
+?>
+The cookie is present.
+
+<?php
+   else:
+?>
+The cookie isn't present.
+
+<?php
+   endif;
+?>
+
+src/Template/Cookie/delete_cookie.ctp
+
+The cookie has been deleted.
+
+Visite
+http://localhost/exemplos/cookie/write
+http://localhost/exemplos/cookie/read
+http://localhost/exemplos/cookie/check
+http://localhost/exemplos/cookie/delete
+
+
+== Exemplo 20 - Segurança
+O CakePHP tem alguns recursos que melhoram a segurança do aplicativo.
+
+config/routes.php
+
+<?php
+   use Cake\Core\Plugin;
+   use Cake\Routing\RouteBuilder;
+   use Cake\Routing\Router;
+
+   Router::defaultRouteClass('DashedRoute');
+   Router::scope('/', function (RouteBuilder $routes) {
+      $routes->connect('login',['controller'=>'Logins','action'=>'index']);
+      $routes->fallbacks('DashedRoute'); 
+   });
+   Plugin::routes();
+
+src/Controller/LoginsController.php
+
+<?php
+   namespace App\Controller;
+   use App\Controller\AppController;
+
+   class LoginsController extends AppController{
+      public function initialize(){
+         parent::initialize();
+         $this->loadComponent('Security');
+      }
+      public function index(){
+      }
+   }
+?>
+
+src/Template/Logins/index.ctp
+
+<?php
+   echo $this->Form->create("Logins",array('url'=>'/login'));
+   echo $this->Form->input('username');
+   echo $this->Form->input('password');
+   echo $this->Form->button('Submit');
+   echo $this->Form->end();
+?>
+
+Visite
+http://localhost/exemplos/login
+
+=============
+Resumo 0 do CakePHP
+
+Geralmente controller são usados para gerenciar a lólica de um único model.
+
+Controllers são classes que estendem a classe AppController. AppController deve conter métodos que são compartilhados entre todos os controllers de sua aplicação.
+
+Os controllers fornecem uma série de métodos que lidam com requisições. Estes são chamados de actions.
+
+Components - são a melhor alternativa sobre código usado por muitos controllers.
+
+Os controllers e componentes contam com um método initilize() que é invocado ao final do cconstrutor do controller.
+
+Qualquer trecho de código ou componente:
+- No AppController fica acessível por todos os controllers.
+- Num certo controller fica acessível somente para este
+
+Redirecionamento para outras páginas
+
+controller/action
+$this->redirect(['controller' => 'Clientes', 'action' => 'index'])
+
+URL
+$this->redirect('http://ribafs.org')
+
+Action do controller atual
+$this->redirect(['action' => 'edit', $id]);
+ou
+$this->setAction('index')
+
+Para o próprio link de onde veio
+$this->redirect($this->referer());
+
+== Carregar model que não é o default
+
+$this->LoadModel('Clientes');
+
+== Componente Flash
+Uma forma eficiente de enviar mensagens do controller para as views
+$this->Flash->msg
+
+msg =
+success
+greatSuccess
+set
+error
+warning
+
+== Layout - contém código de apresentação da view. Tudo que vemos nas views está num layout.
+Estão em src/Template/Layout
+
+O cake já vem com um layout padrão, que é o default.ctp.
+
+Como setar outro layout no controller:
+
+	public function initialize()
+	{
+		$this-viewBuilder()-setLayout('admin');
+	}
+
+== Element - são pedaços de código de apresentação reutilizáveis para as views
+
+Como chamar um element (declarar onde deseja que apareça):
+echo $this->element('nome_element');
+
+== Acesso a Banco de Dados
+
+O trabalho com bancos de dados no Cake é feito com dois objetos Tables (lida com coleções da dados, tabela, por exemplo) e Entities (lida com apenas um registro).
+
+Para trabalhar com Tabelas num controller
+
+Carregar o objeto Table
+use Cake\ORM\TableRegistry;
+
+Carregar o respectivo objeto
+$clientes = TableRegistry::get('Clientes');
+
+Agora pode trabalhar com seu conteúdo.
+
+== Acesso a Bancos de Dados
+
+use Cake\Datasource\ConnectionManager;
+
+$dsn = 'mysql://root:password@localhost/my_database';
+ConnectionManager::config('default', ['url' => $dsn]);
+$conn = ConnectionManager::get('default');
+
+$results = $conn->execute('SELECT * FROM articles')->fetchall('assoc');
+
+Também podemos usar query builder.
+
+== Usando transações
+
+$conn->begin();
+$conn->execute('UPDATE articles SET published = ? WHERE id = ?', [true, 2]);
+$conn->execute('UPDATE articles SET published = ? WHERE id = ?', [false, 2]);
+$conn->commit();
+
+

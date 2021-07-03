@@ -1,0 +1,27 @@
+Components, Helpers and Behaviors
+
+Um plugin pode ter Components, Helpers e Behaviors, como uma aplicação CakePHP normal. Você pode até criar plugins que consistem apenas em Componentes, Helpers ou Behaviors que podem ser uma ótima maneira de construir componentes reutilizáveis que pode ser lançado em qualquer projeto.
+
+Construir esses componentes é exatamente o mesmo que construí-lo dentro de uma aplicacao normal, sem convenção de nome especial.
+
+Referir-se ao seu componente de dentro ou fora do seu plugin requer apenas que você prefixa o nome do plugin antes do nome do componente. Por exemplo:
+
+// Component definido no 'ContactManager' plugin
+namespace ContactManager\Controller\Component;
+
+use Cake\Controller\Component;
+
+class ExampleComponent extends Component
+{
+}
+
+// Dentro de seus controllers
+public function initialize()
+{
+    parent::initialize();
+    $this->loadComponent('ContactManager.Example');
+}
+
+A mesma técnica se aplica aos Helpers e Behaviors.
+
+

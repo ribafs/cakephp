@@ -1,0 +1,10 @@
+Dicas Forms
+Mudando largura de campos
+echo $this->Form->input['Busca',['type'=>'text','maxlength'=>'8','style'=>'width:50px; height:20px;']];
+
+Pegar tamanho de um campo em tabela
+
+SELECT character_maximum_length as len FROM information_schema.columns
+WHERE table_name = 'contas' and column_name='grupo' ORDER BY ordinal_position;
+
+

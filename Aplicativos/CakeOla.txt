@@ -1,0 +1,75 @@
+Instalação e Teste de Aplicativo Mínimo no CakePHP 3.1.6
+
+Criar a estrutura básica do aplicativo (de dentro do diretório web)
+
+cd /backup/www/cake
+composer create-project --prefer-dist cakephp/app ola
+
+Obs.: dessa forma, com o composer, é mais prático para a criação da estrutura básica.
+Ainda mais prático que fazendo o download manual e descompactando no diretório web.
+
+Chamar pelo navegador
+http://localhost/cake/ola
+
+== Classes customizadas:
+
+Controller
+Ola
+
+src/Controller/OlaController.php:
+
+    $routes->connect('/', ['controller' => 'Ola', 'action' => 'index']);
+
+<?php
+namespace App\Controller;
+use App\Controller\AppController;
+
+class OlaController extends AppController
+{
+    public function index()
+    {
+
+    }
+}
+
+View
+Template/OlaController/index.ctp:
+
+<h1>Olá Mundo do Cake</h1>
+
+== Configurações
+config/routes.php	Ajustar o controller inicial para:
+
+    $routes->connect('/', ['controller' => 'OlasController', 'action' => 'index']);
+Este action diz que quando o usuário chamar o aplicativo pelo raiz o action index do OlasController será chamado.
+
+config/app.php
+
+Customizando as views
+
+Mudando o CSS
+Edite o base.css ou cake.css em webroot/css inserindo no início:
+
+#menu-box{
+width:150px;
+float:left;
+border-right:1px solid #CCCCCC;
+}
+#content-box{
+margin-left:10px;
+width:700px;
+float:left;
+border:1px solid #CCCCCC;
+padding:10px;
+background-color:#F3F3F3;
+}
+
+Na view troque as classes pelo nosso id, assim:
+<div id="menu-box">
+    <ul class="side-nav">
+        <li class="heading"><?= __('Actions') ?></li>
+        <li><?= $this->Html->link(__('New Cliente'), ['action' => 'add']) ?></li>
+        <li><?= $this->Html->link(__('List Pedidos'), ['controller' => 'Pedidos', 'action' => 'index']) ?></li>
+        <li><?= $this->Html->link(__('New Pedido'), ['controller' => 'Pedidos', 'action' => 'add']) ?></li>
+    </ul>
+</div>

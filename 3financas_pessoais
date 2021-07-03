@@ -1,0 +1,207 @@
+Criar um Aplicativo com o CakePHP 3.x
+Para gerenciamento de finanças pessoais.
+Apenas com duas tabelas: despesas e receitas
+
+Importante: este código customizado funciona apenas no CakePHP 3.6 ou superior
+
+- Criar o aplicativo
+
+cd /var/www/html
+composer create-project --prefer-dist cakephp/app financas
+
+- Criar o banco de dados
+
+Usaremos como SGBD o MySQL
+
+Criar o banco financas contendo:
+
+CREATE TABLE `despesas` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `descricao` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `valor` int(11) DEFAULT NULL,
+  `mes` char(8) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `created` date DEFAULT NULL,
+  `modified` date DEFAULT NULL,
+  `receita_id` int(11) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+INSERT INTO `despesas` (`id`, `descricao`, `valor`, `mes`, `created`, `modified`, `receita_id`) VALUES
+(1,	'Mercantil',	500,	'05/2017',	'2017-05-11',	'2017-05-15',	1),
+(2,	'Condomínio',	100,	'05/2017',	'2017-05-11',	'2017-05-15',	1),
+(3,	'Teste',	300,	'06/2017',	'2017-05-11',	'2017-05-11',	2);
+
+CREATE TABLE `receitas` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `descricao` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `mes` char(7) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `valor` int(11) DEFAULT NULL,
+  `created` date DEFAULT NULL,
+  `modified` date DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+INSERT INTO `receitas` (`id`, `descricao`, `mes`, `valor`, `created`, `modified`) VALUES
+(1,	'Salário',	'05/2017',	3000,	'2017-05-11',	'2017-05-15'),
+(2,	'Extra',	'05/2017',	100,	'2017-05-11',	'2017-05-15');
+
+Observe acima que o mês é tipo texto para que seja inserido algo com mes/ano
+
+- Configurar o banco de dados em 
+
+cd /var/www/html/financas
+config/app.php 
+e o 
+config/routes.php para Despesas/index
+
+- Gerar o código dos dois CRUDs com o Bake
+
+cd /var/www/html/financas
+
+bin/cake bake all despesas
+
+bin/cake bake all receitas
+
+Veja pelo navegador
+
+http://localhost/financas
+
+Já temos um CRUD básico para as despesas e para as receitas
+
+Mas o importante de um aplicativo deste tipo são o código personalidado, chamado de lógica de negócio, que é por exemplo somar todas as despesas de um mês e subtrair as receitas do mês do total de despesas. Isso o CakePHP não faz e precisamos fazer. Também precisamos criar código nos tempaltes adicionando um formulário
+
+
+== Agora a parte interessante
+
+O código do negócio
+
+Observe que o mês tem um formato próprio, texto sendo dia/ano (dd/aaaa).
+
+
+== Vamos criar uma função em DespesasTable.php, que retorne a soma das despesas do mês:
+
+Adicionar ao início:
+
+use Cake\Datasource\ConnectionManager;
+
+Criar
+
+    public function despesasMes($mes){
+        $connection = ConnectionManager::get('default');
+        $results = $connection->execute("SELECT sum(valor) FROM despesas WHERE mes = '$mes'")->fetchAll();
+        return $results[0][0];
+    }
+
+
+== Criar uma função no DespesasController.php, que retorne o resultado da função acima:
+
+Adicionar ao DespesasController
+
+use Cake\ORM\TableRegistry;
+
+    public function despesasMes()
+    {
+        $mes = $this->request->getData('mes');
+        $despesas = TableRegistry::get('Despesas');
+        $despesa = $despesas->despesasMes($mes);
+        $this->set('despesa',$despesa);
+    }
+
+
+== Agora criaremos uma função no ReceitasTable.php, que retorne a soma das receitas do mês:
+
+Adicionar ao início:
+
+use Cake\Datasource\ConnectionManager;
+
+Criar
+
+    public function receitaMes($mes){
+        $connection = ConnectionManager::get('default');
+        $results = $connection->execute("SELECT sum(valor) FROM receitas WHERE mes = '$mes'")->fetchAll();
+        return $results[0][0];
+    }
+
+Veja que existe grande semelhança entre esta e a das despesas.
+
+
+== Vamos trabalhar com dois models com o mesmo controller. Para isso vamos usar a função LoadModel(). Criaremos outra função no DespesasController.php
+Vamos criar uma função que retorne o saldo do mês entre receitas e despesas
+
+    public function saldoMes()
+    {
+            $mes = $this->request->getData('mes');
+            $this->LoadModel('Receitas');
+
+            $receitas = $this->Receitas->receitaMes($mes);
+            $despesas = TableRegistry::get('Despesas');
+
+            $despesas = $despesas->despesasMes($mes);
+            $saldo = $receitas - $despesas;
+
+            $this->set('saldo',$saldo);
+    }
+
+
+== Vamos customizar a src/Template/Despesas e criar duas views novas:
+
+src/Template/Despesas/despesas_mes.ctp:
+
+<div align="center"><h3><?= $despesa ?></h3></div>
+<br>
+<br>
+<br>
+<li><?= $this->Html->link(__('Voltar'), ['action' => 'index']) ?></li>
+
+
+src/Template/Despesas/saldo_mes.ctp:
+
+<div align="center"><h3><?= $saldo ?></h3></div>
+<br>
+<br>
+<li><?= $this->Html->link(__('Voltar'), ['action' => 'index']) ?></li>
+
+
+Agora vejamos a customização do index.ctp
+
+Logo abaixo da linha:
+
+<li><?= $this->Html->link(__('New Receita'), ['controller' => 'Receitas', 'action' => 'add']) ?></li>
+
+Adicione os dois pequenos forms:
+
+<b>Despesas de um mês</b>
+<?php
+    echo $this->Form->create("Despesas",array('url'=>'/despesas/despesas_mes'));
+    echo $this->Form->input('mes');
+    echo $this->Form->button('Submit');
+    echo $this->Form->end();
+?>
+<b>Saldo de um mês</b>
+<?php
+    echo $this->Form->create("Saldo",array('url'=>'/despesas/saldo_mes'));
+    echo $this->Form->input('mes');
+    echo $this->Form->button('Submit');
+    echo $this->Form->end();
+?>
+
+Depois de pronto podemos efetuar as operações através dos pequenos forms.
+- O form chama o action do controller
+- O controller chama o model para que devolva o resultado de uma função
+- Recebendo o resultado o controller devolve para a view/template respectiva
+
+
+== Testando
+
+Agora acesse pela web
+
+http://localhost/financas
+
+Pesquise o total das despesas do mês de 05/2017 ou outro que você tenha cadastrado.
+
+Pesquise qual o saldo de um mês
+
+Isso dá para começar a mexer no código e ir em frente.
+
+A seguir criaremos um aplicativo Controle de Estoque simplificado mas já com alguns bons recursos de programação no CakePHP
+

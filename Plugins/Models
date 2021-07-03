@@ -1,0 +1,34 @@
+Plugin Models
+
+Os models para o plugin são armazenados em plugins/ContactManager/src/Model. Nós já definimos um ContactsController para este plugin, então vamos criar a tabela e a entidade para esse controlador:
+
+// plugins/ContactManager/src/Model/Entity/Contact.php:
+namespace ContactManager\Model\Entity;
+
+use Cake\ORM\Entity;
+
+class Contact extends Entity
+{
+}
+
+// plugins/ContactManager/src/Model/Table/ContactsTable.php:
+namespace ContactManager\Model\Table;
+
+use Cake\ORM\Table;
+
+class ContactsTable extends Table
+{
+}
+
+
+Você pode usar TableRegistry para carregar suas tabelas de plugins usando o familiar sintaxe plugin:
+
+use Cake\ORM\TableRegistry;
+
+$contacts = TableRegistry::get('ContactManager.Contacts');
+
+Alternativamente, a partir de um contexto de controller, você pode usar:
+
+$this->loadModel('ContactsMangager.Contacts');
+
+

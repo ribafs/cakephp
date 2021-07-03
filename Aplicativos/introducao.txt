@@ -1,0 +1,88 @@
+CakePHP3 Treinamento
+
+Introdução
+
+Nosso principal objetivo aqui é o de criar aplicativos de forma simples e prática e também que eles tenham um bom controle de acesso, permitindo apenas aos usuários determinados acessar determinadas partes do aplicativo.
+
+Iremos fazer isso por etapas, de forma organizada.
+
+Usaremos principalmente o Framework CakePHP em sua versão 3. O CakePHP é um framework bem popular entre os demais existentes e ajuda muito na criação de aplicativos. Ele conta com muitos e bons recursos e usa a linguagem PHP, um servidor Web como o Apache ou outros e um SGBD como o MySQL ou outros. Também usa orientação a objetos e alguns padrões de projeto especialmente o MVC e o ORM. O foco do CakePHP é nas convenções. Você segue as convenções que ele determina e ele facilita sua vida.
+
+Pré-requisitos
+
+De conhecimentos
+Desejáveis – conhecimento da linguagem PHP, de orientação a objetos e de padrões de projeto.
+
+Obrigatório – boa motivação e vontade de aprender.
+
+De Hardware
+Praticamente qualquer computador que esteja funcionando pode ser usado para nosso treinamento.
+
+De Software
+Praticamente qualquer sistema operacional pode ser utilizado.
+Precisamos basicamente do Apache, PHP e MySQL mais alguns módulos/extensões.
+
+Servidor
+
+O servidor precisa ter Apache, PHP e MySQL no mínimo. Eu prefiro criar este servidor em meu computador desktop, no Linux (preferido) ou no Windows, mas podem ser usados outros SOs.
+
+Podemos usar um servidor online daqueles que já vem com editor e todo o ambiente para programação, como é o caso do Cloud9 (http://c9.io). Este exige conhecimento sobre a linha de comando do Linux, mas mostrarei um guia em seguida. Caso queira experimentar, ele oferece um plano free:
+https://c9.io/signup
+
+Podemos usar o Xampp (http://xampp.sf.net), o Wampp, o EasyPHP ou outro no Windows.
+No Linux prefiro usar os pacotes da distribuição.
+
+Para começar você precisa já ter um ambiente pronto e configurado com Apache, PHP e MySQL e extensões. Caso não tenha e não saiba como fazer provavelmente este treinamento não é para você Ainda, a não ser que seja daqueles corajosos que tenham uma grande motivação para aprender e queira experimentar. Se for seu caso, procure um tutorial de como instalar o Xampp no Windows ou outro.
+
+Pré-requisitos para Instalar o CakePHP 3.2.9
+
+- Apache2 ou outro servidor web
+- PHP 5.5.9 ou superior
+- Módulos do Apache: mod_rewrite
+- Extensões: mcrypt, php5-mcrypt, intl, mbstring
+
+
+Instalação do Ambiente
+
+Use o Xampp no Windows e os pacotes no Linux.
+
+
+Instalação do CakePHP pelo Composer
+
+No Linux
+curl -sS https://getcomposer.org/installer | php
+
+sudo mv composer.phar /usr/local/bin/composer
+
+sudo nano /usr/local/bin/comp
+
+Adicionar a linha:
+composer create-project --prefer-dist cakephp/app $1
+
+Execute
+sudo chmod +x /usr/local/bin/comp
+
+Criando o aplicativo:
+cd /var/www/html/treinamento
+comp app1
+
+Acessando
+http://localhost/treinamento/app1
+
+
+No Windows
+Download - https://getcomposer.org/Composer-Setup.exe
+Instale
+
+Veja detalhes sobre como adicionar o php ao path.
+
+Criar o arquivo bat comp.bat na pasta c:\xampp\htdocs, contendo a linha:
+
+composer create-project --prefer-dist cakephp/app %1
+Criando o Aplicativo
+Abrir o prompt
+cd c:\xampp\htdocs\treinamento
+comp app1
+
+Acessando
+http://localhost/treinamento/app1

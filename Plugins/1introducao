@@ -1,0 +1,18 @@
+No CakePHP 3 o plugin é a forma mais adequada de reutilizar código e compartilhar com a comunidade nossos melhores recursos para o Cake.
+
+Basicamente um plugin pode conter um apliicativo a ser usado dentro do Cake como um mini ou sub aplicativo.
+
+Ele pode conter
+Controllers
+Models
+Views/Templates
+
+E dentro destes:
+Componentes, Helpers, Behaviors, etc
+
+Então é um super recurso do Cake.
+
+Empacotamos nosso código, hospedamos no GitHub gratuitamente e publicamos no Packagist para que possa ser usado por nós e por toda a comunidade com grande facilidade.
+Depois podemos atualizar via git ou no próprio GitHub com os ótimos recursos do mesmo.
+
+

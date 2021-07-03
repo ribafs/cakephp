@@ -1,0 +1,70 @@
+
+Dependencies
+
+This repository contains a set of helpers that will help you combine CakePHP and Bootstrap. These helpers do not require any dependencies except the two obvious ones:
+
+    CakePHP 3.x The helpers have been developped since CakePHP 3 beta, and will be kept up to date with the current CakePHP developpment.
+    Bootstrap The helpers currently work with Bootstrap 3, but will be updated soon to work with Bootstrap 4.
+
+Installation
+
+    Composer
+    Manual
+
+Since v3, CakePHP uses composer, the easiest way to set up the Bootstrap helpers is by either running:
+
+composer require holt59/cakephp3-bootstrap-helpers:dev-master
+
+or adding the following to your composer.json and run composer update:
+
+"require": {
+    "holt59/cakephp3-bootstrap-helpers": "dev-master"
+}
+
+Do not forget to load the plugin by adding the following line into your /config/bootstrap.php file:
+
+Plugin::load('Bootstrap');
+
+Using the helpers
+
+Once the plugin is loaded, you need to enable them:
+
+// In your AppController class for instance:
+public $helpers = [
+    'Form' => [
+        'className' => 'Bootstrap.Form'
+    ],
+    'Html' => [
+        'className' => 'Bootstrap.Html'
+    ],
+    'Modal' => [
+        'className' => 'Bootstrap.Modal'
+    ],
+    'Navbar' => [
+        'className' => 'Bootstrap.Navbar'
+    ],
+    'Paginator' => [
+        'className' => 'Bootstrap.Paginator'
+    ],
+    'Panel' => [
+        'className' => 'Bootstrap.Panel'
+    ]
+];
+
+If you are using a version prior to 3.1.2, add the Bootstrap prefix to the class, e.g.:
+
+public $helpers = [
+    'Form' => [
+        'className' => 'Bootstrap.BootstrapForm'
+    ]
+];
+
+You should be careful when mixing the Bootstrap helpers with other helpers, see the FAQ. Do not forget to add the bootstrap style and script files to your view (e.g. in Layout/default.ctp):
+
+echo $this->Html->css('https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css');
+echo $this->Html->script([
+    'https://code.jquery.com/jquery-1.12.4.min.js',
+    'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js'
+]);
+
+See CakePHP documentation for more information on how to enable helpers in your controllers (especially if you want to use the default CakePHP helpers together with these helpers).
